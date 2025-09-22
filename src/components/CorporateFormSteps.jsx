@@ -53,7 +53,7 @@ const CorporateFormSteps = ({ onComplete }) => {
     },
     {
       id: 'premium',
-      name: 'Premium Executive',
+      name: 'Premier Executive',
       price: '$5,000',
       period: '/year',
       features: [
@@ -72,7 +72,7 @@ const CorporateFormSteps = ({ onComplete }) => {
       price: '$10,000',
       period: '/year',
       features: [
-        'Everything in Premium',
+        'Everything in Premier',
         'Exclusive chairman events',
         'Private jet networking trips',
         'Investment opportunities',
@@ -174,21 +174,21 @@ const CorporateFormSteps = ({ onComplete }) => {
           <div key={step.number} className="flex items-center">
             <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
               currentStep >= step.number 
-                ? 'bg-purple-600 border-purple-600 text-white' 
+                ? 'bg-amber-500 border-amber-500 text-black font-medium' 
                 : 'border-gray-600 text-gray-400'
             }`}>
               <span className="text-sm font-semibold">{step.number}</span>
             </div>
             <div className="ml-3 hidden sm:block">
               <p className={`text-sm font-medium ${
-                currentStep >= step.number ? 'text-purple-400' : 'text-gray-400'
+                currentStep >= step.number ? 'text-amber-400' : 'text-gray-400'
               }`}>
                 {step.title}
               </p>
             </div>
             {index < steps.length - 1 && (
-              <div className={`w-8 sm:w-16 h-0.5 mx-4 ${
-                currentStep > step.number ? 'bg-purple-600' : 'bg-gray-600'
+              <div className={`w-8 sm:w-16 h-0.5 mx-4 transition-colors duration-300 ${
+                currentStep > step.number ? 'bg-amber-500' : 'bg-gray-600'
               }`} />
             )}
           </div>
@@ -208,7 +208,7 @@ const CorporateFormSteps = ({ onComplete }) => {
             type="text"
             value={formData.firstName}
             onChange={(e) => updateFormData('firstName', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${
+            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
               errors.firstName ? 'border-red-500' : 'border-gray-600'
             }`}
             placeholder="Enter your first name"
@@ -223,7 +223,7 @@ const CorporateFormSteps = ({ onComplete }) => {
             type="text"
             value={formData.lastName}
             onChange={(e) => updateFormData('lastName', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${
+            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
               errors.lastName ? 'border-red-500' : 'border-gray-600'
             }`}
             placeholder="Enter your last name"
@@ -240,7 +240,7 @@ const CorporateFormSteps = ({ onComplete }) => {
           type="email"
           value={formData.email}
           onChange={(e) => updateFormData('email', e.target.value)}
-          className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${
+          className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
             errors.email ? 'border-red-500' : 'border-gray-600'
           }`}
           placeholder="Enter your email address"
@@ -257,7 +257,7 @@ const CorporateFormSteps = ({ onComplete }) => {
             type="tel"
             value={formData.phone}
             onChange={(e) => updateFormData('phone', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${
+            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
               errors.phone ? 'border-red-500' : 'border-gray-600'
             }`}
             placeholder="(555) 123-4567"
@@ -272,7 +272,7 @@ const CorporateFormSteps = ({ onComplete }) => {
             type="text"
             value={formData.jobTitle}
             onChange={(e) => updateFormData('jobTitle', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${
+            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
               errors.jobTitle ? 'border-red-500' : 'border-gray-600'
             }`}
             placeholder="CEO, CTO, VP, etc."
@@ -289,7 +289,7 @@ const CorporateFormSteps = ({ onComplete }) => {
           type="text"
           value={formData.company}
           onChange={(e) => updateFormData('company', e.target.value)}
-          className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${
+          className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
             errors.company ? 'border-red-500' : 'border-gray-600'
           }`}
           placeholder="Enter your company name"
@@ -305,7 +305,7 @@ const CorporateFormSteps = ({ onComplete }) => {
           type="url"
           value={formData.linkedIn}
           onChange={(e) => updateFormData('linkedIn', e.target.value)}
-          className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+          className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
           placeholder="https://linkedin.com/in/yourprofile"
         />
       </div>
@@ -322,7 +322,7 @@ const CorporateFormSteps = ({ onComplete }) => {
           type="text"
           value={formData.street}
           onChange={(e) => updateFormData('street', e.target.value)}
-          className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${
+          className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
             errors.street ? 'border-red-500' : 'border-gray-600'
           }`}
           placeholder="123 Executive Boulevard"
@@ -339,7 +339,7 @@ const CorporateFormSteps = ({ onComplete }) => {
             type="text"
             value={formData.city}
             onChange={(e) => updateFormData('city', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${
+            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
               errors.city ? 'border-red-500' : 'border-gray-600'
             }`}
             placeholder="New York"
@@ -354,7 +354,7 @@ const CorporateFormSteps = ({ onComplete }) => {
             type="text"
             value={formData.state}
             onChange={(e) => updateFormData('state', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${
+            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
               errors.state ? 'border-red-500' : 'border-gray-600'
             }`}
             placeholder="NY"
@@ -372,7 +372,7 @@ const CorporateFormSteps = ({ onComplete }) => {
             type="text"
             value={formData.zipCode}
             onChange={(e) => updateFormData('zipCode', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${
+            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
               errors.zipCode ? 'border-red-500' : 'border-gray-600'
             }`}
             placeholder="10001"
@@ -386,7 +386,7 @@ const CorporateFormSteps = ({ onComplete }) => {
           <select
             value={formData.country}
             onChange={(e) => updateFormData('country', e.target.value)}
-            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+            className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
           >
             <option value="United States">United States</option>
             <option value="Canada">Canada</option>
@@ -415,13 +415,13 @@ const CorporateFormSteps = ({ onComplete }) => {
             onClick={() => updateFormData('selectedPlan', plan.id)}
             className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all duration-300 hover:scale-105 ${
               formData.selectedPlan === plan.id
-                ? 'border-purple-500 bg-purple-900/20'
+                ? 'border-amber-500 bg-amber-900/20'
                 : 'border-gray-600 bg-gray-800/50 hover:border-gray-500'
             }`}
           >
             {plan.popular && (
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <span className="bg-gradient-to-r from-purple-500 to-purple-700 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                <span className="bg-gradient-to-r from-amber-500 to-amber-600 text-black text-xs font-semibold px-3 py-1 rounded-full">
                   Most Popular
                 </span>
               </div>
@@ -429,7 +429,7 @@ const CorporateFormSteps = ({ onComplete }) => {
             
             <div className="text-center mb-4">
               <h4 className="text-lg font-semibold text-white mb-2">{plan.name}</h4>
-              <div className="text-3xl font-bold text-purple-400 mb-1">
+              <div className="text-3xl font-bold text-amber-400 mb-1">
                 {plan.price}
                 <span className="text-sm text-gray-400 font-normal">{plan.period}</span>
               </div>
@@ -438,7 +438,7 @@ const CorporateFormSteps = ({ onComplete }) => {
             <ul className="space-y-3 mb-6">
               {plan.features.map((feature, index) => (
                 <li key={index} className="flex items-start text-sm text-gray-300">
-                  <svg className="w-4 h-4 text-purple-500 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-4 h-4 text-amber-500 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                   {feature}
@@ -449,11 +449,11 @@ const CorporateFormSteps = ({ onComplete }) => {
             <div className="text-center">
               <div className={`w-4 h-4 rounded-full border-2 mx-auto ${
                 formData.selectedPlan === plan.id
-                  ? 'bg-purple-500 border-purple-500'
+                  ? 'bg-amber-500 border-amber-500'
                   : 'border-gray-400'
               }`}>
                 {formData.selectedPlan === plan.id && (
-                  <div className="w-full h-full rounded-full bg-white transform scale-50"></div>
+                  <div className="w-full h-full rounded-full bg-black transform scale-50"></div>
                 )}
               </div>
             </div>
@@ -480,16 +480,16 @@ const CorporateFormSteps = ({ onComplete }) => {
               />
               <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-colors ${
                 formData.interests?.includes(interest)
-                  ? 'bg-purple-900/30 border-purple-500 text-purple-300'
-                  : 'bg-gray-800 border-gray-600 text-gray-300 hover:border-gray-500'
+                  ? 'bg-amber-900/30 border-amber-500 text-amber-300'
+                  : 'bg-gray-800/50 border-gray-600 text-gray-300 hover:border-gray-500'
               }`}>
                 <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
                   formData.interests?.includes(interest)
-                    ? 'bg-purple-500 border-purple-500'
+                    ? 'bg-amber-500 border-amber-500'
                     : 'border-gray-400'
                 }`}>
                   {formData.interests?.includes(interest) && (
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   )}
@@ -508,7 +508,7 @@ const CorporateFormSteps = ({ onComplete }) => {
         <select
           value={formData.referralSource}
           onChange={(e) => updateFormData('referralSource', e.target.value)}
-          className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+          className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
         >
           <option value="">Select an option</option>
           <option value="colleague">Colleague Referral</option>
@@ -589,24 +589,24 @@ const CorporateFormSteps = ({ onComplete }) => {
               <span className="mr-2">💎</span> Membership Plan
             </h4>
             {selectedPlan && (
-              <div className="border border-purple-500 rounded-lg p-4 bg-purple-900/20">
+              <div className="border border-amber-500 rounded-lg p-4 bg-amber-900/20">
                 <div className="flex justify-between items-start mb-3">
                   <h5 className="text-lg font-semibold text-white">{selectedPlan.name}</h5>
-                  <div className="text-purple-400 font-bold">
+                  <div className="text-amber-400 font-bold">
                     {selectedPlan.price}<span className="text-sm text-gray-400">{selectedPlan.period}</span>
                   </div>
                 </div>
                 <ul className="space-y-1 text-sm text-gray-300">
                   {selectedPlan.features.slice(0, 3).map((feature, index) => (
                     <li key={index} className="flex items-center">
-                      <svg className="w-4 h-4 text-purple-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-4 h-4 text-amber-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                       {feature}
                     </li>
                   ))}
                   {selectedPlan.features.length > 3 && (
-                    <li className="text-purple-400 text-xs">
+                    <li className="text-amber-400 text-xs">
                       +{selectedPlan.features.length - 3} more features
                     </li>
                   )}
@@ -619,7 +619,7 @@ const CorporateFormSteps = ({ onComplete }) => {
                 <span className="text-gray-400 text-sm">Selected Interests:</span>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.interests.map((interest) => (
-                    <span key={interest} className="px-2 py-1 bg-purple-900/30 text-purple-300 text-xs rounded">
+                    <span key={interest} className="px-2 py-1 bg-amber-900/30 text-amber-300 text-xs rounded">
                       {interest}
                     </span>
                   ))}
@@ -636,8 +636,8 @@ const CorporateFormSteps = ({ onComplete }) => {
           </div>
         </div>
 
-        <div className="bg-purple-900/20 border border-purple-500/50 rounded-lg p-4">
-          <p className="text-purple-300 text-sm">
+        <div className="bg-amber-900/20 border border-amber-500/50 rounded-lg p-4">
+          <p className="text-amber-300 text-sm">
             <strong>Next Steps:</strong> After submitting your application, our membership committee will review your details within 24-48 hours. You'll receive an email confirmation and may be contacted for a brief introductory call.
           </p>
         </div>
@@ -692,7 +692,7 @@ const CorporateFormSteps = ({ onComplete }) => {
           {currentStep < steps.length ? (
             <button
               onClick={nextStep}
-              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300 transform hover:scale-105 shadow-lg"
+              className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-black font-medium rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
               Next Step
             </button>

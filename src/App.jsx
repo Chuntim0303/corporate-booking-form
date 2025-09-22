@@ -1,281 +1,792 @@
-import React, { useState } from 'react';
-import HomePage from './components/HomePage';
+import React, { useState, useId } from 'react';
+import { 
+  User, 
+  Mail, 
+  Phone, 
+  Building, 
+  MapPin, 
+  CreditCard, 
+  ArrowRight, 
+  ArrowLeft,
+  CheckCircle,
+  AlertCircle,
+  Users,
+  Calendar,
+  Trophy,
+  Sparkles,
+  Crown,
+  Star,
+  Check,
+  Loader2,
+  X
+} from 'lucide-react';
 import CorporateFormSteps from './components/CorporateFormSteps';
 
+// Enhanced Input Component for Modal
+const EnhancedInput = ({ 
+  label, 
+  name, 
+  type = 'text', 
+  placeholder, 
+  value, 
+  onChange, 
+  error, 
+  icon: Icon, 
+  required = false,
+  disabled = false,
+  helpText,
+  maxLength
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const id = useId();
+
+  return (
+    <div className="space-y-3">
+      <label htmlFor={id} className="block text-sm font-medium text-gray-200 tracking-wide">
+        {label} {required && <span className="text-amber-400">*</span>}
+      </label>
+      
+      <div className={`relative transition-all duration-300 ${
+        isFocused ? 'transform scale-[1.01]' : ''
+      }`}>
+        {Icon && (
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+            <Icon className={`h-5 w-5 transition-colors duration-200 ${
+              error ? 'text-red-400' : isFocused ? 'text-amber-400' : 'text-gray-400'
+            }`} />
+          </div>
+        )}
+        
+        <input
+          id={id}
+          name={name}
+          type={type}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          required={required}
+          disabled={disabled}
+          maxLength={maxLength}
+          className={`block w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-4 bg-gray-800/50 backdrop-blur-sm border-0 border-b-2 text-white placeholder-gray-400 focus:outline-none transition-all duration-300 font-light tracking-wide ${
+            error 
+              ? 'border-red-500 bg-red-900/10' 
+              : isFocused
+              ? 'border-amber-400 bg-gray-700/50'
+              : 'border-gray-600 hover:border-gray-500'
+          } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        />
+        
+        {isFocused && !error && (
+          <div className="absolute inset-0 rounded-lg border border-amber-400/30 pointer-events-none"></div>
+        )}
+      </div>
+      
+      {helpText && !error && (
+        <p className="text-xs text-gray-400 tracking-wide">{helpText}</p>
+      )}
+      
+      {error && (
+        <div className="flex items-center gap-2 text-sm text-red-400">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <span className="font-light">{error}</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Enhanced Select Component for Modal
+const EnhancedSelect = ({
+  label,
+  name,
+  placeholder,
+  value,
+  onChange,
+  error,
+  icon: Icon,
+  required = false,
+  disabled = false,
+  options = []
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const id = useId();
+
+  return (
+    <div className="space-y-3">
+      <label htmlFor={id} className="block text-sm font-medium text-gray-200 tracking-wide">
+        {label} {required && <span className="text-amber-400">*</span>}
+      </label>
+      
+      <div className={`relative transition-all duration-300 ${
+        isFocused ? 'transform scale-[1.01]' : ''
+      }`}>
+        {Icon && (
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+            <Icon className={`h-5 w-5 transition-colors duration-200 ${
+              error ? 'text-red-400' : isFocused ? 'text-amber-400' : 'text-gray-400'
+            }`} />
+          </div>
+        )}
+        
+        <select
+          id={id}
+          name={name}
+          value={value}
+          onChange={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          required={required}
+          disabled={disabled}
+          className={`block w-full ${Icon ? 'pl-12' : 'pl-4'} pr-12 py-4 bg-gray-800/50 backdrop-blur-sm border-0 border-b-2 text-white focus:outline-none appearance-none transition-all duration-300 font-light tracking-wide ${
+            error 
+              ? 'border-red-500 bg-red-900/10' 
+              : isFocused
+              ? 'border-amber-400 bg-gray-700/50'
+              : 'border-gray-600 hover:border-gray-500'
+          } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          <option value="" className="bg-gray-800 text-gray-400">{placeholder}</option>
+          {options.map((option) => (
+            <option key={option.value} value={option.value} className="bg-gray-800 text-white">
+              {option.label}
+            </option>
+          ))}
+        </select>
+        
+        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        
+        {isFocused && !error && (
+          <div className="absolute inset-0 rounded-lg border border-amber-400/30 pointer-events-none"></div>
+        )}
+      </div>
+      
+      {error && (
+        <div className="flex items-center gap-2 text-sm text-red-400">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <span className="font-light">{error}</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Main App Component
 function App() {
-  const [currentView, setCurrentView] = useState('home'); // 'home' or 'form'
   const [showModal, setShowModal] = useState(false);
+  const [showMembershipForm, setShowMembershipForm] = useState(false);
 
-  const navigateToForm = () => {
-    setCurrentView('form');
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
+
+  const handleJoinNetwork = () => {
+    setShowMembershipForm(true);
   };
 
-  const navigateToHome = () => {
-    setCurrentView('home');
+  const handleFormComplete = () => {
+    setShowMembershipForm(false);
   };
 
-  const openModal = () => {
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
+  const handleBackToHome = () => {
+    setShowMembershipForm(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
       {/* Header */}
-      <header className="bg-gray-900/90 backdrop-blur-sm border-b border-gray-800 sticky top-0 z-50">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="bg-black/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
+        <nav className="max-w-7xl mx-auto px-8 py-6">
           <div className="flex items-center justify-between">
-            <div 
-              className="flex items-center space-x-2 cursor-pointer"
-              onClick={navigateToHome}
-            >
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+            <div className="cursor-pointer group" onClick={handleBackToHome}>
+              <div className="flex items-center space-x-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300">
+                  <Crown className="w-6 h-6 text-black" />
+                </div>
+                <span className="text-2xl font-light text-white tracking-[0.2em]" style={{fontFamily: 'serif'}}>
+                  CONFETTI <span className="text-amber-400">KL</span>
+                </span>
               </div>
-              <span className="text-xl font-bold text-white">NexusConnect</span>
-            </div>
-            
-            {/* Navigation Links */}
-            <div className="hidden md:flex items-center space-x-8">
-              <button 
-                onClick={navigateToHome}
-                className={`text-sm font-medium transition-colors ${
-                  currentView === 'home' ? 'text-purple-400' : 'text-gray-300 hover:text-purple-400'
-                }`}
-              >
-                Home
-              </button>
-              <a href="#about" className="text-sm font-medium text-gray-300 hover:text-purple-400 transition-colors">
-                About
-              </a>
-              <a href="#services" className="text-sm font-medium text-gray-300 hover:text-purple-400 transition-colors">
-                Services
-              </a>
-              <a href="#members" className="text-sm font-medium text-gray-300 hover:text-purple-400 transition-colors">
-                Members
-              </a>
-              <a href="#events" className="text-sm font-medium text-gray-300 hover:text-purple-400 transition-colors">
-                Events
-              </a>
-              <a href="#contact" className="text-sm font-medium text-gray-300 hover:text-purple-400 transition-colors">
-                Contact
-              </a>
             </div>
 
             <button 
               onClick={openModal}
-              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300 transform hover:scale-105 shadow-lg"
+              className="group relative px-8 py-3 bg-gradient-to-r from-amber-400 to-amber-600 text-black font-medium tracking-wider text-sm uppercase overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/25"
             >
-              Request Info
+              <span className="relative z-10">Private Inquiry</span>
+              <div className="absolute inset-0 bg-white transform translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
             </button>
           </div>
         </nav>
       </header>
 
-      {/* Main Content */}
       <main>
-        {currentView === 'home' ? (
-          <HomePage onJoinNetwork={navigateToForm} onRequestInfo={openModal} />
-        ) : (
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="text-center mb-8">
-              <button 
-                onClick={navigateToHome}
-                className="text-purple-400 hover:text-purple-300 mb-4 flex items-center mx-auto transition-colors"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to Home
-              </button>
-              <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Join Our Elite Network
-              </h1>
-              <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                Complete your executive membership application and gain access to our exclusive community of industry leaders.
-              </p>
+        {showMembershipForm ? (
+          <div className="py-20 px-8">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-12">
+                <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-400/10 border border-amber-400/20 backdrop-blur-sm mb-8">
+                  <Crown className="w-5 h-5 text-amber-400" />
+                  <span className="text-amber-400 text-sm font-medium tracking-widest uppercase">Membership Application</span>
+                </div>
+                <h1 className="text-4xl lg:text-6xl font-light text-white mb-8 tracking-wider" style={{fontFamily: 'serif'}}>
+                  Join the 
+                  <span className="block text-amber-400 mt-2">Elite Network</span>
+                </h1>
+                <div className="w-24 h-px bg-amber-400 mx-auto mb-8"></div>
+                <p className="text-xl text-gray-300 max-w-3xl mx-auto font-light leading-relaxed tracking-wide">
+                  Complete your application to become part of the world's most influential business network
+                </p>
+              </div>
+
+              <CorporateFormSteps onComplete={handleFormComplete} />
+
+              <div className="text-center mt-12">
+                <button 
+                  onClick={handleBackToHome}
+                  className="px-8 py-3 border border-gray-600 text-gray-300 font-light tracking-widest text-sm uppercase hover:border-amber-400 hover:text-amber-400 transition-all duration-500"
+                >
+                  Back to Home
+                </button>
+              </div>
             </div>
-            
-            <CorporateFormSteps onComplete={navigateToHome} />
           </div>
+        ) : (
+          <HomePage onJoinNetwork={handleJoinNetwork} onRequestInfo={openModal} />
         )}
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-950 border-t border-gray-800 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="md:col-span-1">
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
+      <footer className="bg-black border-t border-gray-800 mt-32">
+        <div className="max-w-7xl mx-auto px-8 py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+            <div className="lg:col-span-2">
+              <div className="flex items-center space-x-4 mb-8">
+                <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+                  <Crown className="w-6 h-6 text-black" />
                 </div>
-                <span className="text-xl font-bold text-white">NexusConnect</span>
+                <span className="text-2xl font-light text-white tracking-[0.2em]" style={{fontFamily: 'serif'}}>
+                  CONFETTI <span className="text-amber-400">KL</span>
+                </span>
               </div>
-              <p className="text-gray-400 text-sm mb-4">
-                Elevating professional networking to an art form. Creating meaningful connections for executives and industry leaders.
+              <p className="text-gray-400 font-light leading-relaxed tracking-wide max-w-md mb-8">
+                An exclusive network of visionary leaders, industry pioneers, and influential decision-makers shaping the future of business.
               </p>
-              <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <div className="flex space-x-6">
+                <a href="#" className="text-gray-400 hover:text-amber-400 transition-colors">
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                   </svg>
                 </a>
-                <a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <a href="#" className="text-gray-400 hover:text-amber-400 transition-colors">
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                  </svg>
-                </a>
-                <a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.347-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.740-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z"/>
                   </svg>
                 </a>
               </div>
             </div>
             
             <div>
-              <h3 className="text-white font-semibold mb-4">Quick Links</h3>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">Executive Membership</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">Upcoming Events</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">Partnership Opportunities</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">Leadership Summit</a></li>
+              <h3 className="text-white font-medium mb-6 tracking-widest text-sm uppercase">Exclusive Access</h3>
+              <ul className="space-y-4">
+                <li><a href="#" className="text-gray-400 hover:text-amber-400 transition-colors font-light tracking-wide">Executive Membership</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-amber-400 transition-colors font-light tracking-wide">Private Events</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-amber-400 transition-colors font-light tracking-wide">Strategic Partnerships</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-amber-400 transition-colors font-light tracking-wide">Leadership Council</a></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="text-white font-semibold mb-4">Services</h3>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">Executive Coaching</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">Strategic Partnerships</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">Industry Reports</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">Board Advisory</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-white font-semibold mb-4">Contact Us</h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li className="flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  500 Executive Blvd, Suite 200
+              <h3 className="text-white font-medium mb-6 tracking-widest text-sm uppercase">Connect</h3>
+              <ul className="space-y-4 text-gray-400 font-light">
+                <li className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-amber-400" />
+                  <span className="tracking-wide text-sm">Global Headquarters</span>
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                  (555) 123-4567
+                <li className="flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-amber-400" />
+                  <span className="tracking-wide text-sm">+1 (555) 123-4567</span>
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  info@nexusconnect.com
+                <li className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-amber-400" />
+                  <span className="tracking-wide text-sm">connect@confettikl.com</span>
                 </li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 pt-8 mt-8">
-            <p className="text-center text-gray-400 text-sm">
-              &copy; 2025 NexusConnect. All rights reserved.
+          <div className="border-t border-gray-800 pt-8 mt-16">
+            <p className="text-center text-gray-500 text-sm font-light tracking-widest uppercase">
+              © 2025 NexusConnect. All Rights Reserved.
             </p>
           </div>
         </div>
       </footer>
 
-      {/* Modal */}
+      {/* Enhanced Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 w-full max-w-md relative">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-8">
+          <div className="bg-gray-900 border border-gray-700 shadow-2xl w-full max-w-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-amber-600"></div>
+            
             <button 
               onClick={closeModal}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+              className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors z-10"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X className="w-6 h-6" />
             </button>
             
-            <h2 className="text-xl font-bold text-white mb-2">Executive Enquiry</h2>
-            <p className="text-gray-400 mb-6">Complete the form below and our team will contact you within 24 hours.</p>
-            
-            <form className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
-                <input 
-                  type="text" 
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="Enter your full name"
+            <div className="p-12">
+              <div className="text-center mb-10">
+                <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 mx-auto mb-6 flex items-center justify-center">
+                  <Crown className="w-8 h-8 text-black" />
+                </div>
+                <h2 className="text-3xl font-light text-white mb-4 tracking-wider" style={{fontFamily: 'serif'}}>
+                  Executive Consultation
+                </h2>
+                <div className="w-16 h-px bg-amber-400 mx-auto mb-6"></div>
+                <p className="text-gray-300 font-light leading-relaxed tracking-wide">
+                  Request a private consultation with our membership committee to discuss your professional networking objectives.
+                </p>
+              </div>
+              
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <EnhancedInput
+                    label="Full Name"
+                    name="fullName"
+                    placeholder="Your full name"
+                    icon={User}
+                    required
+                  />
+                  <EnhancedInput
+                    label="Email Address"
+                    name="email"
+                    type="email"
+                    placeholder="professional@company.com"
+                    icon={Mail}
+                    required
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <EnhancedInput
+                    label="Company"
+                    name="company"
+                    placeholder="Organization name"
+                    icon={Building}
+                    required
+                  />
+                  <EnhancedInput
+                    label="Position"
+                    name="position"
+                    placeholder="Your title"
+                    icon={Trophy}
+                    required
+                  />
+                </div>
+                
+                <EnhancedSelect
+                  label="Area of Interest"
+                  name="interest"
+                  placeholder="Select primary interest"
+                  icon={Sparkles}
+                  required
+                  options={[
+                    { value: 'executive-membership', label: 'Executive Membership' },
+                    { value: 'strategic-partnerships', label: 'Strategic Partnerships' },
+                    { value: 'private-events', label: 'Private Events' },
+                    { value: 'board-advisory', label: 'Board Advisory' },
+                    { value: 'investment-opportunities', label: 'Investment Opportunities' }
+                  ]}
                 />
+                
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-gray-200 tracking-wide">Message</label>
+                  <textarea 
+                    rows={4}
+                    placeholder="Tell us about your networking objectives and how we can assist you..."
+                    className="w-full px-4 py-4 bg-gray-800/50 backdrop-blur-sm border-0 border-b-2 border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-amber-400 transition-all duration-300 font-light tracking-wide resize-none"
+                  />
+                </div>
+                
+                <button 
+                  className="group relative w-full py-5 bg-gradient-to-r from-amber-400 to-amber-600 text-black font-medium tracking-widest text-sm uppercase overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/25"
+                  onClick={() => {
+                    alert('Thank you for your inquiry. Our executive team will contact you within 24 hours to schedule your private consultation.');
+                    closeModal();
+                  }}
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-3">
+                    <Crown className="w-5 h-5" />
+                    Submit Consultation Request
+                  </span>
+                  <div className="absolute inset-0 bg-white transform translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+                </button>
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
-                <input 
-                  type="email" 
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="Enter your email"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Company</label>
-                <input 
-                  type="text" 
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="Enter your company name"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Interest</label>
-                <select className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-                  <option value="">Select an option</option>
-                  <option value="membership">Executive Membership</option>
-                  <option value="partnership">Partnership Opportunities</option>
-                  <option value="events">Event Registration</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Message</label>
-                <textarea 
-                  rows={3}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="How can we assist you?"
-                ></textarea>
-              </div>
-              
-              <button 
-                type="submit"
-                className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300"
-                onClick={(e) => {
-                  e.preventDefault();
-                  alert('Thank you for your enquiry! Our executive team will contact you within 24 hours.');
-                  closeModal();
-                }}
-              >
-                Submit Enquiry
-              </button>
-            </form>
+            </div>
           </div>
         </div>
       )}
     </div>
   );
 }
+
+// HomePage Component
+const HomePage = ({ onJoinNetwork, onRequestInfo }) => {
+  const features = [
+    {
+      icon: Users,
+      title: 'Elite Network Access',
+      description: 'Connect with C-suite executives, industry titans, and visionary leaders across global markets.',
+    },
+    {
+      icon: Calendar,
+      title: 'Exclusive Events',
+      description: 'Access invitation-only gatherings, private dinners, and strategic forums in world-class venues.',
+    },
+    {
+      icon: Trophy,
+      title: 'Strategic Partnerships',
+      description: 'Forge high-value alliances that drive exponential business growth and market expansion.',
+    },
+  ];
+
+  const testimonials = [
+    {
+      quote: "Confetti KL has transformed how I approach strategic partnerships. The caliber of connections and opportunities is unmatched in the industry.",
+      name: "Victoria Sterling",
+      title: "CEO, Sterling Enterprises",
+    },
+    {
+      quote: "Through Confetti KL, I've accessed investment opportunities and board positions that have redefined my career trajectory completely.",
+      name: "Marcus Chen",
+      title: "Managing Director, Chen Capital",
+    },
+    {
+      quote: "The network's exclusive events provide unparalleled access to decision-makers who are actively shaping tomorrow's business landscape.",
+      name: "Elena Rodriguez",
+      title: "Founder, Rodriguez Ventures",
+    }
+  ];
+
+  return (
+    <div>
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-black/95 via-gray-900/90 to-black/95 z-10"></div>
+          <img 
+            src="https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
+            alt="Executive networking environment" 
+            className="w-full h-full object-cover opacity-30"
+          />
+          
+          {/* Animated particles */}
+          <div className="absolute inset-0 z-5">
+            <div className="absolute top-20 left-10 w-2 h-2 bg-amber-400/40 rounded-full animate-pulse"></div>
+            <div className="absolute top-40 right-20 w-1 h-1 bg-white/30 rounded-full animate-pulse delay-300"></div>
+            <div className="absolute bottom-40 left-20 w-1 h-1 bg-amber-400/40 rounded-full animate-pulse delay-700"></div>
+            <div className="absolute bottom-20 right-10 w-2 h-2 bg-white/20 rounded-full animate-pulse delay-1000"></div>
+          </div>
+        </div>
+
+        <div className="relative z-20 text-center px-8 max-w-6xl mx-auto">
+          <div className="mb-12">
+            <div className="w-px h-20 bg-gradient-to-b from-transparent via-amber-400 to-transparent mx-auto mb-8"></div>
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-400/10 border border-amber-400/20 backdrop-blur-sm mb-8">
+              <Crown className="w-5 h-5 text-amber-400" />
+              <span className="text-amber-400 text-sm font-medium tracking-widest uppercase">Exclusive Membership</span>
+            </div>
+          </div>
+          
+          <h1 className="text-6xl lg:text-8xl font-light text-white mb-16 leading-none tracking-wider" style={{fontFamily: 'serif'}}>
+            ELEVATE YOUR
+            <span className="block text-amber-400 font-normal mt-4">
+              INFLUENCE
+            </span>
+          </h1>
+          
+          <p className="text-xl lg:text-2xl text-gray-300 mb-20 max-w-3xl mx-auto leading-relaxed font-light tracking-wide">
+            Join an exclusive confederation of visionary leaders, industry pioneers, and global decision-makers shaping the future of business.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
+            <button 
+              onClick={onJoinNetwork}
+              className="group relative px-16 py-6 bg-gradient-to-r from-amber-400 to-amber-600 text-black font-medium tracking-widest text-sm uppercase overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-amber-500/25"
+            >
+              <span className="relative z-10 flex items-center gap-3">
+                <Crown className="w-5 h-5" />
+                Apply for Membership
+              </span>
+              <div className="absolute inset-0 bg-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+            </button>
+            <button 
+              onClick={onRequestInfo}
+              className="px-16 py-6 border border-gray-600 text-gray-300 font-light tracking-widest text-sm uppercase hover:border-amber-400 hover:text-amber-400 transition-all duration-500"
+            >
+              Private Consultation
+            </button>
+          </div>
+        </div>
+
+        <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-20">
+          <div className="flex flex-col items-center text-gray-400">
+            <div className="w-px h-24 bg-gradient-to-b from-amber-400/60 via-gray-600 to-transparent animate-pulse"></div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-48 bg-gray-900 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900 to-black opacity-50"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-8">
+          <div className="text-center mb-32">
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-400/10 border border-amber-400/20 backdrop-blur-sm mb-8">
+              <Star className="w-5 h-5 text-amber-400" />
+              <span className="text-amber-400 text-sm font-medium tracking-widest uppercase">Why Choose NexusConnect</span>
+            </div>
+            <h2 className="text-5xl lg:text-6xl font-light text-white mb-12 tracking-wider" style={{fontFamily: 'serif'}}>
+              Power Through
+              <span className="block text-amber-400">Connection</span>
+            </h2>
+            <div className="w-24 h-px bg-amber-400 mx-auto mb-8"></div>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto font-light leading-relaxed tracking-wide">
+              Experience networking elevated beyond convention through our meticulously curated community
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+            {features.map((feature, index) => (
+              <div 
+                key={index}
+                className="group text-center"
+              >
+                <div className="relative mb-12">
+                  <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-600 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                    <feature.icon className="w-10 h-10 text-black" />
+                  </div>
+                  <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
+                </div>
+                <h3 className="text-2xl font-light text-white mb-8 tracking-wide" style={{fontFamily: 'serif'}}>
+                  {feature.title}
+                </h3>
+                <p className="text-gray-400 font-light leading-relaxed tracking-wide">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-32 bg-black">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-16 text-center">
+            <div className="group">
+              <div className="text-5xl font-light text-amber-400 mb-6 tracking-wider group-hover:scale-110 transition-transform duration-300" style={{fontFamily: 'serif'}}>500+</div>
+              <div className="text-gray-400 font-light tracking-widest text-sm uppercase">Global Leaders</div>
+            </div>
+            <div className="group">
+              <div className="text-5xl font-light text-amber-400 mb-6 tracking-wider group-hover:scale-110 transition-transform duration-300" style={{fontFamily: 'serif'}}>50+</div>
+              <div className="text-gray-400 font-light tracking-widest text-sm uppercase">Industry Sectors</div>
+            </div>
+            <div className="group">
+              <div className="text-5xl font-light text-amber-400 mb-6 tracking-wider group-hover:scale-110 transition-transform duration-300" style={{fontFamily: 'serif'}}>200+</div>
+              <div className="text-gray-400 font-light tracking-widest text-sm uppercase">Exclusive Events</div>
+            </div>
+            <div className="group">
+              <div className="text-5xl font-light text-amber-400 mb-6 tracking-wider group-hover:scale-110 transition-transform duration-300" style={{fontFamily: 'serif'}}>$5B+</div>
+              <div className="text-gray-400 font-light tracking-widest text-sm uppercase">Value Created</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-48 bg-gradient-to-b from-black via-gray-900 to-black">
+        <div className="max-w-6xl mx-auto px-8">
+          <div className="text-center mb-32">
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-400/10 border border-amber-400/20 backdrop-blur-sm mb-8">
+              <Users className="w-5 h-5 text-amber-400" />
+              <span className="text-amber-400 text-sm font-medium tracking-widest uppercase">Member Testimonials</span>
+            </div>
+            <h2 className="text-5xl lg:text-6xl font-light text-white mb-12 tracking-wider" style={{fontFamily: 'serif'}}>
+              Leaders Speak
+            </h2>
+            <div className="w-24 h-px bg-amber-400 mx-auto"></div>
+          </div>
+
+          <div className="space-y-24">
+            {testimonials.map((testimonial, index) => (
+              <div 
+                key={index}
+                className="text-center max-w-5xl mx-auto group"
+              >
+                <div className="relative mb-12">
+                  <div className="absolute -top-4 -left-4 text-6xl text-amber-400/20 font-serif">"</div>
+                  <p className="text-2xl lg:text-3xl text-white mb-12 font-light leading-loose tracking-wide italic" style={{fontFamily: 'serif'}}>
+                    {testimonial.quote}
+                  </p>
+                  <div className="absolute -bottom-4 -right-4 text-6xl text-amber-400/20 font-serif rotate-180">"</div>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-px bg-amber-400 mb-6"></div>
+                  <h4 className="text-white font-light text-xl tracking-wide mb-2" style={{fontFamily: 'serif'}}>{testimonial.name}</h4>
+                  <p className="text-gray-400 font-light text-sm tracking-widest uppercase">{testimonial.title}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Membership Tiers Section */}
+      <section className="py-48 bg-gray-900">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="text-center mb-32">
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-400/10 border border-amber-400/20 backdrop-blur-sm mb-8">
+              <Trophy className="w-5 h-5 text-amber-400" />
+              <span className="text-amber-400 text-sm font-medium tracking-widest uppercase">Membership Tiers</span>
+            </div>
+            <h2 className="text-5xl lg:text-6xl font-light text-white mb-12 tracking-wider" style={{fontFamily: 'serif'}}>
+              Choose Your
+              <span className="block text-amber-400">Level</span>
+            </h2>
+            <div className="w-24 h-px bg-amber-400 mx-auto mb-8"></div>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto font-light leading-relaxed tracking-wide">
+              Select the membership tier that aligns with your professional aspirations and influence
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            {/* Executive Tier */}
+            <div className="bg-gray-800/50 border border-gray-700 p-12 text-center group hover:bg-gray-800/70 hover:border-gray-600 transition-all duration-500">
+              <div className="mb-8">
+                <Trophy className="w-12 h-12 text-gray-400 mx-auto mb-6 group-hover:text-amber-400 transition-colors duration-300" />
+                <h3 className="text-2xl font-light text-white mb-8 tracking-wide" style={{fontFamily: 'serif'}}>Executive</h3>
+                <div className="mb-6">
+                  <div className="text-4xl font-light text-white tracking-wider" style={{fontFamily: 'serif'}}>$2,500</div>
+                  <div className="text-gray-400 font-light text-sm tracking-widest uppercase mt-2">Annually</div>
+                </div>
+              </div>
+              
+              <p className="text-gray-300 mb-12 font-light leading-relaxed tracking-wide">
+                For rising executives seeking strategic connections and industry insights
+              </p>
+              
+              <button 
+                onClick={onJoinNetwork}
+                className="w-full py-4 border border-gray-600 text-gray-300 font-light tracking-widest text-sm uppercase hover:border-amber-400 hover:text-amber-400 hover:bg-amber-400/5 transition-all duration-500"
+              >
+                Apply Now
+              </button>
+            </div>
+            
+            {/* Premier Tier - Featured */}
+            <div className="bg-gradient-to-br from-amber-400/10 via-gray-800/50 to-amber-600/10 border-2 border-amber-400/50 p-12 text-center relative transform lg:scale-105 group hover:scale-110 transition-all duration-500">
+              <div className="absolute -top-px left-1/2 transform -translate-x-1/2 w-32 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
+              
+              <div className="mb-8">
+                <Crown className="w-12 h-12 text-amber-400 mx-auto mb-6 group-hover:scale-110 transition-transform duration-300" />
+                <h3 className="text-2xl font-light text-white mb-8 tracking-wide" style={{fontFamily: 'serif'}}>Premier Executive</h3>
+                <div className="mb-6">
+                  <div className="text-4xl font-light text-amber-400 tracking-wider" style={{fontFamily: 'serif'}}>$5,000</div>
+                  <div className="text-gray-300 font-light text-sm tracking-widest uppercase mt-2">Annually</div>
+                </div>
+              </div>
+              
+              <p className="text-gray-200 mb-12 font-light leading-relaxed tracking-wide">
+                For established leaders ready to shape industry standards and global markets
+              </p>
+              
+              <button 
+                onClick={onJoinNetwork}
+                className="w-full py-4 bg-gradient-to-r from-amber-400 to-amber-600 text-black font-medium tracking-widest text-sm uppercase hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-500"
+              >
+                Join Premier
+              </button>
+            </div>
+            
+            {/* Chairman Tier */}
+            <div className="bg-gray-800/50 border border-gray-700 p-12 text-center group hover:bg-gray-800/70 hover:border-gray-600 transition-all duration-500">
+              <div className="mb-8">
+                <Sparkles className="w-12 h-12 text-gray-400 mx-auto mb-6 group-hover:text-amber-400 transition-colors duration-300" />
+                <h3 className="text-2xl font-light text-white mb-8 tracking-wide" style={{fontFamily: 'serif'}}>Chairman Circle</h3>
+                <div className="mb-6">
+                  <div className="text-4xl font-light text-white tracking-wider" style={{fontFamily: 'serif'}}>$10,000</div>
+                  <div className="text-gray-400 font-light text-sm tracking-widest uppercase mt-2">Annually</div>
+                </div>
+              </div>
+              
+              <p className="text-gray-300 mb-12 font-light leading-relaxed tracking-wide">
+                For visionary leaders defining the future of business and society
+              </p>
+              
+              <button 
+                onClick={onJoinNetwork}
+                className="w-full py-4 border border-gray-600 text-gray-300 font-light tracking-widest text-sm uppercase hover:border-amber-400 hover:text-amber-400 hover:bg-amber-400/5 transition-all duration-500"
+              >
+                Request Invitation
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-48 bg-gradient-to-br from-black via-gray-900 to-black relative">
+        <div className="absolute inset-0 opacity-5">
+          <img 
+            src="https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
+            alt="Professional networking" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        
+        <div className="relative max-w-5xl mx-auto text-center px-8">
+          <div className="mb-12">
+            <div className="w-px h-20 bg-gradient-to-b from-transparent via-amber-400 to-transparent mx-auto mb-8"></div>
+          </div>
+          
+          <h2 className="text-5xl lg:text-7xl font-light text-white mb-16 leading-tight tracking-wider" style={{fontFamily: 'serif'}}>
+            Transform Your
+            <span className="block text-amber-400 mt-4">Network Today</span>
+          </h2>
+          
+          <p className="text-xl text-gray-300 mb-20 max-w-3xl mx-auto font-light leading-relaxed tracking-wide">
+            Join the most influential business network in the world. Connect with industry titans, access exclusive opportunities, and shape the future of commerce.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-8 justify-center">
+            <button 
+              onClick={onJoinNetwork}
+              className="group relative px-20 py-6 bg-gradient-to-r from-amber-400 to-amber-600 text-black font-medium tracking-widest text-sm uppercase overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-amber-500/25"
+            >
+              <span className="relative z-10 flex items-center gap-3">
+                <Crown className="w-5 h-5" />
+                Begin Your Journey
+              </span>
+              <div className="absolute inset-0 bg-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+            </button>
+            <button 
+              onClick={onRequestInfo}
+              className="px-20 py-6 border border-gray-600 text-gray-300 font-light tracking-widest text-sm uppercase hover:border-amber-400 hover:text-amber-400 transition-all duration-500"
+            >
+              Schedule Consultation
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
 
 export default App;
