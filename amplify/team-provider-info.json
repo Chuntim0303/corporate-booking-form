@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-corporatebookingform-dev-65382-authRole",
+      "UnauthRoleArn": "arn:aws:iam::130799455054:role/amplify-corporatebookingform-dev-65382-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::130799455054:role/amplify-corporatebookingform-dev-65382-authRole",
+      "Region": "ap-southeast-1",
+      "DeploymentBucketName": "amplify-corporatebookingform-dev-65382-deployment",
+      "UnauthRoleName": "amplify-corporatebookingform-dev-65382-unauthRole",
+      "StackName": "amplify-corporatebookingform-dev-65382",
+      "StackId": "arn:aws:cloudformation:ap-southeast-1:130799455054:stack/amplify-corporatebookingform-dev-65382/8b0d7c50-9775-11f0-8c1b-0206271afb9d",
+      "AmplifyAppId": "de1hrtgw0elf8"
+    }
+  }
+}
