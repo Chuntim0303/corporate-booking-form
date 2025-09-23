@@ -39,17 +39,15 @@ const EnhancedInput = ({
   const id = useId();
 
   return (
-    <div className="space-y-3">
-      <label htmlFor={id} className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
-        {label} {required && <span style={{color: '#F4C430'}}>*</span>}
+    <div className="space-y-2">
+      <label htmlFor={id} className="block text-sm font-medium text-gray-100" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
+        {label} {required && <span className="text-yellow-400">*</span>}
       </label>
       
-      <div className={`relative transition-all duration-300 ${
-        isFocused ? 'transform scale-[1.02]' : ''
-      }`}>
+      <div className={`relative transition-all duration-200 ${isFocused ? 'transform scale-[1.01]' : ''}`}>
         {Icon && (
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-            <Icon className={`h-5 w-5 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#F4C430' : '#9ca3af'}} />
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#F4C430' : '#6b7280'}} />
           </div>
         )}
         
@@ -65,27 +63,25 @@ const EnhancedInput = ({
           required={required}
           disabled={disabled}
           maxLength={maxLength}
-          className={`block w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-4 text-base text-white placeholder-gray-400 focus:outline-none transition-all duration-300 font-light tracking-wide rounded-lg border-2 ${
+          className={`block w-full ${Icon ? 'pl-10' : 'pl-3'} pr-3 py-3 text-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 rounded-md border ${
             error 
-              ? 'border-red-500 bg-red-900/10 focus:border-red-400' 
+              ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400' 
               : isFocused
-              ? 'border-yellow-400 bg-gray-800/70 shadow-lg shadow-yellow-400/20'
+              ? 'border-yellow-400 bg-gray-800/60 shadow-md shadow-yellow-400/10 focus:ring-1 focus:ring-yellow-400'
               : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-          style={{
-            fontFamily: 'Montserrat, sans-serif'
-          }}
+          style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}
         />
       </div>
       
       {helpText && !error && (
-        <p className="text-sm text-gray-400 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>{helpText}</p>
+        <p className="text-xs text-gray-400" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>{helpText}</p>
       )}
       
       {error && (
-        <div className="flex items-center gap-2 text-sm text-red-400">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          <span className="font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>{error}</span>
+        <div className="flex items-center gap-2 text-xs text-red-400">
+          <AlertCircle className="w-3 h-3 flex-shrink-0" />
+          <span style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>{error}</span>
         </div>
       )}
     </div>
@@ -109,17 +105,15 @@ const EnhancedSelect = ({
   const id = useId();
 
   return (
-    <div className="space-y-3">
-      <label htmlFor={id} className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
-        {label} {required && <span style={{color: '#F4C430'}}>*</span>}
+    <div className="space-y-2">
+      <label htmlFor={id} className="block text-sm font-medium text-gray-100" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
+        {label} {required && <span className="text-yellow-400">*</span>}
       </label>
       
-      <div className={`relative transition-all duration-300 ${
-        isFocused ? 'transform scale-[1.02]' : ''
-      }`}>
+      <div className={`relative transition-all duration-200 ${isFocused ? 'transform scale-[1.01]' : ''}`}>
         {Icon && (
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-            <Icon className={`h-5 w-5 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#F4C430' : '#9ca3af'}} />
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#F4C430' : '#6b7280'}} />
           </div>
         )}
         
@@ -132,16 +126,14 @@ const EnhancedSelect = ({
           onBlur={() => setIsFocused(false)}
           required={required}
           disabled={disabled}
-          className={`block w-full ${Icon ? 'pl-12' : 'pl-4'} pr-12 py-4 text-base text-white focus:outline-none appearance-none transition-all duration-300 font-light tracking-wide rounded-lg border-2 ${
+          className={`block w-full ${Icon ? 'pl-10' : 'pl-3'} pr-10 py-3 text-sm text-white focus:outline-none appearance-none transition-all duration-200 rounded-md border ${
             error 
-              ? 'border-red-500 bg-red-900/10 focus:border-red-400' 
+              ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400' 
               : isFocused
-              ? 'border-yellow-400 bg-gray-800/70 shadow-lg shadow-yellow-400/20'
+              ? 'border-yellow-400 bg-gray-800/60 shadow-md shadow-yellow-400/10 focus:ring-1 focus:ring-yellow-400'
               : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-          style={{
-            fontFamily: 'Montserrat, sans-serif'
-          }}
+          style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}
         >
           <option value="" style={{backgroundColor: '#1f2937', color: '#9ca3af'}}>{placeholder}</option>
           {options.map((option) => (
@@ -151,15 +143,15 @@ const EnhancedSelect = ({
           ))}
         </select>
         
-        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-          <ChevronDown className="w-5 h-5 text-gray-400" />
+        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+          <ChevronDown className="w-4 h-4 text-gray-400" />
         </div>
       </div>
       
       {error && (
-        <div className="flex items-center gap-2 text-sm text-red-400">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          <span className="font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>{error}</span>
+        <div className="flex items-center gap-2 text-xs text-red-400">
+          <AlertCircle className="w-3 h-3 flex-shrink-0" />
+          <span style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>{error}</span>
         </div>
       )}
     </div>
@@ -167,19 +159,21 @@ const EnhancedSelect = ({
 };
 
 // Corporate Form Steps Component
-const CorporateFormSteps = ({ onClose, onComplete }) => {
+const CorporateFormSteps = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    // Step 1: Contact Person (now step 1)
+    // Step 1: Contact Person
     contactName: '',
     position: '',
     email: '',
+    countryCode: '+60',
     phone: '',
     nric: '',
 
-    // Step 2: Company Information (simplified)
+    // Step 2: Company Information
     companyName: '',
     industry: '',
+    industryOther: '',
     companySize: '',
 
     // Step 3: Partnership Preferences
@@ -197,7 +191,6 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
-    // Only event arrays use array push/pop logic (eventTypes)
     if (type === 'checkbox' && name === 'eventTypes') {
       const currentArray = formData[name] || [];
       if (checked) {
@@ -212,10 +205,30 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
         }));
       }
     } else if (type === 'checkbox') {
-      // simple boolean checkbox (e.g. termsAccepted)
       setFormData(prev => ({
         ...prev,
         [name]: checked
+      }));
+    } else if (name === 'nric') {
+      // Format NRIC with dashes: XXXXXX-XX-XXXX
+      let formattedValue = value.replace(/\D/g, ''); // Remove non-digits
+      if (formattedValue.length <= 12) {
+        if (formattedValue.length > 8) {
+          formattedValue = formattedValue.slice(0, 6) + '-' + formattedValue.slice(6, 8) + '-' + formattedValue.slice(8);
+        } else if (formattedValue.length > 6) {
+          formattedValue = formattedValue.slice(0, 6) + '-' + formattedValue.slice(6);
+        }
+        setFormData(prev => ({
+          ...prev,
+          [name]: formattedValue
+        }));
+      }
+    } else if (name === 'phone') {
+      // Remove any non-digit characters except + and -
+      const cleanedValue = value.replace(/[^\d-\s]/g, '');
+      setFormData(prev => ({
+        ...prev,
+        [name]: cleanedValue
       }));
     } else {
       setFormData(prev => ({
@@ -224,7 +237,6 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
       }));
     }
     
-    // Clear error when user starts typing / toggling
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -243,13 +255,33 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
         if (!formData.email.trim()) newErrors.email = 'Email is required';
         if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
         if (!formData.nric.trim()) newErrors.nric = 'NRIC is required';
+        
         if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
           newErrors.email = 'Please enter a valid email address';
+        }
+        
+        // Phone number validation for Malaysia
+        if (formData.phone && formData.countryCode === '+60') {
+          const cleanPhone = formData.phone.replace(/[\s\-]/g, '');
+          if (cleanPhone.startsWith('0')) {
+            newErrors.phone = 'Malaysian phone numbers should not start with 0 when using country code';
+          }
+        }
+        
+        // NRIC validation - must be exactly 12 digits
+        if (formData.nric) {
+          const nricDigits = formData.nric.replace(/\D/g, '');
+          if (nricDigits.length !== 12) {
+            newErrors.nric = 'NRIC must contain exactly 12 digits';
+          }
         }
         break;
       case 2:
         if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
         if (!formData.industry) newErrors.industry = 'Industry selection is required';
+        if (formData.industry === 'other' && !formData.industryOther.trim()) {
+          newErrors.industryOther = 'Please specify your industry';
+        }
         if (!formData.companySize) newErrors.companySize = 'Company size is required';
         break;
       case 3:
@@ -281,20 +313,20 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch('YOUR_LAMBDA_API_ENDPOINT', {
+      const response = await fetch('https://s8uentbcpd.execute-api.ap-southeast-1.amazonaws.com/dev/applications', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        // only send relevant fields
         body: JSON.stringify({
           contactName: formData.contactName,
           position: formData.position,
           email: formData.email,
+          countryCode: formData.countryCode,
           phone: formData.phone,
           nric: formData.nric,
           companyName: formData.companyName,
-          industry: formData.industry,
+          industry: formData.industry === 'other' ? formData.industryOther : formData.industry,
           companySize: formData.companySize,
           partnershipTier: formData.partnershipTier,
           eventTypes: formData.eventTypes,
@@ -318,19 +350,26 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
     }
   };
 
+  const stepTitles = [
+    'Contact Information',
+    'Company Information', 
+    'Partnership Preferences',
+    'Review & Terms'
+  ];
+
   const renderStep = () => {
     switch (currentStep) {
-      case 1: // Contact Information (was previously step 2)
+      case 1:
         return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h3 className="text-xl sm:text-2xl font-light text-white mb-4" style={{fontFamily: 'Montserrat, sans-serif'}}>
+          <div className="space-y-4 sm:space-y-6">
+            <div className="text-center mb-6 sm:mb-8">
+              <h3 className="text-lg sm:text-xl font-medium text-white mb-2">
                 Contact Information
               </h3>
-              <p className="text-gray-400 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>Primary contact person details</p>
+              <p className="text-sm text-gray-400">Primary contact person details</p>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <EnhancedInput
                 label="Full Name"
                 name="contactName"
@@ -353,7 +392,7 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
               />
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <EnhancedInput
                 label="Email Address"
                 name="email"
@@ -365,55 +404,91 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
                 icon={Mail}
                 required
               />
-              <EnhancedInput
-                label="Phone Number"
-                name="phone"
-                placeholder="+60 12-345-6789"
-                value={formData.phone}
-                onChange={handleChange}
-                error={errors.phone}
-                icon={Phone}
-                required
-              />
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-100">
+                  Phone Number <span className="text-yellow-400">*</span>
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    name="countryCode"
+                    value={formData.countryCode}
+                    onChange={handleChange}
+                    className="w-24 px-3 py-3 text-sm text-white bg-gray-800/40 border border-gray-600 rounded-md focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
+                    style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}
+                  >
+                    <option value="+60" style={{backgroundColor: '#1f2937'}}>🇲🇾 +60</option>
+                    <option value="+65" style={{backgroundColor: '#1f2937'}}>🇸🇬 +65</option>
+                    <option value="+66" style={{backgroundColor: '#1f2937'}}>🇹🇭 +66</option>
+                    <option value="+62" style={{backgroundColor: '#1f2937'}}>🇮🇩 +62</option>
+                    <option value="+1" style={{backgroundColor: '#1f2937'}}>🇺🇸 +1</option>
+                    <option value="+44" style={{backgroundColor: '#1f2937'}}>🇬🇧 +44</option>
+                    <option value="+86" style={{backgroundColor: '#1f2937'}}>🇨🇳 +86</option>
+                    <option value="+91" style={{backgroundColor: '#1f2937'}}>🇮🇳 +91</option>
+                  </select>
+                  <div className="flex-1 relative">
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                      name="phone"
+                      type="tel"
+                      placeholder={formData.countryCode === '+60' ? '12-345-6789' : '123-456-7890'}
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className={`block w-full pl-10 pr-3 py-3 text-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 rounded-md border ${
+                        errors.phone 
+                          ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400' 
+                          : 'border-gray-600 bg-gray-800/40 hover:border-gray-500 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400'
+                      }`}
+                      style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}
+                      required
+                    />
+                  </div>
+                </div>
+                {errors.phone && (
+                  <div className="flex items-center gap-2 text-xs text-red-400">
+                    <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                    <span>{errors.phone}</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             <EnhancedInput
               label="NRIC"
               name="nric"
-              placeholder="e.g., 901212-14-5678"
+              placeholder="123456-12-1234"
               value={formData.nric}
               onChange={handleChange}
               error={errors.nric}
               icon={CreditCard}
               required
+              helpText="Malaysian NRIC format: 6 digits + 2 digits + 4 digits"
+              maxLength={14}
             />
           </div>
         );
 
-      case 2: // Company Information (was previously step 1 with removals)
+      case 2:
         return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h3 className="text-xl sm:text-2xl font-light text-white mb-4" style={{fontFamily: 'Montserrat, sans-serif'}}>
+          <div className="space-y-4 sm:space-y-6">
+            <div className="text-center mb-6 sm:mb-8">
+              <h3 className="text-lg sm:text-xl font-medium text-white mb-2">
                 Company Information
               </h3>
-              <p className="text-gray-400 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>Tell us about your organization</p>
+              <p className="text-sm text-gray-400">Tell us about your organization</p>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <EnhancedInput
-                label="Company Name"
-                name="companyName"
-                placeholder="Your company name"
-                value={formData.companyName}
-                onChange={handleChange}
-                error={errors.companyName}
-                icon={Building}
-                required
-              />
-            </div>
+            <EnhancedInput
+              label="Company Name"
+              name="companyName"
+              placeholder="Your company name"
+              value={formData.companyName}
+              onChange={handleChange}
+              error={errors.companyName}
+              icon={Building}
+              required
+            />
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <EnhancedSelect
                 label="Industry"
                 name="industry"
@@ -453,17 +528,30 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
                 ]}
               />
             </div>
+            
+            {formData.industry === 'other' && (
+              <EnhancedInput
+                label="Please specify your industry"
+                name="industryOther"
+                placeholder="Enter your industry"
+                value={formData.industryOther}
+                onChange={handleChange}
+                error={errors.industryOther}
+                icon={Building}
+                required
+              />
+            )}
           </div>
         );
 
-      case 3: // Partnership Preferences (removed Preferred Seasons)
+      case 3:
         return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h3 className="text-xl sm:text-2xl font-light text-white mb-4" style={{fontFamily: 'Montserrat, sans-serif'}}>
+          <div className="space-y-4 sm:space-y-6">
+            <div className="text-center mb-6 sm:mb-8">
+              <h3 className="text-lg sm:text-xl font-medium text-white mb-2">
                 Partnership Preferences
               </h3>
-              <p className="text-gray-400 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>Choose your preferred partnership tier and event types</p>
+              <p className="text-sm text-gray-400">Choose your preferred partnership tier and event types</p>
             </div>
             
             <EnhancedSelect
@@ -482,11 +570,11 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
               ]}
             />
             
-            <div className="space-y-4">
-              <label className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
-                Event Types (Select all that apply)
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-100">
+                Event Types <span className="text-gray-400">(Select all that apply)</span>
               </label>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 {[
                   'Corporate Meetings',
                   'Product Launches', 
@@ -497,20 +585,20 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
                   'Award Ceremonies',
                   'Holiday Parties'
                 ].map(type => (
-                  <label key={type} className="flex items-center space-x-3 cursor-pointer group p-2 rounded-lg hover:bg-gray-800/30 transition-colors duration-200">
+                  <label key={type} className="flex items-center space-x-3 cursor-pointer group p-3 rounded-lg hover:bg-gray-800/30 transition-colors duration-200 border border-transparent hover:border-gray-700">
                     <input
                       type="checkbox"
                       name="eventTypes"
                       value={type}
                       checked={formData.eventTypes.includes(type)}
                       onChange={handleChange}
-                      className="w-5 h-5 border-gray-600 rounded focus:ring-2"
+                      className="w-4 h-4 border-gray-600 rounded focus:ring-2 focus:ring-yellow-400"
                       style={{
                         accentColor: '#F4C430',
                         backgroundColor: '#1f2937'
                       }}
                     />
-                    <span className="text-gray-300 text-sm group-hover:text-white transition-colors" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                    <span className="text-gray-300 text-sm group-hover:text-white transition-colors">
                       {type}
                     </span>
                   </label>
@@ -537,46 +625,72 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
           </div>
         );
 
-      case 4: // Summary + Terms & Conditions (replaces previous additional info)
+      case 4:
         return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h3 className="text-xl sm:text-2xl font-light text-white mb-4" style={{fontFamily: 'Montserrat, sans-serif'}}>
+          <div className="space-y-4 sm:space-y-6">
+            <div className="text-center mb-6 sm:mb-8">
+              <h3 className="text-lg sm:text-xl font-medium text-white mb-2">
                 Review & Confirm
               </h3>
-              <p className="text-gray-400 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>Please review your details before submitting</p>
+              <p className="text-sm text-gray-400">Please review your details before submitting</p>
             </div>
             
-            <div className="bg-gray-800/40 rounded-lg p-6 space-y-4 text-gray-300">
-              <h4 className="font-semibold text-white">Contact Information</h4>
-              <p>Name: {formData.contactName}</p>
-              <p>Position: {formData.position}</p>
-              <p>Email: {formData.email}</p>
-              <p>Phone: {formData.phone}</p>
-              <p>NRIC: {formData.nric}</p>
+            <div className="bg-gray-800/40 rounded-lg p-4 sm:p-6 space-y-3 text-sm">
+              <div>
+                <h4 className="font-medium text-white mb-2">Contact Information</h4>
+                <div className="text-gray-300 space-y-1">
+                  <p><span className="text-gray-400">Name:</span> {formData.contactName}</p>
+                  <p><span className="text-gray-400">Position:</span> {formData.position}</p>
+                  <p><span className="text-gray-400">Email:</span> {formData.email}</p>
+                  <p><span className="text-gray-400">Phone:</span> {formData.countryCode} {formData.phone}</p>
+                  <p><span className="text-gray-400">NRIC:</span> {formData.nric}</p>
+                </div>
+              </div>
 
-              <h4 className="font-semibold text-white mt-4">Company Information</h4>
-              <p>Company: {formData.companyName}</p>
-              <p>Industry: {formData.industry}</p>
-              <p>Size: {formData.companySize}</p>
+              <div className="border-t border-gray-700 pt-3">
+                <h4 className="font-medium text-white mb-2">Company Information</h4>
+                <div className="text-gray-300 space-y-1">
+                  <p><span className="text-gray-400">Company:</span> {formData.companyName}</p>
+                  <p><span className="text-gray-400">Industry:</span> {
+                    formData.industry === 'other' && formData.industryOther 
+                      ? formData.industryOther 
+                      : formData.industry
+                  }</p>
+                  <p><span className="text-gray-400">Size:</span> {formData.companySize}</p>
+                </div>
+              </div>
 
-              <h4 className="font-semibold text-white mt-4">Partnership Preferences</h4>
-              <p>Tier: {formData.partnershipTier}</p>
-              <p>Events: {formData.eventTypes.join(', ') || '-'}</p>
-              <p>Expected Events: {formData.expectedEvents || '-'}</p>
+              <div className="border-t border-gray-700 pt-3">
+                <h4 className="font-medium text-white mb-2">Partnership Preferences</h4>
+                <div className="text-gray-300 space-y-1">
+                  <p><span className="text-gray-400">Tier:</span> {formData.partnershipTier}</p>
+                  <p><span className="text-gray-400">Events:</span> {formData.eventTypes.join(', ') || 'None selected'}</p>
+                  <p><span className="text-gray-400">Expected Events:</span> {formData.expectedEvents || 'Not specified'}</p>
+                </div>
+              </div>
             </div>
 
-            <label className="flex items-center space-x-3">
-              <input type="checkbox" name="termsAccepted" checked={formData.termsAccepted}
-                onChange={handleChange}
-                className="w-5 h-5 border-gray-600 rounded"
-                style={{ accentColor: '#F4C430' }}
-              />
-              <span className="text-gray-300 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>
-                I agree to the Terms & Conditions
-              </span>
-            </label>
-            {errors.termsAccepted && <p className="text-sm text-red-400">{errors.termsAccepted}</p>}
+            <div className="border rounded-lg p-4" style={{borderColor: errors.termsAccepted ? '#ef4444' : 'rgba(107, 114, 128, 0.5)'}}>
+              <label className="flex items-start space-x-3 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  name="termsAccepted" 
+                  checked={formData.termsAccepted}
+                  onChange={handleChange}
+                  className="w-4 h-4 mt-0.5 border-gray-600 rounded focus:ring-2 focus:ring-yellow-400"
+                  style={{ accentColor: '#F4C430' }}
+                />
+                <span className="text-sm text-gray-300 leading-relaxed">
+                  I agree to the <button type="button" className="text-yellow-400 hover:underline">Terms & Conditions</button> and authorize Confetti KL to contact me regarding this partnership application.
+                </span>
+              </label>
+              {errors.termsAccepted && (
+                <p className="text-xs text-red-400 mt-2 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.termsAccepted}
+                </p>
+              )}
+            </div>
           </div>
         );
 
@@ -587,30 +701,30 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Progress Bar */}
-      <div className="mb-12">
-        <div className="flex items-center justify-between mb-6">
+      {/* Mobile-friendly Progress Bar */}
+      <div className="mb-8 sm:mb-12">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
           {[1, 2, 3, 4].map((step) => (
             <div 
               key={step} 
               className={`flex items-center ${step < 4 ? 'flex-1' : ''}`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300`}
+              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 text-xs sm:text-sm font-medium`}
                 style={{
                   backgroundColor: currentStep >= step ? '#F4C430' : 'transparent',
-                  borderColor: currentStep >= step ? '#F4C430' : '#4b5563',
+                  borderColor: currentStep >= step ? '#F4C430' : '#6b7280',
                   color: currentStep >= step ? 'black' : '#9ca3af'
                 }}
               >
                 {currentStep > step ? (
-                  <Check className="w-5 h-5" />
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5" />
                 ) : (
-                  <span className="text-sm font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>{step}</span>
+                  <span>{step}</span>
                 )}
               </div>
               {step < 4 && (
-                <div className={`h-px flex-1 mx-4 transition-all duration-300`}
-                  style={{backgroundColor: currentStep > step ? '#F4C430' : '#4b5563'}}
+                <div className={`h-px flex-1 mx-2 sm:mx-4 transition-all duration-300`}
+                  style={{backgroundColor: currentStep > step ? '#F4C430' : '#6b7280'}}
                 ></div>
               )}
             </div>
@@ -618,20 +732,17 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
         </div>
         
         <div className="text-center">
-          <div className="text-sm text-gray-400 tracking-widest uppercase mb-2" style={{fontFamily: 'Montserrat, sans-serif'}}>
+          <div className="text-xs sm:text-sm text-gray-400 uppercase tracking-wide mb-1">
             Step {currentStep} of 4
           </div>
-          <div className="text-xs text-gray-500" style={{fontFamily: 'Montserrat, sans-serif'}}>
-            {currentStep === 1 && 'Contact Information'}
-            {currentStep === 2 && 'Company Information'}
-            {currentStep === 3 && 'Partnership Preferences'}
-            {currentStep === 4 && 'Review & Terms'}
+          <div className="text-xs text-gray-500">
+            {stepTitles[currentStep - 1]}
           </div>
         </div>
       </div>
 
       {/* Form Content */}
-      <div className="rounded-2xl p-8 lg:p-12 border-2"
+      <div className="rounded-xl p-4 sm:p-6 lg:p-8 border"
         style={{
           backgroundColor: '#1a1a1a',
           borderColor: 'rgba(244, 196, 48, 0.2)'
@@ -640,16 +751,15 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
         {renderStep()}
         
         {/* Navigation Buttons */}
-        <div className="flex justify-between mt-12 pt-8 border-t border-gray-700">
+        <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-700">
           <button
             onClick={prevStep}
             disabled={currentStep === 1}
-            className={`flex items-center gap-2 px-6 py-3 text-sm font-light tracking-widest uppercase transition-all duration-300 border-2 rounded-lg ${
+            className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-3 text-sm font-medium uppercase transition-all duration-300 border rounded-md ${
               currentStep === 1
-                ? 'text-gray-500 cursor-not-allowed border-gray-600'
-                : 'text-gray-300 hover:text-yellow-400 border-gray-600 hover:border-yellow-400'
+                ? 'text-gray-500 cursor-not-allowed border-gray-600 bg-gray-800/20'
+                : 'text-gray-300 hover:text-yellow-400 border-gray-600 hover:border-yellow-400 bg-gray-800/40 hover:bg-gray-800/60'
             }`}
-            style={{fontFamily: 'Montserrat, sans-serif'}}
           >
             <ArrowLeft className="w-4 h-4" />
             Previous
@@ -658,10 +768,9 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
           {currentStep < 4 ? (
             <button
               onClick={nextStep}
-              className="flex items-center gap-2 px-6 py-3 text-black text-sm font-semibold tracking-widest uppercase transition-all duration-300 rounded-lg hover:shadow-lg hover:shadow-yellow-400/30"
+              className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 text-black text-sm font-medium uppercase transition-all duration-300 rounded-md hover:shadow-lg hover:shadow-yellow-400/20"
               style={{
-                background: '#F4C430',
-                fontFamily: 'Montserrat, sans-serif'
+                background: '#F4C430'
               }}
             >
               Next
@@ -671,10 +780,9 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-8 py-3 text-black text-sm font-semibold tracking-widest uppercase transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg hover:shadow-lg hover:shadow-yellow-400/30"
+              className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 text-black text-sm font-medium uppercase transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-md hover:shadow-lg hover:shadow-yellow-400/20"
               style={{
-                background: '#F4C430',
-                fontFamily: 'Montserrat, sans-serif'
+                background: '#F4C430'
               }}
             >
               {isSubmitting ? (
