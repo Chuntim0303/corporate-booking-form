@@ -170,31 +170,25 @@ const EnhancedSelect = ({
 const CorporateFormSteps = ({ onClose, onComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    // Step 1: Company Information
-    companyName: '',
-    companyRegistration: '',
-    industry: '',
-    companySize: '',
-    website: '',
-    address: '',
-    
-    // Step 2: Contact Person
+    // Step 1: Contact Person (now step 1)
     contactName: '',
     position: '',
     email: '',
     phone: '',
-    
+    nric: '',
+
+    // Step 2: Company Information (simplified)
+    companyName: '',
+    industry: '',
+    companySize: '',
+
     // Step 3: Partnership Preferences
     partnershipTier: '',
     eventTypes: [],
     expectedEvents: '',
-    preferredSeasons: [],
-    
-    // Step 4: Additional Information
-    experience: '',
-    budget: '',
-    specialRequirements: '',
-    marketing: ''
+
+    // Step 4: Terms
+    termsAccepted: false
   });
   
   const [errors, setErrors] = useState({});
@@ -203,7 +197,8 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
-    if (type === 'checkbox') {
+    // Only event arrays use array push/pop logic (eventTypes)
+    if (type === 'checkbox' && name === 'eventTypes') {
       const currentArray = formData[name] || [];
       if (checked) {
         setFormData(prev => ({
@@ -216,6 +211,12 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
           [name]: currentArray.filter(item => item !== value)
         }));
       }
+    } else if (type === 'checkbox') {
+      // simple boolean checkbox (e.g. termsAccepted)
+      setFormData(prev => ({
+        ...prev,
+        [name]: checked
+      }));
     } else {
       setFormData(prev => ({
         ...prev,
@@ -223,7 +224,7 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
       }));
     }
     
-    // Clear error when user starts typing
+    // Clear error when user starts typing / toggling
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -237,23 +238,26 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
     
     switch (step) {
       case 1:
-        if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
-        if (!formData.companyRegistration.trim()) newErrors.companyRegistration = 'Registration number is required';
-        if (!formData.industry) newErrors.industry = 'Industry selection is required';
-        if (!formData.companySize) newErrors.companySize = 'Company size is required';
-        break;
-      case 2:
         if (!formData.contactName.trim()) newErrors.contactName = 'Contact name is required';
         if (!formData.position.trim()) newErrors.position = 'Position is required';
         if (!formData.email.trim()) newErrors.email = 'Email is required';
         if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+        if (!formData.nric.trim()) newErrors.nric = 'NRIC is required';
         if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
           newErrors.email = 'Please enter a valid email address';
         }
         break;
+      case 2:
+        if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
+        if (!formData.industry) newErrors.industry = 'Industry selection is required';
+        if (!formData.companySize) newErrors.companySize = 'Company size is required';
+        break;
       case 3:
         if (!formData.partnershipTier) newErrors.partnershipTier = 'Partnership tier selection is required';
         if (!formData.expectedEvents) newErrors.expectedEvents = 'Expected events per year is required';
+        break;
+      case 4:
+        if (!formData.termsAccepted) newErrors.termsAccepted = 'You must accept terms and conditions';
         break;
     }
     
@@ -276,117 +280,47 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
     
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsSubmitting(false);
-    onComplete();
+    try {
+      const response = await fetch('YOUR_LAMBDA_API_ENDPOINT', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // only send relevant fields
+        body: JSON.stringify({
+          contactName: formData.contactName,
+          position: formData.position,
+          email: formData.email,
+          phone: formData.phone,
+          nric: formData.nric,
+          companyName: formData.companyName,
+          industry: formData.industry,
+          companySize: formData.companySize,
+          partnershipTier: formData.partnershipTier,
+          eventTypes: formData.eventTypes,
+          expectedEvents: formData.expectedEvents,
+          termsAccepted: formData.termsAccepted
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Submission failed');
+      }
+      
+      const result = await response.json();
+      if (onComplete) onComplete(result);
+      
+    } catch (error) {
+      console.error('Submission error:', error);
+      alert('There was an error submitting your application. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStep = () => {
     switch (currentStep) {
-      case 1:
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h3 className="text-xl sm:text-2xl font-light text-white mb-4" style={{fontFamily: 'Montserrat, sans-serif'}}>
-                Company Information
-              </h3>
-              <p className="text-gray-400 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>Tell us about your organization</p>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <EnhancedInput
-                label="Company Name"
-                name="companyName"
-                placeholder="Your company name"
-                value={formData.companyName}
-                onChange={handleChange}
-                error={errors.companyName}
-                icon={Building}
-                required
-              />
-              <EnhancedInput
-                label="Registration Number"
-                name="companyRegistration"
-                placeholder="Company registration number"
-                value={formData.companyRegistration}
-                onChange={handleChange}
-                error={errors.companyRegistration}
-                icon={CreditCard}
-                required
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <EnhancedSelect
-                label="Industry"
-                name="industry"
-                placeholder="Select your industry"
-                value={formData.industry}
-                onChange={handleChange}
-                error={errors.industry}
-                icon={Trophy}
-                required
-                options={[
-                  { value: 'technology', label: 'Technology' },
-                  { value: 'finance', label: 'Finance & Banking' },
-                  { value: 'healthcare', label: 'Healthcare' },
-                  { value: 'manufacturing', label: 'Manufacturing' },
-                  { value: 'retail', label: 'Retail & E-commerce' },
-                  { value: 'consulting', label: 'Consulting' },
-                  { value: 'education', label: 'Education' },
-                  { value: 'government', label: 'Government' },
-                  { value: 'other', label: 'Other' }
-                ]}
-              />
-              <EnhancedSelect
-                label="Company Size"
-                name="companySize"
-                placeholder="Number of employees"
-                value={formData.companySize}
-                onChange={handleChange}
-                error={errors.companySize}
-                icon={Users}
-                required
-                options={[
-                  { value: '1-10', label: '1-10 employees' },
-                  { value: '11-50', label: '11-50 employees' },
-                  { value: '51-200', label: '51-200 employees' },
-                  { value: '201-500', label: '201-500 employees' },
-                  { value: '500+', label: '500+ employees' }
-                ]}
-              />
-            </div>
-            
-            <EnhancedInput
-              label="Website"
-              name="website"
-              placeholder="www.yourcompany.com"
-              value={formData.website}
-              onChange={handleChange}
-              error={errors.website}
-              icon={Sparkles}
-            />
-            
-            <div className="space-y-3">
-              <label className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
-                Company Address
-              </label>
-              <textarea 
-                name="address"
-                rows={3}
-                placeholder="Full company address"
-                value={formData.address}
-                onChange={handleChange}
-                className="w-full px-4 py-4 text-base text-white placeholder-gray-400 focus:outline-none transition-all duration-300 font-light tracking-wide rounded-lg border-2 border-gray-600 bg-gray-800/40 hover:border-gray-500 focus:border-yellow-400 focus:bg-gray-800/70 focus:shadow-lg focus:shadow-yellow-400/20 resize-none"
-                style={{fontFamily: 'Montserrat, sans-serif'}}
-              />
-            </div>
-          </div>
-        );
-
-      case 2:
+      case 1: // Contact Information (was previously step 2)
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -442,10 +376,87 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
                 required
               />
             </div>
+
+            <EnhancedInput
+              label="NRIC"
+              name="nric"
+              placeholder="e.g., 901212-14-5678"
+              value={formData.nric}
+              onChange={handleChange}
+              error={errors.nric}
+              icon={CreditCard}
+              required
+            />
           </div>
         );
 
-      case 3:
+      case 2: // Company Information (was previously step 1 with removals)
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h3 className="text-xl sm:text-2xl font-light text-white mb-4" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                Company Information
+              </h3>
+              <p className="text-gray-400 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>Tell us about your organization</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <EnhancedInput
+                label="Company Name"
+                name="companyName"
+                placeholder="Your company name"
+                value={formData.companyName}
+                onChange={handleChange}
+                error={errors.companyName}
+                icon={Building}
+                required
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <EnhancedSelect
+                label="Industry"
+                name="industry"
+                placeholder="Select your industry"
+                value={formData.industry}
+                onChange={handleChange}
+                error={errors.industry}
+                icon={Trophy}
+                required
+                options={[
+                  { value: 'technology', label: 'Technology' },
+                  { value: 'finance', label: 'Finance & Banking' },
+                  { value: 'healthcare', label: 'Healthcare' },
+                  { value: 'manufacturing', label: 'Manufacturing' },
+                  { value: 'retail', label: 'Retail & E-commerce' },
+                  { value: 'consulting', label: 'Consulting' },
+                  { value: 'education', label: 'Education' },
+                  { value: 'government', label: 'Government' },
+                  { value: 'other', label: 'Other' }
+                ]}
+              />
+              <EnhancedSelect
+                label="Company Size"
+                name="companySize"
+                placeholder="Number of employees"
+                value={formData.companySize}
+                onChange={handleChange}
+                error={errors.companySize}
+                icon={Users}
+                required
+                options={[
+                  { value: '1-10', label: '1-10 employees' },
+                  { value: '11-50', label: '11-50 employees' },
+                  { value: '51-200', label: '51-200 employees' },
+                  { value: '201-500', label: '201-500 employees' },
+                  { value: '500+', label: '500+ employees' }
+                ]}
+              />
+            </div>
+          </div>
+        );
+
+      case 3: // Partnership Preferences (removed Preferred Seasons)
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -523,108 +534,49 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
                 { value: '21+', label: '21+ events' }
               ]}
             />
-            
-            <div className="space-y-4">
-              <label className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
-                Preferred Event Seasons
-              </label>
-              <div className="grid grid-cols-2 gap-4">
-                {['Spring', 'Summer', 'Autumn', 'Winter'].map(season => (
-                  <label key={season} className="flex items-center space-x-3 cursor-pointer group p-2 rounded-lg hover:bg-gray-800/30 transition-colors duration-200">
-                    <input
-                      type="checkbox"
-                      name="preferredSeasons"
-                      value={season}
-                      checked={formData.preferredSeasons.includes(season)}
-                      onChange={handleChange}
-                      className="w-5 h-5 border-gray-600 rounded focus:ring-2"
-                      style={{
-                        accentColor: '#F4C430',
-                        backgroundColor: '#1f2937'
-                      }}
-                    />
-                    <span className="text-gray-300 text-sm group-hover:text-white transition-colors" style={{fontFamily: 'Montserrat, sans-serif'}}>
-                      {season}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
           </div>
         );
 
-      case 4:
+      case 4: // Summary + Terms & Conditions (replaces previous additional info)
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
               <h3 className="text-xl sm:text-2xl font-light text-white mb-4" style={{fontFamily: 'Montserrat, sans-serif'}}>
-                Additional Information
+                Review & Confirm
               </h3>
-              <p className="text-gray-400 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>Help us understand your event planning needs</p>
+              <p className="text-gray-400 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>Please review your details before submitting</p>
             </div>
             
-            <div className="space-y-3">
-              <label className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
-                Previous Event Experience
-              </label>
-              <textarea 
-                name="experience"
-                rows={4}
-                placeholder="Tell us about your previous corporate event experiences..."
-                value={formData.experience}
+            <div className="bg-gray-800/40 rounded-lg p-6 space-y-4 text-gray-300">
+              <h4 className="font-semibold text-white">Contact Information</h4>
+              <p>Name: {formData.contactName}</p>
+              <p>Position: {formData.position}</p>
+              <p>Email: {formData.email}</p>
+              <p>Phone: {formData.phone}</p>
+              <p>NRIC: {formData.nric}</p>
+
+              <h4 className="font-semibold text-white mt-4">Company Information</h4>
+              <p>Company: {formData.companyName}</p>
+              <p>Industry: {formData.industry}</p>
+              <p>Size: {formData.companySize}</p>
+
+              <h4 className="font-semibold text-white mt-4">Partnership Preferences</h4>
+              <p>Tier: {formData.partnershipTier}</p>
+              <p>Events: {formData.eventTypes.join(', ') || '-'}</p>
+              <p>Expected Events: {formData.expectedEvents || '-'}</p>
+            </div>
+
+            <label className="flex items-center space-x-3">
+              <input type="checkbox" name="termsAccepted" checked={formData.termsAccepted}
                 onChange={handleChange}
-                className="w-full px-4 py-4 text-base text-white placeholder-gray-400 focus:outline-none transition-all duration-300 font-light tracking-wide rounded-lg border-2 border-gray-600 bg-gray-800/40 hover:border-gray-500 focus:border-yellow-400 focus:bg-gray-800/70 focus:shadow-lg focus:shadow-yellow-400/20 resize-none"
-                style={{fontFamily: 'Montserrat, sans-serif'}}
+                className="w-5 h-5 border-gray-600 rounded"
+                style={{ accentColor: '#F4C430' }}
               />
-            </div>
-            
-            <EnhancedSelect
-              label="Annual Event Budget Range"
-              name="budget"
-              placeholder="Select your budget range"
-              value={formData.budget}
-              onChange={handleChange}
-              icon={CreditCard}
-              options={[
-                { value: 'under-50k', label: 'Under RM 50,000' },
-                { value: '50k-100k', label: 'RM 50,000 - RM 100,000' },
-                { value: '100k-250k', label: 'RM 100,000 - RM 250,000' },
-                { value: '250k-500k', label: 'RM 250,000 - RM 500,000' },
-                { value: 'over-500k', label: 'Over RM 500,000' }
-              ]}
-            />
-            
-            <div className="space-y-3">
-              <label className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
-                Special Requirements
-              </label>
-              <textarea 
-                name="specialRequirements"
-                rows={4}
-                placeholder="Any special requirements for your events (AV equipment, catering preferences, accessibility needs, etc.)"
-                value={formData.specialRequirements}
-                onChange={handleChange}
-                className="w-full px-4 py-4 text-base text-white placeholder-gray-400 focus:outline-none transition-all duration-300 font-light tracking-wide rounded-lg border-2 border-gray-600 bg-gray-800/40 hover:border-gray-500 focus:border-yellow-400 focus:bg-gray-800/70 focus:shadow-lg focus:shadow-yellow-400/20 resize-none"
-                style={{fontFamily: 'Montserrat, sans-serif'}}
-              />
-            </div>
-            
-            <EnhancedSelect
-              label="How did you hear about us?"
-              name="marketing"
-              placeholder="Select marketing channel"
-              value={formData.marketing}
-              onChange={handleChange}
-              icon={Sparkles}
-              options={[
-                { value: 'website', label: 'Website/Google Search' },
-                { value: 'social-media', label: 'Social Media' },
-                { value: 'referral', label: 'Referral from partner' },
-                { value: 'event', label: 'Industry Event' },
-                { value: 'advertisement', label: 'Advertisement' },
-                { value: 'other', label: 'Other' }
-              ]}
-            />
+              <span className="text-gray-300 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                I agree to the Terms & Conditions
+              </span>
+            </label>
+            {errors.termsAccepted && <p className="text-sm text-red-400">{errors.termsAccepted}</p>}
           </div>
         );
 
@@ -670,10 +622,10 @@ const CorporateFormSteps = ({ onClose, onComplete }) => {
             Step {currentStep} of 4
           </div>
           <div className="text-xs text-gray-500" style={{fontFamily: 'Montserrat, sans-serif'}}>
-            {currentStep === 1 && 'Company Information'}
-            {currentStep === 2 && 'Contact Information'}
+            {currentStep === 1 && 'Contact Information'}
+            {currentStep === 2 && 'Company Information'}
             {currentStep === 3 && 'Partnership Preferences'}
-            {currentStep === 4 && 'Additional Information'}
+            {currentStep === 4 && 'Review & Terms'}
           </div>
         </div>
       </div>
