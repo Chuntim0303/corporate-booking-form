@@ -6,19 +6,18 @@ import {
   Building, 
   MapPin, 
   CreditCard, 
-  ArrowRight, 
-  ArrowLeft,
-  CheckCircle,
   AlertCircle,
   Users,
-  Calendar,
   Trophy,
   Sparkles,
   Crown,
   Star,
-  Check,
-  Loader2,
-  X
+  X,
+  Gift,
+  Percent,
+  RefreshCw,
+  Award,
+  ChevronDown
 } from 'lucide-react';
 import CorporateFormSteps from './components/CorporateFormSteps';
 
@@ -42,18 +41,16 @@ const EnhancedInput = ({
 
   return (
     <div className="space-y-3">
-      <label htmlFor={id} className="block text-sm font-medium text-gray-200 tracking-wide">
-        {label} {required && <span className="text-amber-400">*</span>}
+      <label htmlFor={id} className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
+        {label} {required && <span style={{color: '#F4C430'}}>*</span>}
       </label>
       
       <div className={`relative transition-all duration-300 ${
-        isFocused ? 'transform scale-[1.01]' : ''
+        isFocused ? 'transform scale-[1.02]' : ''
       }`}>
         {Icon && (
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-            <Icon className={`h-5 w-5 transition-colors duration-200 ${
-              error ? 'text-red-400' : isFocused ? 'text-amber-400' : 'text-gray-400'
-            }`} />
+            <Icon className={`h-5 w-5 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#F4C430' : '#9ca3af'}} />
           </div>
         )}
         
@@ -69,28 +66,27 @@ const EnhancedInput = ({
           required={required}
           disabled={disabled}
           maxLength={maxLength}
-          className={`block w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-4 bg-gray-800/50 backdrop-blur-sm border-0 border-b-2 text-white placeholder-gray-400 focus:outline-none transition-all duration-300 font-light tracking-wide ${
+          className={`block w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-4 text-base text-white placeholder-gray-400 focus:outline-none transition-all duration-300 font-light tracking-wide rounded-lg border-2 ${
             error 
-              ? 'border-red-500 bg-red-900/10' 
+              ? 'border-red-500 bg-red-900/10 focus:border-red-400' 
               : isFocused
-              ? 'border-amber-400 bg-gray-700/50'
-              : 'border-gray-600 hover:border-gray-500'
+              ? 'border-yellow-400 bg-gray-800/70 shadow-lg shadow-yellow-400/20'
+              : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          style={{
+            fontFamily: 'Montserrat, sans-serif'
+          }}
         />
-        
-        {isFocused && !error && (
-          <div className="absolute inset-0 rounded-lg border border-amber-400/30 pointer-events-none"></div>
-        )}
       </div>
       
       {helpText && !error && (
-        <p className="text-xs text-gray-400 tracking-wide">{helpText}</p>
+        <p className="text-sm text-gray-400 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>{helpText}</p>
       )}
       
       {error && (
         <div className="flex items-center gap-2 text-sm text-red-400">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          <span className="font-light">{error}</span>
+          <span className="font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>{error}</span>
         </div>
       )}
     </div>
@@ -115,18 +111,16 @@ const EnhancedSelect = ({
 
   return (
     <div className="space-y-3">
-      <label htmlFor={id} className="block text-sm font-medium text-gray-200 tracking-wide">
-        {label} {required && <span className="text-amber-400">*</span>}
+      <label htmlFor={id} className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
+        {label} {required && <span style={{color: '#F4C430'}}>*</span>}
       </label>
       
       <div className={`relative transition-all duration-300 ${
-        isFocused ? 'transform scale-[1.01]' : ''
+        isFocused ? 'transform scale-[1.02]' : ''
       }`}>
         {Icon && (
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-            <Icon className={`h-5 w-5 transition-colors duration-200 ${
-              error ? 'text-red-400' : isFocused ? 'text-amber-400' : 'text-gray-400'
-            }`} />
+            <Icon className={`h-5 w-5 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#F4C430' : '#9ca3af'}} />
           </div>
         )}
         
@@ -139,37 +133,34 @@ const EnhancedSelect = ({
           onBlur={() => setIsFocused(false)}
           required={required}
           disabled={disabled}
-          className={`block w-full ${Icon ? 'pl-12' : 'pl-4'} pr-12 py-4 bg-gray-800/50 backdrop-blur-sm border-0 border-b-2 text-white focus:outline-none appearance-none transition-all duration-300 font-light tracking-wide ${
+          className={`block w-full ${Icon ? 'pl-12' : 'pl-4'} pr-12 py-4 text-base text-white focus:outline-none appearance-none transition-all duration-300 font-light tracking-wide rounded-lg border-2 ${
             error 
-              ? 'border-red-500 bg-red-900/10' 
+              ? 'border-red-500 bg-red-900/10 focus:border-red-400' 
               : isFocused
-              ? 'border-amber-400 bg-gray-700/50'
-              : 'border-gray-600 hover:border-gray-500'
+              ? 'border-yellow-400 bg-gray-800/70 shadow-lg shadow-yellow-400/20'
+              : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          style={{
+            fontFamily: 'Montserrat, sans-serif'
+          }}
         >
-          <option value="" className="bg-gray-800 text-gray-400">{placeholder}</option>
+          <option value="" style={{backgroundColor: '#1f2937', color: '#9ca3af'}}>{placeholder}</option>
           {options.map((option) => (
-            <option key={option.value} value={option.value} className="bg-gray-800 text-white">
+            <option key={option.value} value={option.value} style={{backgroundColor: '#1f2937', color: 'white'}}>
               {option.label}
             </option>
           ))}
         </select>
         
         <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          <ChevronDown className="w-5 h-5 text-gray-400" />
         </div>
-        
-        {isFocused && !error && (
-          <div className="absolute inset-0 rounded-lg border border-amber-400/30 pointer-events-none"></div>
-        )}
       </div>
       
       {error && (
         <div className="flex items-center gap-2 text-sm text-red-400">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          <span className="font-light">{error}</span>
+          <span className="font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>{error}</span>
         </div>
       )}
     </div>
@@ -178,256 +169,194 @@ const EnhancedSelect = ({
 
 // Main App Component
 function App() {
-  const [showModal, setShowModal] = useState(false);
-  const [showMembershipForm, setShowMembershipForm] = useState(false);
-
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
+  const [showCorporateForm, setShowCorporateForm] = useState(false);
 
   const handleJoinNetwork = () => {
-    setShowMembershipForm(true);
+    setShowCorporateForm(true);
   };
 
   const handleFormComplete = () => {
-    setShowMembershipForm(false);
+    setShowCorporateForm(false);
+    alert('Thank you for your application! Our team will review your submission and contact you within 48 hours to discuss the next steps.');
   };
 
-  const handleBackToHome = () => {
-    setShowMembershipForm(false);
+  const handleCloseForm = () => {
+    setShowCorporateForm(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
+    <div className="min-h-screen" style={{background: `linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 50%, #1a1a1a 100%)`}}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap');
+        
+        ::selection {
+          background-color: #F4C430;
+          color: #1a1a1a;
+        }
+        ::-moz-selection {
+          background-color: #F4C430;
+          color: #1a1a1a;
+        }
+        
+        .smooth-scroll {
+          scroll-behavior: smooth;
+        }
+        
+        .hover-lift {
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+          transform: translateY(-8px);
+        }
+        
+        .glow-border {
+          box-shadow: 0 0 0 1px rgba(244, 196, 48, 0.2);
+        }
+        
+        .glow-border:hover {
+          box-shadow: 0 0 0 2px rgba(244, 196, 48, 0.4), 0 8px 32px rgba(244, 196, 48, 0.15);
+        }
+      `}</style>
+
       {/* Header */}
-      <header className="bg-black/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
-        <nav className="max-w-7xl mx-auto px-8 py-6">
+      <header className="backdrop-blur-xl border-b sticky top-0 z-50"
+        style={{
+          backgroundColor: 'rgba(26, 26, 26, 0.95)',
+          borderBottomColor: 'rgba(244, 196, 48, 0.1)'
+        }}
+      >
+        <nav className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
-            <div className="cursor-pointer group" onClick={handleBackToHome}>
+            <div 
+              className="cursor-pointer group"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
               <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300">
-                  <Crown className="w-6 h-6 text-black" />
-                </div>
-                <span className="text-2xl font-light text-white tracking-[0.2em]" style={{fontFamily: 'serif'}}>
-                  CONFETTI <span className="text-amber-400">KL</span>
+                <img 
+                  src="/black_logo.png" 
+                  alt="Confetti KL Logo" 
+                  className="w-12 h-12 object-contain transition-transform duration-300 group-hover:scale-110"
+                />
+                <span 
+                  className="text-2xl lg:text-3xl font-light text-white tracking-wider transition-colors duration-300 group-hover:text-yellow-400" 
+                  style={{fontFamily: 'Montserrat, sans-serif'}}
+                >
+                  CONFETTI <span style={{color: '#F4C430'}}>KL</span>
                 </span>
               </div>
             </div>
-
-            <button 
-              onClick={openModal}
-              className="group relative px-8 py-3 bg-gradient-to-r from-amber-400 to-amber-600 text-black font-medium tracking-wider text-sm uppercase overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/25"
-            >
-              <span className="relative z-10">Private Inquiry</span>
-              <div className="absolute inset-0 bg-white transform translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-            </button>
           </div>
         </nav>
       </header>
 
       <main>
-        {showMembershipForm ? (
-          <div className="py-20 px-8">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-12">
-                <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-400/10 border border-amber-400/20 backdrop-blur-sm mb-8">
-                  <Crown className="w-5 h-5 text-amber-400" />
-                  <span className="text-amber-400 text-sm font-medium tracking-widest uppercase">Membership Application</span>
-                </div>
-                <h1 className="text-4xl lg:text-6xl font-light text-white mb-8 tracking-wider" style={{fontFamily: 'serif'}}>
-                  Join the 
-                  <span className="block text-amber-400 mt-2">Elite Network</span>
-                </h1>
-                <div className="w-24 h-px bg-amber-400 mx-auto mb-8"></div>
-                <p className="text-xl text-gray-300 max-w-3xl mx-auto font-light leading-relaxed tracking-wide">
-                  Complete your application to become part of the world's most influential business network
-                </p>
-              </div>
-
-              <CorporateFormSteps onComplete={handleFormComplete} />
-
-              <div className="text-center mt-12">
-                <button 
-                  onClick={handleBackToHome}
-                  className="px-8 py-3 border border-gray-600 text-gray-300 font-light tracking-widest text-sm uppercase hover:border-amber-400 hover:text-amber-400 transition-all duration-500"
-                >
-                  Back to Home
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <HomePage onJoinNetwork={handleJoinNetwork} onRequestInfo={openModal} />
-        )}
+        <HomePage onJoinNetwork={handleJoinNetwork} />
       </main>
 
       {/* Footer */}
-      <footer className="bg-black border-t border-gray-800 mt-32">
-        <div className="max-w-7xl mx-auto px-8 py-20">
+      <footer className="border-t mt-32"
+        style={{
+          backgroundColor: '#0a0a0a',
+          borderTopColor: 'rgba(244, 196, 48, 0.1)'
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
             <div className="lg:col-span-2">
               <div className="flex items-center space-x-4 mb-8">
-                <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-                  <Crown className="w-6 h-6 text-black" />
-                </div>
-                <span className="text-2xl font-light text-white tracking-[0.2em]" style={{fontFamily: 'serif'}}>
-                  CONFETTI <span className="text-amber-400">KL</span>
+                <span className="text-xl lg:text-2xl font-light text-white tracking-wider" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                  CONFETTI <span style={{color: '#F4C430'}}>KL</span>
                 </span>
               </div>
-              <p className="text-gray-400 font-light leading-relaxed tracking-wide max-w-md mb-8">
-                An exclusive network of visionary leaders, industry pioneers, and influential decision-makers shaping the future of business.
+              <p className="text-gray-400 text-lg font-light leading-relaxed max-w-md mb-8" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                Malaysia's premier corporate event venue offering exclusive partnership programs for businesses seeking memorable event experiences.
               </p>
-              <div className="flex space-x-6">
-                <a href="#" className="text-gray-400 hover:text-amber-400 transition-colors">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                </a>
-                <a href="#" className="text-gray-400 hover:text-amber-400 transition-colors">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                  </svg>
-                </a>
-              </div>
             </div>
             
             <div>
-              <h3 className="text-white font-medium mb-6 tracking-widest text-sm uppercase">Exclusive Access</h3>
+              <h3 className="text-white font-semibold mb-6 tracking-wider text-sm uppercase" style={{fontFamily: 'Montserrat, sans-serif'}}>Partnership Tiers</h3>
               <ul className="space-y-4">
-                <li><a href="#" className="text-gray-400 hover:text-amber-400 transition-colors font-light tracking-wide">Executive Membership</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-amber-400 transition-colors font-light tracking-wide">Private Events</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-amber-400 transition-colors font-light tracking-wide">Strategic Partnerships</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-amber-400 transition-colors font-light tracking-wide">Leadership Council</a></li>
+                <li><a href="#" className="text-gray-400 font-light transition-colors duration-300 hover:text-yellow-400" style={{fontFamily: 'Montserrat, sans-serif'}}>Gold Partner</a></li>
+                <li><a href="#" className="text-gray-400 font-light transition-colors duration-300 hover:text-yellow-400" style={{fontFamily: 'Montserrat, sans-serif'}}>Platinum Partner</a></li>
+                <li><a href="#" className="text-gray-400 font-light transition-colors duration-300 hover:text-yellow-400" style={{fontFamily: 'Montserrat, sans-serif'}}>Diamond Partner</a></li>
+                <li><a href="#" className="text-gray-400 font-light transition-colors duration-300 hover:text-yellow-400" style={{fontFamily: 'Montserrat, sans-serif'}}>Event Packages</a></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="text-white font-medium mb-6 tracking-widest text-sm uppercase">Connect</h3>
+              <h3 className="text-white font-semibold mb-6 tracking-wider text-sm uppercase" style={{fontFamily: 'Montserrat, sans-serif'}}>Contact</h3>
               <ul className="space-y-4 text-gray-400 font-light">
-                <li className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-amber-400" />
-                  <span className="tracking-wide text-sm">Global Headquarters</span>
+                <li className="flex items-center gap-3" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                  <MapPin className="w-5 h-5 text-yellow-400" />
+                  <span>Kuala Lumpur, Malaysia</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-amber-400" />
-                  <span className="tracking-wide text-sm">+1 (555) 123-4567</span>
+                <li className="flex items-center gap-3" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                  <Phone className="w-5 h-5 text-yellow-400" />
+                  <span>+60 3-1234-5678</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-amber-400" />
-                  <span className="tracking-wide text-sm">connect@confettikl.com</span>
+                <li className="flex items-center gap-3" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                  <Mail className="w-5 h-5 text-yellow-400" />
+                  <span>partners@confettikl.com</span>
                 </li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 pt-8 mt-16">
-            <p className="text-center text-gray-500 text-sm font-light tracking-widest uppercase">
-              © 2025 NexusConnect. All Rights Reserved.
+          <div className="border-t pt-8 mt-12" style={{borderColor: 'rgba(244, 196, 48, 0.1)'}}>
+            <p className="text-center text-gray-500 text-sm font-light tracking-wider uppercase" style={{fontFamily: 'Montserrat, sans-serif'}}>
+              © 2025 Confetti KL. All Rights Reserved.
             </p>
           </div>
         </div>
       </footer>
 
-      {/* Enhanced Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-8">
-          <div className="bg-gray-900 border border-gray-700 shadow-2xl w-full max-w-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-amber-600"></div>
+      {/* Corporate Form Popup */}
+      {showCorporateForm && (
+        <div className="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
+          style={{backgroundColor: 'rgba(0, 0, 0, 0.85)'}}
+        >
+          <div className="border-2 shadow-2xl w-full max-w-6xl relative overflow-hidden max-h-[90vh] overflow-y-auto rounded-2xl"
+            style={{
+              backgroundColor: '#0a0a0a',
+              borderColor: 'rgba(244, 196, 48, 0.3)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(244, 196, 48, 0.1)'
+            }}
+          >
+            <div className="absolute top-0 left-0 w-full h-1 rounded-t-2xl" style={{background: `linear-gradient(to right, #F4C430, #FFD700)`}}></div>
             
             <button 
-              onClick={closeModal}
-              className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors z-10"
+              onClick={handleCloseForm}
+              className="absolute top-6 right-6 text-gray-400 hover:text-yellow-400 transition-colors z-10 p-2 rounded-full hover:bg-gray-800/50"
             >
               <X className="w-6 h-6" />
             </button>
             
-            <div className="p-12">
-              <div className="text-center mb-10">
-                <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 mx-auto mb-6 flex items-center justify-center">
-                  <Crown className="w-8 h-8 text-black" />
-                </div>
-                <h2 className="text-3xl font-light text-white mb-4 tracking-wider" style={{fontFamily: 'serif'}}>
-                  Executive Consultation
-                </h2>
-                <div className="w-16 h-px bg-amber-400 mx-auto mb-6"></div>
-                <p className="text-gray-300 font-light leading-relaxed tracking-wide">
-                  Request a private consultation with our membership committee to discuss your professional networking objectives.
-                </p>
-              </div>
-              
-              <div className="space-y-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <EnhancedInput
-                    label="Full Name"
-                    name="fullName"
-                    placeholder="Your full name"
-                    icon={User}
-                    required
-                  />
-                  <EnhancedInput
-                    label="Email Address"
-                    name="email"
-                    type="email"
-                    placeholder="professional@company.com"
-                    icon={Mail}
-                    required
-                  />
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <EnhancedInput
-                    label="Company"
-                    name="company"
-                    placeholder="Organization name"
-                    icon={Building}
-                    required
-                  />
-                  <EnhancedInput
-                    label="Position"
-                    name="position"
-                    placeholder="Your title"
-                    icon={Trophy}
-                    required
-                  />
-                </div>
-                
-                <EnhancedSelect
-                  label="Area of Interest"
-                  name="interest"
-                  placeholder="Select primary interest"
-                  icon={Sparkles}
-                  required
-                  options={[
-                    { value: 'executive-membership', label: 'Executive Membership' },
-                    { value: 'strategic-partnerships', label: 'Strategic Partnerships' },
-                    { value: 'private-events', label: 'Private Events' },
-                    { value: 'board-advisory', label: 'Board Advisory' },
-                    { value: 'investment-opportunities', label: 'Investment Opportunities' }
-                  ]}
-                />
-                
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-200 tracking-wide">Message</label>
-                  <textarea 
-                    rows={4}
-                    placeholder="Tell us about your networking objectives and how we can assist you..."
-                    className="w-full px-4 py-4 bg-gray-800/50 backdrop-blur-sm border-0 border-b-2 border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-amber-400 transition-all duration-300 font-light tracking-wide resize-none"
-                  />
-                </div>
-                
-                <button 
-                  className="group relative w-full py-5 bg-gradient-to-r from-amber-400 to-amber-600 text-black font-medium tracking-widest text-sm uppercase overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/25"
-                  onClick={() => {
-                    alert('Thank you for your inquiry. Our executive team will contact you within 24 hours to schedule your private consultation.');
-                    closeModal();
+            <div className="p-6 lg:p-12">
+              <div className="text-center mb-12">
+                <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-sm mb-8 glow-border"
+                  style={{
+                    backgroundColor: 'rgba(244, 196, 48, 0.1)',
+                    border: '1px solid rgba(244, 196, 48, 0.2)'
                   }}
                 >
-                  <span className="relative z-10 flex items-center justify-center gap-3">
-                    <Crown className="w-5 h-5" />
-                    Submit Consultation Request
-                  </span>
-                  <div className="absolute inset-0 bg-white transform translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-                </button>
+                  <Sparkles className="w-5 h-5 text-yellow-400" />
+                  <span className="text-sm font-semibold tracking-wider uppercase text-yellow-400" style={{fontFamily: 'Montserrat, sans-serif'}}>Class Partner Application</span>
+                </div>
+                <h2 className="text-3xl lg:text-5xl font-light text-white mb-6 tracking-tight" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                  Join Confetti KL
+                  <span className="block mt-2 text-yellow-400">Class Partners</span>
+                </h2>
+                <div className="w-24 h-1 mx-auto mb-6 rounded-full" style={{background: 'linear-gradient(90deg, #F4C430, #FFD700)'}}></div>
+                <p className="text-lg text-gray-300 max-w-3xl mx-auto font-light leading-relaxed" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                  Become a premium partner and unlock exclusive benefits for your corporate events
+                </p>
               </div>
+
+              <CorporateFormSteps 
+                onClose={handleCloseForm}
+                onComplete={handleFormComplete} 
+              />
             </div>
           </div>
         </div>
@@ -437,41 +366,23 @@ function App() {
 }
 
 // HomePage Component
-const HomePage = ({ onJoinNetwork, onRequestInfo }) => {
+const HomePage = ({ onJoinNetwork }) => {
   const features = [
     {
-      icon: Users,
-      title: 'Elite Network Access',
-      description: 'Connect with C-suite executives, industry titans, and visionary leaders across global markets.',
+      icon: Gift,
+      title: 'Points & Birthday Benefits',
+      description: 'Earn valuable points with every event booking and receive special birthday point bonuses annually.',
     },
     {
-      icon: Calendar,
-      title: 'Exclusive Events',
-      description: 'Access invitation-only gatherings, private dinners, and strategic forums in world-class venues.',
+      icon: Percent,
+      title: 'Referral Rewards',
+      description: 'Earn 6%-15% referral fees when you bring new partners to our network.',
     },
     {
-      icon: Trophy,
-      title: 'Strategic Partnerships',
-      description: 'Forge high-value alliances that drive exponential business growth and market expansion.',
+      icon: RefreshCw,
+      title: 'Guaranteed Buyback',
+      description: 'Full buyback options available after 2 years with annual buyback opportunities.',
     },
-  ];
-
-  const testimonials = [
-    {
-      quote: "Confetti KL has transformed how I approach strategic partnerships. The caliber of connections and opportunities is unmatched in the industry.",
-      name: "Victoria Sterling",
-      title: "CEO, Sterling Enterprises",
-    },
-    {
-      quote: "Through Confetti KL, I've accessed investment opportunities and board positions that have redefined my career trajectory completely.",
-      name: "Marcus Chen",
-      title: "Managing Director, Chen Capital",
-    },
-    {
-      quote: "The network's exclusive events provide unparalleled access to decision-makers who are actively shaping tomorrow's business landscape.",
-      name: "Elena Rodriguez",
-      title: "Founder, Rodriguez Ventures",
-    }
   ];
 
   return (
@@ -479,105 +390,90 @@ const HomePage = ({ onJoinNetwork, onRequestInfo }) => {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-black/95 via-gray-900/90 to-black/95 z-10"></div>
+          <div className="absolute inset-0 z-10" style={{background: `linear-gradient(135deg, rgba(26, 26, 26, 0.7) 0%, rgba(10, 10, 10, 0.7) 50%, rgba(26, 26, 26, 0.9) 100%)`}}></div>
           <img 
-            src="https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
-            alt="Executive networking environment" 
-            className="w-full h-full object-cover opacity-30"
+            src="/cf_125.jpg" 
+            alt="Confetti KL event venue" 
+            className="w-full h-full object-cover"
           />
-          
-          {/* Animated particles */}
-          <div className="absolute inset-0 z-5">
-            <div className="absolute top-20 left-10 w-2 h-2 bg-amber-400/40 rounded-full animate-pulse"></div>
-            <div className="absolute top-40 right-20 w-1 h-1 bg-white/30 rounded-full animate-pulse delay-300"></div>
-            <div className="absolute bottom-40 left-20 w-1 h-1 bg-amber-400/40 rounded-full animate-pulse delay-700"></div>
-            <div className="absolute bottom-20 right-10 w-2 h-2 bg-white/20 rounded-full animate-pulse delay-1000"></div>
-          </div>
         </div>
 
-        <div className="relative z-20 text-center px-8 max-w-6xl mx-auto">
-          <div className="mb-12">
-            <div className="w-px h-20 bg-gradient-to-b from-transparent via-amber-400 to-transparent mx-auto mb-8"></div>
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-400/10 border border-amber-400/20 backdrop-blur-sm mb-8">
-              <Crown className="w-5 h-5 text-amber-400" />
-              <span className="text-amber-400 text-sm font-medium tracking-widest uppercase">Exclusive Membership</span>
-            </div>
-          </div>
-          
-          <h1 className="text-6xl lg:text-8xl font-light text-white mb-16 leading-none tracking-wider" style={{fontFamily: 'serif'}}>
+        <div className="relative z-20 text-center px-6 lg:px-8 max-w-6xl mx-auto">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-light text-white mb-12 lg:mb-16 leading-tight tracking-tight" style={{fontFamily: 'Montserrat, sans-serif'}}>
             ELEVATE YOUR
-            <span className="block text-amber-400 font-normal mt-4">
-              INFLUENCE
+            <span className="block font-normal mt-4 text-yellow-400">
+              CORPORATE EVENTS
             </span>
           </h1>
           
-          <p className="text-xl lg:text-2xl text-gray-300 mb-20 max-w-3xl mx-auto leading-relaxed font-light tracking-wide">
-            Join an exclusive confederation of visionary leaders, industry pioneers, and global decision-makers shaping the future of business.
+          <p className="text-lg lg:text-xl text-gray-200 mb-16 lg:mb-20 max-w-4xl mx-auto leading-relaxed font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>
+            Join Confetti KL's exclusive Class Partner program and unlock premium benefits for your corporate events. From product launches to team building - create memorable experiences.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-6 lg:gap-8 justify-center items-center">
             <button 
               onClick={onJoinNetwork}
-              className="group relative px-16 py-6 bg-gradient-to-r from-amber-400 to-amber-600 text-black font-medium tracking-widest text-sm uppercase overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-amber-500/25"
+              className="group relative px-12 lg:px-16 py-5 lg:py-6 text-black font-semibold tracking-wider text-sm lg:text-base uppercase overflow-hidden transition-all duration-500 hover-lift w-full sm:w-auto"
+              style={{
+                backgroundColor: "#F4C430",
+                fontFamily: "Montserrat, sans-serif"
+              }}
             >
-              <span className="relative z-10 flex items-center gap-3">
-                <Crown className="w-5 h-5" />
-                Apply for Membership
+              <span className="relative z-10 flex items-center justify-center gap-3">
+                <Sparkles className="w-5 h-5 lg:w-6 lg:h-6" />
+                Apply for Partnership
               </span>
-              <div className="absolute inset-0 bg-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-            </button>
-            <button 
-              onClick={onRequestInfo}
-              className="px-16 py-6 border border-gray-600 text-gray-300 font-light tracking-widest text-sm uppercase hover:border-amber-400 hover:text-amber-400 transition-all duration-500"
-            >
-              Private Consultation
             </button>
           </div>
         </div>
 
-        <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-20">
+        <div className="absolute bottom-12 lg:bottom-16 left-1/2 transform -translate-x-1/2 z-20">
           <div className="flex flex-col items-center text-gray-400">
-            <div className="w-px h-24 bg-gradient-to-b from-amber-400/60 via-gray-600 to-transparent animate-pulse"></div>
+            <div className="w-px h-20 lg:h-24 animate-pulse" style={{background: `linear-gradient(to bottom, rgba(244, 196, 48, 0.6), transparent)`}}></div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-48 bg-gray-900 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900 to-black opacity-50"></div>
-        
-        <div className="relative max-w-7xl mx-auto px-8">
-          <div className="text-center mb-32">
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-400/10 border border-amber-400/20 backdrop-blur-sm mb-8">
-              <Star className="w-5 h-5 text-amber-400" />
-              <span className="text-amber-400 text-sm font-medium tracking-widest uppercase">Why Choose NexusConnect</span>
+      {/* Value Proposition Section */}
+      <section className="py-24 lg:py-32 relative" style={{backgroundColor: '#1a1a1a'}}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-20 lg:mb-24">
+            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-sm mb-8 glow-border"
+              style={{
+                backgroundColor: 'rgba(244, 196, 48, 0.1)',
+                border: '1px solid rgba(244, 196, 48, 0.2)'
+              }}
+            >
+              <Star className="w-5 h-5 text-yellow-400" />
+              <span className="text-sm font-semibold tracking-wider uppercase text-yellow-400" style={{fontFamily: 'Montserrat, sans-serif'}}>Why Choose Us</span>
             </div>
-            <h2 className="text-5xl lg:text-6xl font-light text-white mb-12 tracking-wider" style={{fontFamily: 'serif'}}>
-              Power Through
-              <span className="block text-amber-400">Connection</span>
+            <h2 className="text-3xl lg:text-4xl xl:text-5xl font-light text-white mb-8 lg:mb-12 tracking-tight" style={{fontFamily: 'Montserrat, sans-serif'}}>
+              Premium Benefits
+              <span className="block text-yellow-400">Await You</span>
             </h2>
-            <div className="w-24 h-px bg-amber-400 mx-auto mb-8"></div>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto font-light leading-relaxed tracking-wide">
-              Experience networking elevated beyond convention through our meticulously curated community
+            <div className="w-24 h-1 mx-auto mb-8 rounded-full" style={{background: 'linear-gradient(90deg, #F4C430, #FFD700)'}}></div>
+            <p className="text-lg lg:text-xl text-gray-300 max-w-4xl mx-auto font-light leading-relaxed" style={{fontFamily: 'Montserrat, sans-serif'}}>
+              Experience unparalleled advantages designed exclusively for our Class Partners
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16">
             {features.map((feature, index) => (
               <div 
                 key={index}
-                className="group text-center"
+                className="group text-center hover-lift"
               >
-                <div className="relative mb-12">
-                  <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-600 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                    <feature.icon className="w-10 h-10 text-black" />
+                <div className="relative mb-8 lg:mb-12">
+                  <div className="w-20 h-20 lg:w-24 lg:h-24 mx-auto flex items-center justify-center rounded-2xl transition-all duration-500 group-hover:scale-110"
+                    style={{backgroundColor: '#F4C430', boxShadow: '0 8px 32px rgba(244, 196, 48, 0.3)'}}
+                  >
+                    <feature.icon className="w-10 h-10 lg:w-12 lg:h-12 text-black" />
                   </div>
-                  <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
                 </div>
-                <h3 className="text-2xl font-light text-white mb-8 tracking-wide" style={{fontFamily: 'serif'}}>
+                <h3 className="text-xl lg:text-2xl font-light text-white mb-6 tracking-tight" style={{fontFamily: 'Montserrat, sans-serif'}}>
                   {feature.title}
                 </h3>
-                <p className="text-gray-400 font-light leading-relaxed tracking-wide">
+                <p className="text-gray-400 text-base lg:text-lg font-light leading-relaxed" style={{fontFamily: 'Montserrat, sans-serif'}}>
                   {feature.description}
                 </p>
               </div>
@@ -586,202 +482,196 @@ const HomePage = ({ onJoinNetwork, onRequestInfo }) => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-32 bg-black">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-16 text-center">
-            <div className="group">
-              <div className="text-5xl font-light text-amber-400 mb-6 tracking-wider group-hover:scale-110 transition-transform duration-300" style={{fontFamily: 'serif'}}>500+</div>
-              <div className="text-gray-400 font-light tracking-widest text-sm uppercase">Global Leaders</div>
+      {/* Pricing Plans Section */}
+      <section className="py-24 lg:py-32" style={{backgroundColor: '#0a0a0a'}}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-20 lg:mb-24">
+            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-sm mb-8 glow-border"
+              style={{
+                backgroundColor: 'rgba(244, 196, 48, 0.1)',
+                border: '1px solid rgba(244, 196, 48, 0.2)'
+              }}
+            >
+              <Trophy className="w-5 h-5 text-yellow-400" />
+              <span className="text-sm font-semibold tracking-wider uppercase text-yellow-400" style={{fontFamily: 'Montserrat, sans-serif'}}>Pricing Plans</span>
             </div>
-            <div className="group">
-              <div className="text-5xl font-light text-amber-400 mb-6 tracking-wider group-hover:scale-110 transition-transform duration-300" style={{fontFamily: 'serif'}}>50+</div>
-              <div className="text-gray-400 font-light tracking-widest text-sm uppercase">Industry Sectors</div>
-            </div>
-            <div className="group">
-              <div className="text-5xl font-light text-amber-400 mb-6 tracking-wider group-hover:scale-110 transition-transform duration-300" style={{fontFamily: 'serif'}}>200+</div>
-              <div className="text-gray-400 font-light tracking-widest text-sm uppercase">Exclusive Events</div>
-            </div>
-            <div className="group">
-              <div className="text-5xl font-light text-amber-400 mb-6 tracking-wider group-hover:scale-110 transition-transform duration-300" style={{fontFamily: 'serif'}}>$5B+</div>
-              <div className="text-gray-400 font-light tracking-widest text-sm uppercase">Value Created</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-48 bg-gradient-to-b from-black via-gray-900 to-black">
-        <div className="max-w-6xl mx-auto px-8">
-          <div className="text-center mb-32">
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-400/10 border border-amber-400/20 backdrop-blur-sm mb-8">
-              <Users className="w-5 h-5 text-amber-400" />
-              <span className="text-amber-400 text-sm font-medium tracking-widest uppercase">Member Testimonials</span>
-            </div>
-            <h2 className="text-5xl lg:text-6xl font-light text-white mb-12 tracking-wider" style={{fontFamily: 'serif'}}>
-              Leaders Speak
-            </h2>
-            <div className="w-24 h-px bg-amber-400 mx-auto"></div>
-          </div>
-
-          <div className="space-y-24">
-            {testimonials.map((testimonial, index) => (
-              <div 
-                key={index}
-                className="text-center max-w-5xl mx-auto group"
-              >
-                <div className="relative mb-12">
-                  <div className="absolute -top-4 -left-4 text-6xl text-amber-400/20 font-serif">"</div>
-                  <p className="text-2xl lg:text-3xl text-white mb-12 font-light leading-loose tracking-wide italic" style={{fontFamily: 'serif'}}>
-                    {testimonial.quote}
-                  </p>
-                  <div className="absolute -bottom-4 -right-4 text-6xl text-amber-400/20 font-serif rotate-180">"</div>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="w-16 h-px bg-amber-400 mb-6"></div>
-                  <h4 className="text-white font-light text-xl tracking-wide mb-2" style={{fontFamily: 'serif'}}>{testimonial.name}</h4>
-                  <p className="text-gray-400 font-light text-sm tracking-widest uppercase">{testimonial.title}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Membership Tiers Section */}
-      <section className="py-48 bg-gray-900">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="text-center mb-32">
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-400/10 border border-amber-400/20 backdrop-blur-sm mb-8">
-              <Trophy className="w-5 h-5 text-amber-400" />
-              <span className="text-amber-400 text-sm font-medium tracking-widest uppercase">Membership Tiers</span>
-            </div>
-            <h2 className="text-5xl lg:text-6xl font-light text-white mb-12 tracking-wider" style={{fontFamily: 'serif'}}>
+            <h2 className="text-3xl lg:text-4xl xl:text-5xl font-light text-white mb-8 lg:mb-12 tracking-tight" style={{fontFamily: 'Montserrat, sans-serif'}}>
               Choose Your
-              <span className="block text-amber-400">Level</span>
+              <span className="block text-yellow-400">Partnership Level</span>
             </h2>
-            <div className="w-24 h-px bg-amber-400 mx-auto mb-8"></div>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto font-light leading-relaxed tracking-wide">
-              Select the membership tier that aligns with your professional aspirations and influence
+            <div className="w-24 h-1 mx-auto mb-8 rounded-full" style={{background: 'linear-gradient(90deg, #F4C430, #FFD700)'}}></div>
+            <p className="text-lg lg:text-xl text-gray-300 max-w-4xl mx-auto font-light leading-relaxed" style={{fontFamily: 'Montserrat, sans-serif'}}>
+              Select the partnership tier that best fits your corporate event needs and budget
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Executive Tier */}
-            <div className="bg-gray-800/50 border border-gray-700 p-12 text-center group hover:bg-gray-800/70 hover:border-gray-600 transition-all duration-500">
-              <div className="mb-8">
-                <Trophy className="w-12 h-12 text-gray-400 mx-auto mb-6 group-hover:text-amber-400 transition-colors duration-300" />
-                <h3 className="text-2xl font-light text-white mb-8 tracking-wide" style={{fontFamily: 'serif'}}>Executive</h3>
-                <div className="mb-6">
-                  <div className="text-4xl font-light text-white tracking-wider" style={{fontFamily: 'serif'}}>$2,500</div>
-                  <div className="text-gray-400 font-light text-sm tracking-widest uppercase mt-2">Annually</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-12">
+            {/* Gold Tier */}
+            <div className="border-2 rounded-2xl p-8 lg:p-12 text-center group transition-all duration-500 hover-lift glow-border"
+              style={{
+                background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
+                borderColor: 'rgba(255, 215, 0, 0.3)'
+              }}
+            >
+              <div className="mb-8 lg:mb-12">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-6 lg:mb-8 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                  style={{backgroundColor: 'rgba(255, 215, 0, 0.1)', border: '2px solid rgba(255, 215, 0, 0.3)'}}
+                >
+                  <Award className="w-8 h-8 lg:w-10 lg:h-10 text-yellow-500" />
+                </div>
+                <h3 className="text-xl lg:text-2xl font-light text-white mb-6 tracking-tight" style={{fontFamily: 'Montserrat, sans-serif'}}>Gold Partner</h3>
+                <div className="mb-6 lg:mb-8">
+                  <div className="text-2xl lg:text-3xl xl:text-4xl font-light text-yellow-500 tracking-tight" style={{fontFamily: 'Montserrat, sans-serif'}}>RM 50,000</div>
+                  <div className="text-gray-400 font-light text-sm tracking-wider uppercase mt-2" style={{fontFamily: 'Montserrat, sans-serif'}}>Partnership Investment</div>
                 </div>
               </div>
               
-              <p className="text-gray-300 mb-12 font-light leading-relaxed tracking-wide">
-                For rising executives seeking strategic connections and industry insights
-              </p>
+              <div className="space-y-4 mb-8 lg:mb-12 text-left">
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Points Value:</span>
+                  <span className="text-yellow-500 font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>150,000</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Birthday Points:</span>
+                  <span className="text-yellow-500 font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>RM 5,000 x 2Y</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Referral Fee:</span>
+                  <span className="text-yellow-500 font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>6%</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Yearly Buyback:</span>
+                  <span className="text-yellow-500 font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>RM 3,000 x 2Y</span>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Validity:</span>
+                  <span className="text-yellow-500 font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>3 Months</span>
+                </div>
+              </div>
               
               <button 
                 onClick={onJoinNetwork}
-                className="w-full py-4 border border-gray-600 text-gray-300 font-light tracking-widest text-sm uppercase hover:border-amber-400 hover:text-amber-400 hover:bg-amber-400/5 transition-all duration-500"
+                className="w-full py-4 lg:py-5 border-2 border-yellow-500 text-yellow-500 font-semibold tracking-wider text-sm lg:text-base uppercase transition-all duration-300 hover:bg-yellow-500 hover:text-black hover:shadow-lg hover:shadow-yellow-500/30"
+                style={{fontFamily: 'Montserrat, sans-serif'}}
               >
-                Apply Now
+                Apply for Gold
               </button>
             </div>
             
-            {/* Premier Tier - Featured */}
-            <div className="bg-gradient-to-br from-amber-400/10 via-gray-800/50 to-amber-600/10 border-2 border-amber-400/50 p-12 text-center relative transform lg:scale-105 group hover:scale-110 transition-all duration-500">
-              <div className="absolute -top-px left-1/2 transform -translate-x-1/2 w-32 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
-              
-              <div className="mb-8">
-                <Crown className="w-12 h-12 text-amber-400 mx-auto mb-6 group-hover:scale-110 transition-transform duration-300" />
-                <h3 className="text-2xl font-light text-white mb-8 tracking-wide" style={{fontFamily: 'serif'}}>Premier Executive</h3>
-                <div className="mb-6">
-                  <div className="text-4xl font-light text-amber-400 tracking-wider" style={{fontFamily: 'serif'}}>$5,000</div>
-                  <div className="text-gray-300 font-light text-sm tracking-widest uppercase mt-2">Annually</div>
+            {/* Platinum Tier - Featured */}
+            <div className="border-2 rounded-2xl p-8 lg:p-12 text-center relative group transition-all duration-500 hover-lift md:col-span-2 xl:col-span-1"
+              style={{
+                background: 'linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%)',
+                borderColor: 'rgba(192, 192, 192, 0.5)',
+                boxShadow: '0 16px 64px rgba(244, 196, 48, 0.2)'
+              }}
+            >
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <div className="px-6 py-2 rounded-full text-xs font-bold tracking-wider uppercase" 
+                  style={{background: 'linear-gradient(90deg, #F4C430, #FFD700)', color: '#1a1a1a', fontFamily: 'Montserrat, sans-serif'}}>
+                  Most Popular
                 </div>
               </div>
               
-              <p className="text-gray-200 mb-12 font-light leading-relaxed tracking-wide">
-                For established leaders ready to shape industry standards and global markets
-              </p>
+              <div className="mb-8 lg:mb-12">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-6 lg:mb-8 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                  style={{background: 'linear-gradient(135deg, #F4C430, #FFD700)'}}
+                >
+                  <Crown className="w-8 h-8 lg:w-10 lg:h-10 text-black" />
+                </div>
+                <h3 className="text-xl lg:text-2xl font-light text-white mb-6 tracking-tight" style={{fontFamily: 'Montserrat, sans-serif'}}>Platinum Partner</h3>
+                <div className="mb-6 lg:mb-8">
+                  <div className="text-2xl lg:text-3xl xl:text-4xl font-light text-white tracking-tight" style={{fontFamily: 'Montserrat, sans-serif'}}>RM 100,000</div>
+                  <div className="text-gray-400 font-light text-sm tracking-wider uppercase mt-2" style={{fontFamily: 'Montserrat, sans-serif'}}>Partnership Investment</div>
+                </div>
+              </div>
+              
+              <div className="space-y-4 mb-8 lg:mb-12 text-left">
+                <div className="flex items-center justify-between py-2 border-b border-gray-600">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Points Value:</span>
+                  <span className="text-white font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>350,000</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-600">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Birthday Points:</span>
+                  <span className="text-white font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>RM 10,000 x 5Y</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-600">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Referral Fee:</span>
+                  <span className="text-white font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>10%</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-600">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Yearly Buyback:</span>
+                  <span className="text-white font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>RM 10,000 x 2Y</span>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Validity:</span>
+                  <span className="text-white font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>1 Month</span>
+                </div>
+              </div>
               
               <button 
                 onClick={onJoinNetwork}
-                className="w-full py-4 bg-gradient-to-r from-amber-400 to-amber-600 text-black font-medium tracking-widest text-sm uppercase hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-500"
+                className="w-full py-4 lg:py-5 text-black font-semibold tracking-wider text-sm lg:text-base uppercase transition-all duration-300 hover:shadow-xl hover:shadow-yellow-400/40"
+                style={{
+                  background: 'linear-gradient(135deg, #F4C430, #FFD700)',
+                  fontFamily: 'Montserrat, sans-serif'
+                }}
               >
-                Join Premier
+                Apply for Platinum
               </button>
             </div>
             
-            {/* Chairman Tier */}
-            <div className="bg-gray-800/50 border border-gray-700 p-12 text-center group hover:bg-gray-800/70 hover:border-gray-600 transition-all duration-500">
-              <div className="mb-8">
-                <Sparkles className="w-12 h-12 text-gray-400 mx-auto mb-6 group-hover:text-amber-400 transition-colors duration-300" />
-                <h3 className="text-2xl font-light text-white mb-8 tracking-wide" style={{fontFamily: 'serif'}}>Chairman Circle</h3>
-                <div className="mb-6">
-                  <div className="text-4xl font-light text-white tracking-wider" style={{fontFamily: 'serif'}}>$10,000</div>
-                  <div className="text-gray-400 font-light text-sm tracking-widest uppercase mt-2">Annually</div>
+            {/* Diamond Tier */}
+            <div className="border-2 rounded-2xl p-8 lg:p-12 text-center group transition-all duration-500 hover-lift glow-border"
+              style={{
+                background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
+                borderColor: 'rgba(0, 255, 255, 0.3)'
+              }}
+            >
+              <div className="mb-8 lg:mb-12">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-6 lg:mb-8 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                  style={{backgroundColor: 'rgba(0, 255, 255, 0.1)', border: '2px solid rgba(0, 255, 255, 0.3)'}}
+                >
+                  <Sparkles className="w-8 h-8 lg:w-10 lg:h-10 text-cyan-400" />
+                </div>
+                <h3 className="text-xl lg:text-2xl font-light text-white mb-6 tracking-tight" style={{fontFamily: 'Montserrat, sans-serif'}}>Diamond Partner</h3>
+                <div className="mb-6 lg:mb-8">
+                  <div className="text-2xl lg:text-3xl xl:text-4xl font-light text-cyan-400 tracking-tight" style={{fontFamily: 'Montserrat, sans-serif'}}>RM 200,000</div>
+                  <div className="text-gray-400 font-light text-sm tracking-wider uppercase mt-2" style={{fontFamily: 'Montserrat, sans-serif'}}>Partnership Investment</div>
                 </div>
               </div>
               
-              <p className="text-gray-300 mb-12 font-light leading-relaxed tracking-wide">
-                For visionary leaders defining the future of business and society
-              </p>
+              <div className="space-y-4 mb-8 lg:mb-12 text-left">
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Points Value:</span>
+                  <span className="text-cyan-400 font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>800,000</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Birthday Points:</span>
+                  <span className="text-cyan-400 font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>RM 30,000 x 8Y</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Referral Fee:</span>
+                  <span className="text-cyan-400 font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>15%</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Yearly Buyback:</span>
+                  <span className="text-cyan-400 font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>RM 30,000 x 2Y</span>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-gray-300 font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>Validity:</span>
+                  <span className="text-cyan-400 font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>Immediately</span>
+                </div>
+              </div>
               
               <button 
                 onClick={onJoinNetwork}
-                className="w-full py-4 border border-gray-600 text-gray-300 font-light tracking-widest text-sm uppercase hover:border-amber-400 hover:text-amber-400 hover:bg-amber-400/5 transition-all duration-500"
+                className="w-full py-4 lg:py-5 border-2 border-cyan-400 text-cyan-400 font-semibold tracking-wider text-sm lg:text-base uppercase transition-all duration-300 hover:bg-cyan-400 hover:text-black hover:shadow-lg hover:shadow-cyan-400/30"
+                style={{fontFamily: 'Montserrat, sans-serif'}}
               >
-                Request Invitation
+                Apply for Diamond
               </button>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="py-48 bg-gradient-to-br from-black via-gray-900 to-black relative">
-        <div className="absolute inset-0 opacity-5">
-          <img 
-            src="https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
-            alt="Professional networking" 
-            className="w-full h-full object-cover"
-          />
-        </div>
-        
-        <div className="relative max-w-5xl mx-auto text-center px-8">
-          <div className="mb-12">
-            <div className="w-px h-20 bg-gradient-to-b from-transparent via-amber-400 to-transparent mx-auto mb-8"></div>
-          </div>
-          
-          <h2 className="text-5xl lg:text-7xl font-light text-white mb-16 leading-tight tracking-wider" style={{fontFamily: 'serif'}}>
-            Transform Your
-            <span className="block text-amber-400 mt-4">Network Today</span>
-          </h2>
-          
-          <p className="text-xl text-gray-300 mb-20 max-w-3xl mx-auto font-light leading-relaxed tracking-wide">
-            Join the most influential business network in the world. Connect with industry titans, access exclusive opportunities, and shape the future of commerce.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-8 justify-center">
-            <button 
-              onClick={onJoinNetwork}
-              className="group relative px-20 py-6 bg-gradient-to-r from-amber-400 to-amber-600 text-black font-medium tracking-widest text-sm uppercase overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-amber-500/25"
-            >
-              <span className="relative z-10 flex items-center gap-3">
-                <Crown className="w-5 h-5" />
-                Begin Your Journey
-              </span>
-              <div className="absolute inset-0 bg-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-            </button>
-            <button 
-              onClick={onRequestInfo}
-              className="px-20 py-6 border border-gray-600 text-gray-300 font-light tracking-widest text-sm uppercase hover:border-amber-400 hover:text-amber-400 transition-all duration-500"
-            >
-              Schedule Consultation
-            </button>
           </div>
         </div>
       </section>

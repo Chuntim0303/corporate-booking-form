@@ -1,134 +1,262 @@
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
+import { 
+  User, 
+  Mail, 
+  Phone, 
+  Building, 
+  CreditCard, 
+  ArrowRight, 
+  ArrowLeft,
+  CheckCircle,
+  AlertCircle,
+  Users,
+  Calendar,
+  Trophy,
+  Sparkles,
+  Crown,
+  Check,
+  Loader2,
+  Award,
+  ChevronDown
+} from 'lucide-react';
 
-const CorporateFormSteps = ({ onComplete }) => {
+// Enhanced Input Component
+const EnhancedInput = ({ 
+  label, 
+  name, 
+  type = 'text', 
+  placeholder, 
+  value, 
+  onChange, 
+  error, 
+  icon: Icon, 
+  required = false,
+  disabled = false,
+  helpText,
+  maxLength
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const id = useId();
+
+  return (
+    <div className="space-y-3">
+      <label htmlFor={id} className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
+        {label} {required && <span style={{color: '#F4C430'}}>*</span>}
+      </label>
+      
+      <div className={`relative transition-all duration-300 ${
+        isFocused ? 'transform scale-[1.02]' : ''
+      }`}>
+        {Icon && (
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+            <Icon className={`h-5 w-5 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#F4C430' : '#9ca3af'}} />
+          </div>
+        )}
+        
+        <input
+          id={id}
+          name={name}
+          type={type}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          required={required}
+          disabled={disabled}
+          maxLength={maxLength}
+          className={`block w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-4 text-base text-white placeholder-gray-400 focus:outline-none transition-all duration-300 font-light tracking-wide rounded-lg border-2 ${
+            error 
+              ? 'border-red-500 bg-red-900/10 focus:border-red-400' 
+              : isFocused
+              ? 'border-yellow-400 bg-gray-800/70 shadow-lg shadow-yellow-400/20'
+              : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
+          } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          style={{
+            fontFamily: 'Montserrat, sans-serif'
+          }}
+        />
+      </div>
+      
+      {helpText && !error && (
+        <p className="text-sm text-gray-400 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>{helpText}</p>
+      )}
+      
+      {error && (
+        <div className="flex items-center gap-2 text-sm text-red-400">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <span className="font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>{error}</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Enhanced Select Component
+const EnhancedSelect = ({
+  label,
+  name,
+  placeholder,
+  value,
+  onChange,
+  error,
+  icon: Icon,
+  required = false,
+  disabled = false,
+  options = []
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const id = useId();
+
+  return (
+    <div className="space-y-3">
+      <label htmlFor={id} className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
+        {label} {required && <span style={{color: '#F4C430'}}>*</span>}
+      </label>
+      
+      <div className={`relative transition-all duration-300 ${
+        isFocused ? 'transform scale-[1.02]' : ''
+      }`}>
+        {Icon && (
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+            <Icon className={`h-5 w-5 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#F4C430' : '#9ca3af'}} />
+          </div>
+        )}
+        
+        <select
+          id={id}
+          name={name}
+          value={value}
+          onChange={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          required={required}
+          disabled={disabled}
+          className={`block w-full ${Icon ? 'pl-12' : 'pl-4'} pr-12 py-4 text-base text-white focus:outline-none appearance-none transition-all duration-300 font-light tracking-wide rounded-lg border-2 ${
+            error 
+              ? 'border-red-500 bg-red-900/10 focus:border-red-400' 
+              : isFocused
+              ? 'border-yellow-400 bg-gray-800/70 shadow-lg shadow-yellow-400/20'
+              : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
+          } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          style={{
+            fontFamily: 'Montserrat, sans-serif'
+          }}
+        >
+          <option value="" style={{backgroundColor: '#1f2937', color: '#9ca3af'}}>{placeholder}</option>
+          {options.map((option) => (
+            <option key={option.value} value={option.value} style={{backgroundColor: '#1f2937', color: 'white'}}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        
+        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+          <ChevronDown className="w-5 h-5 text-gray-400" />
+        </div>
+      </div>
+      
+      {error && (
+        <div className="flex items-center gap-2 text-sm text-red-400">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <span className="font-light" style={{fontFamily: 'Montserrat, sans-serif'}}>{error}</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Corporate Form Steps Component
+const CorporateFormSteps = ({ onClose, onComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    // Personal Information
-    firstName: '',
-    lastName: '',
+    // Step 1: Company Information
+    companyName: '',
+    companyRegistration: '',
+    industry: '',
+    companySize: '',
+    website: '',
+    address: '',
+    
+    // Step 2: Contact Person
+    contactName: '',
+    position: '',
     email: '',
     phone: '',
-    jobTitle: '',
-    company: '',
-    linkedIn: '',
     
-    // Address
-    street: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: 'United States',
+    // Step 3: Partnership Preferences
+    partnershipTier: '',
+    eventTypes: [],
+    expectedEvents: '',
+    preferredSeasons: [],
     
-    // Plan Selection
-    selectedPlan: '',
-    
-    // Additional preferences
-    interests: [],
-    referralSource: ''
+    // Step 4: Additional Information
+    experience: '',
+    budget: '',
+    specialRequirements: '',
+    marketing: ''
   });
-
+  
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const steps = [
-    { number: 1, title: 'Personal Info', icon: '👤' },
-    { number: 2, title: 'Address', icon: '📍' },
-    { number: 3, title: 'Select Plan', icon: '💎' },
-    { number: 4, title: 'Review', icon: '✅' }
-  ];
-
-  const plans = [
-    {
-      id: 'executive',
-      name: 'Executive',
-      price: '$2,500',
-      period: '/year',
-      features: [
-        'Access to all networking events',
-        'Executive lounge access',
-        'Monthly industry reports',
-        'Priority event booking',
-        '1-on-1 executive coaching session'
-      ],
-      popular: false
-    },
-    {
-      id: 'premium',
-      name: 'Premier Executive',
-      price: '$5,000',
-      period: '/year',
-      features: [
-        'Everything in Executive',
-        'VIP event access',
-        'Quarterly leadership retreats',
-        'Personal brand consultation',
-        'Direct CEO introductions',
-        'Board advisory opportunities'
-      ],
-      popular: true
-    },
-    {
-      id: 'chairman',
-      name: 'Chairman Circle',
-      price: '$10,000',
-      period: '/year',
-      features: [
-        'Everything in Premier',
-        'Exclusive chairman events',
-        'Private jet networking trips',
-        'Investment opportunities',
-        'Global expansion consulting',
-        'Legacy planning sessions'
-      ],
-      popular: false
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    
+    if (type === 'checkbox') {
+      const currentArray = formData[name] || [];
+      if (checked) {
+        setFormData(prev => ({
+          ...prev,
+          [name]: [...currentArray, value]
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          [name]: currentArray.filter(item => item !== value)
+        }));
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
     }
-  ];
-
-  const interestOptions = [
-    'Technology & Innovation',
-    'Finance & Investment',
-    'Healthcare & Biotech',
-    'Real Estate',
-    'Manufacturing',
-    'Energy & Sustainability',
-    'Media & Entertainment',
-    'Professional Services'
-  ];
-
-  const updateFormData = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    
     // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
     }
   };
 
   const validateStep = (step) => {
     const newErrors = {};
-
-    if (step === 1) {
-      if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-      if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-      if (!formData.email.trim()) {
-        newErrors.email = 'Email is required';
-      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-        newErrors.email = 'Please enter a valid email';
-      }
-      if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-      if (!formData.jobTitle.trim()) newErrors.jobTitle = 'Job title is required';
-      if (!formData.company.trim()) newErrors.company = 'Company name is required';
+    
+    switch (step) {
+      case 1:
+        if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
+        if (!formData.companyRegistration.trim()) newErrors.companyRegistration = 'Registration number is required';
+        if (!formData.industry) newErrors.industry = 'Industry selection is required';
+        if (!formData.companySize) newErrors.companySize = 'Company size is required';
+        break;
+      case 2:
+        if (!formData.contactName.trim()) newErrors.contactName = 'Contact name is required';
+        if (!formData.position.trim()) newErrors.position = 'Position is required';
+        if (!formData.email.trim()) newErrors.email = 'Email is required';
+        if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+        if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+          newErrors.email = 'Please enter a valid email address';
+        }
+        break;
+      case 3:
+        if (!formData.partnershipTier) newErrors.partnershipTier = 'Partnership tier selection is required';
+        if (!formData.expectedEvents) newErrors.expectedEvents = 'Expected events per year is required';
+        break;
     }
-
-    if (step === 2) {
-      if (!formData.street.trim()) newErrors.street = 'Street address is required';
-      if (!formData.city.trim()) newErrors.city = 'City is required';
-      if (!formData.state.trim()) newErrors.state = 'State is required';
-      if (!formData.zipCode.trim()) newErrors.zipCode = 'ZIP code is required';
-    }
-
-    if (step === 3) {
-      if (!formData.selectedPlan) newErrors.selectedPlan = 'Please select a membership plan';
-    }
-
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -143,565 +271,471 @@ const CorporateFormSteps = ({ onComplete }) => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
-  const handleSubmit = () => {
-    if (validateStep(currentStep)) {
-      alert('Application submitted successfully! Our team will contact you within 24 hours.');
-      console.log('Form submitted:', formData);
-      // Navigate back to home page after successful submission
-      if (onComplete) {
-        setTimeout(() => {
-          onComplete();
-        }, 2000);
-      }
-    }
-  };
-
-  const handleInterestToggle = (interest) => {
-    const currentInterests = formData.interests || [];
-    const isSelected = currentInterests.includes(interest);
+  const handleSubmit = async () => {
+    if (!validateStep(currentStep)) return;
     
-    if (isSelected) {
-      updateFormData('interests', currentInterests.filter(i => i !== interest));
-    } else {
-      updateFormData('interests', [...currentInterests, interest]);
-    }
-  };
-
-  const renderProgressBar = () => (
-    <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
-        {steps.map((step, index) => (
-          <div key={step.number} className="flex items-center">
-            <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
-              currentStep >= step.number 
-                ? 'bg-amber-500 border-amber-500 text-black font-medium' 
-                : 'border-gray-600 text-gray-400'
-            }`}>
-              <span className="text-sm font-semibold">{step.number}</span>
-            </div>
-            <div className="ml-3 hidden sm:block">
-              <p className={`text-sm font-medium ${
-                currentStep >= step.number ? 'text-amber-400' : 'text-gray-400'
-              }`}>
-                {step.title}
-              </p>
-            </div>
-            {index < steps.length - 1 && (
-              <div className={`w-8 sm:w-16 h-0.5 mx-4 transition-colors duration-300 ${
-                currentStep > step.number ? 'bg-amber-500' : 'bg-gray-600'
-              }`} />
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderPersonalInfo = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            First Name *
-          </label>
-          <input
-            type="text"
-            value={formData.firstName}
-            onChange={(e) => updateFormData('firstName', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
-              errors.firstName ? 'border-red-500' : 'border-gray-600'
-            }`}
-            placeholder="Enter your first name"
-          />
-          {errors.firstName && <p className="text-red-400 text-sm mt-1">{errors.firstName}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Last Name *
-          </label>
-          <input
-            type="text"
-            value={formData.lastName}
-            onChange={(e) => updateFormData('lastName', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
-              errors.lastName ? 'border-red-500' : 'border-gray-600'
-            }`}
-            placeholder="Enter your last name"
-          />
-          {errors.lastName && <p className="text-red-400 text-sm mt-1">{errors.lastName}</p>}
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          Email Address *
-        </label>
-        <input
-          type="email"
-          value={formData.email}
-          onChange={(e) => updateFormData('email', e.target.value)}
-          className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
-            errors.email ? 'border-red-500' : 'border-gray-600'
-          }`}
-          placeholder="Enter your email address"
-        />
-        {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Phone Number *
-          </label>
-          <input
-            type="tel"
-            value={formData.phone}
-            onChange={(e) => updateFormData('phone', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
-              errors.phone ? 'border-red-500' : 'border-gray-600'
-            }`}
-            placeholder="(555) 123-4567"
-          />
-          {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Job Title *
-          </label>
-          <input
-            type="text"
-            value={formData.jobTitle}
-            onChange={(e) => updateFormData('jobTitle', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
-              errors.jobTitle ? 'border-red-500' : 'border-gray-600'
-            }`}
-            placeholder="CEO, CTO, VP, etc."
-          />
-          {errors.jobTitle && <p className="text-red-400 text-sm mt-1">{errors.jobTitle}</p>}
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          Company Name *
-        </label>
-        <input
-          type="text"
-          value={formData.company}
-          onChange={(e) => updateFormData('company', e.target.value)}
-          className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
-            errors.company ? 'border-red-500' : 'border-gray-600'
-          }`}
-          placeholder="Enter your company name"
-        />
-        {errors.company && <p className="text-red-400 text-sm mt-1">{errors.company}</p>}
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          LinkedIn Profile (Optional)
-        </label>
-        <input
-          type="url"
-          value={formData.linkedIn}
-          onChange={(e) => updateFormData('linkedIn', e.target.value)}
-          className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
-          placeholder="https://linkedin.com/in/yourprofile"
-        />
-      </div>
-    </div>
-  );
-
-  const renderAddress = () => (
-    <div className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          Street Address *
-        </label>
-        <input
-          type="text"
-          value={formData.street}
-          onChange={(e) => updateFormData('street', e.target.value)}
-          className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
-            errors.street ? 'border-red-500' : 'border-gray-600'
-          }`}
-          placeholder="123 Executive Boulevard"
-        />
-        {errors.street && <p className="text-red-400 text-sm mt-1">{errors.street}</p>}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            City *
-          </label>
-          <input
-            type="text"
-            value={formData.city}
-            onChange={(e) => updateFormData('city', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
-              errors.city ? 'border-red-500' : 'border-gray-600'
-            }`}
-            placeholder="New York"
-          />
-          {errors.city && <p className="text-red-400 text-sm mt-1">{errors.city}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            State *
-          </label>
-          <input
-            type="text"
-            value={formData.state}
-            onChange={(e) => updateFormData('state', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
-              errors.state ? 'border-red-500' : 'border-gray-600'
-            }`}
-            placeholder="NY"
-          />
-          {errors.state && <p className="text-red-400 text-sm mt-1">{errors.state}</p>}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            ZIP Code *
-          </label>
-          <input
-            type="text"
-            value={formData.zipCode}
-            onChange={(e) => updateFormData('zipCode', e.target.value)}
-            className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
-              errors.zipCode ? 'border-red-500' : 'border-gray-600'
-            }`}
-            placeholder="10001"
-          />
-          {errors.zipCode && <p className="text-red-400 text-sm mt-1">{errors.zipCode}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Country
-          </label>
-          <select
-            value={formData.country}
-            onChange={(e) => updateFormData('country', e.target.value)}
-            className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
-          >
-            <option value="United States">United States</option>
-            <option value="Canada">Canada</option>
-            <option value="United Kingdom">United Kingdom</option>
-            <option value="Australia">Australia</option>
-            <option value="Germany">Germany</option>
-            <option value="France">France</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderPlanSelection = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h3 className="text-xl font-semibold text-white mb-2">Choose Your Membership Level</h3>
-        <p className="text-gray-400">Select the plan that best fits your executive networking needs</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {plans.map((plan) => (
-          <div
-            key={plan.id}
-            onClick={() => updateFormData('selectedPlan', plan.id)}
-            className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all duration-300 hover:scale-105 ${
-              formData.selectedPlan === plan.id
-                ? 'border-amber-500 bg-amber-900/20'
-                : 'border-gray-600 bg-gray-800/50 hover:border-gray-500'
-            }`}
-          >
-            {plan.popular && (
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <span className="bg-gradient-to-r from-amber-500 to-amber-600 text-black text-xs font-semibold px-3 py-1 rounded-full">
-                  Most Popular
-                </span>
-              </div>
-            )}
-            
-            <div className="text-center mb-4">
-              <h4 className="text-lg font-semibold text-white mb-2">{plan.name}</h4>
-              <div className="text-3xl font-bold text-amber-400 mb-1">
-                {plan.price}
-                <span className="text-sm text-gray-400 font-normal">{plan.period}</span>
-              </div>
-            </div>
-            
-            <ul className="space-y-3 mb-6">
-              {plan.features.map((feature, index) => (
-                <li key={index} className="flex items-start text-sm text-gray-300">
-                  <svg className="w-4 h-4 text-amber-500 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  {feature}
-                </li>
-              ))}
-            </ul>
-            
-            <div className="text-center">
-              <div className={`w-4 h-4 rounded-full border-2 mx-auto ${
-                formData.selectedPlan === plan.id
-                  ? 'bg-amber-500 border-amber-500'
-                  : 'border-gray-400'
-              }`}>
-                {formData.selectedPlan === plan.id && (
-                  <div className="w-full h-full rounded-full bg-black transform scale-50"></div>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {errors.selectedPlan && (
-        <p className="text-red-400 text-sm text-center">{errors.selectedPlan}</p>
-      )}
-
-      <div className="mt-8">
-        <label className="block text-sm font-medium text-gray-300 mb-3">
-          Industry Interests (Select all that apply)
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {interestOptions.map((interest) => (
-            <label key={interest} className="flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.interests?.includes(interest) || false}
-                onChange={() => handleInterestToggle(interest)}
-                className="sr-only"
-              />
-              <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-colors ${
-                formData.interests?.includes(interest)
-                  ? 'bg-amber-900/30 border-amber-500 text-amber-300'
-                  : 'bg-gray-800/50 border-gray-600 text-gray-300 hover:border-gray-500'
-              }`}>
-                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                  formData.interests?.includes(interest)
-                    ? 'bg-amber-500 border-amber-500'
-                    : 'border-gray-400'
-                }`}>
-                  {formData.interests?.includes(interest) && (
-                    <svg className="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </div>
-                <span className="text-sm">{interest}</span>
-              </div>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          How did you hear about us?
-        </label>
-        <select
-          value={formData.referralSource}
-          onChange={(e) => updateFormData('referralSource', e.target.value)}
-          className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
-        >
-          <option value="">Select an option</option>
-          <option value="colleague">Colleague Referral</option>
-          <option value="linkedin">LinkedIn</option>
-          <option value="event">Industry Event</option>
-          <option value="website">Company Website</option>
-          <option value="search">Search Engine</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-    </div>
-  );
-
-  const renderReview = () => {
-    const selectedPlan = plans.find(p => p.id === formData.selectedPlan);
+    setIsSubmitting(true);
     
-    return (
-      <div className="space-y-8">
-        <div className="text-center mb-8">
-          <h3 className="text-xl font-semibold text-white mb-2">Review Your Application</h3>
-          <p className="text-gray-400">Please review your information before submitting</p>
-        </div>
-
-        <div className="space-y-6">
-          {/* Personal Information */}
-          <div className="bg-gray-800/50 rounded-lg p-6">
-            <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
-              <span className="mr-2">👤</span> Personal Information
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-gray-400">Name:</span>
-                <p className="text-white">{formData.firstName} {formData.lastName}</p>
-              </div>
-              <div>
-                <span className="text-gray-400">Email:</span>
-                <p className="text-white">{formData.email}</p>
-              </div>
-              <div>
-                <span className="text-gray-400">Phone:</span>
-                <p className="text-white">{formData.phone}</p>
-              </div>
-              <div>
-                <span className="text-gray-400">Job Title:</span>
-                <p className="text-white">{formData.jobTitle}</p>
-              </div>
-              <div className="sm:col-span-2">
-                <span className="text-gray-400">Company:</span>
-                <p className="text-white">{formData.company}</p>
-              </div>
-              {formData.linkedIn && (
-                <div className="sm:col-span-2">
-                  <span className="text-gray-400">LinkedIn:</span>
-                  <p className="text-white">{formData.linkedIn}</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Address */}
-          <div className="bg-gray-800/50 rounded-lg p-6">
-            <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
-              <span className="mr-2">📍</span> Address
-            </h4>
-            <div className="text-sm">
-              <span className="text-gray-400">Address:</span>
-              <p className="text-white">
-                {formData.street}<br />
-                {formData.city}, {formData.state} {formData.zipCode}<br />
-                {formData.country}
-              </p>
-            </div>
-          </div>
-
-          {/* Selected Plan */}
-          <div className="bg-gray-800/50 rounded-lg p-6">
-            <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
-              <span className="mr-2">💎</span> Membership Plan
-            </h4>
-            {selectedPlan && (
-              <div className="border border-amber-500 rounded-lg p-4 bg-amber-900/20">
-                <div className="flex justify-between items-start mb-3">
-                  <h5 className="text-lg font-semibold text-white">{selectedPlan.name}</h5>
-                  <div className="text-amber-400 font-bold">
-                    {selectedPlan.price}<span className="text-sm text-gray-400">{selectedPlan.period}</span>
-                  </div>
-                </div>
-                <ul className="space-y-1 text-sm text-gray-300">
-                  {selectedPlan.features.slice(0, 3).map((feature, index) => (
-                    <li key={index} className="flex items-center">
-                      <svg className="w-4 h-4 text-amber-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      {feature}
-                    </li>
-                  ))}
-                  {selectedPlan.features.length > 3 && (
-                    <li className="text-amber-400 text-xs">
-                      +{selectedPlan.features.length - 3} more features
-                    </li>
-                  )}
-                </ul>
-              </div>
-            )}
-
-            {formData.interests && formData.interests.length > 0 && (
-              <div className="mt-4">
-                <span className="text-gray-400 text-sm">Selected Interests:</span>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {formData.interests.map((interest) => (
-                    <span key={interest} className="px-2 py-1 bg-amber-900/30 text-amber-300 text-xs rounded">
-                      {interest}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {formData.referralSource && (
-              <div className="mt-4">
-                <span className="text-gray-400 text-sm">Referral Source:</span>
-                <p className="text-white text-sm">{formData.referralSource}</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-amber-900/20 border border-amber-500/50 rounded-lg p-4">
-          <p className="text-amber-300 text-sm">
-            <strong>Next Steps:</strong> After submitting your application, our membership committee will review your details within 24-48 hours. You'll receive an email confirmation and may be contacted for a brief introductory call.
-          </p>
-        </div>
-      </div>
-    );
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setIsSubmitting(false);
+    onComplete();
   };
 
-  const renderStepContent = () => {
+  const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return renderPersonalInfo();
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h3 className="text-xl sm:text-2xl font-light text-white mb-4" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                Company Information
+              </h3>
+              <p className="text-gray-400 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>Tell us about your organization</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <EnhancedInput
+                label="Company Name"
+                name="companyName"
+                placeholder="Your company name"
+                value={formData.companyName}
+                onChange={handleChange}
+                error={errors.companyName}
+                icon={Building}
+                required
+              />
+              <EnhancedInput
+                label="Registration Number"
+                name="companyRegistration"
+                placeholder="Company registration number"
+                value={formData.companyRegistration}
+                onChange={handleChange}
+                error={errors.companyRegistration}
+                icon={CreditCard}
+                required
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <EnhancedSelect
+                label="Industry"
+                name="industry"
+                placeholder="Select your industry"
+                value={formData.industry}
+                onChange={handleChange}
+                error={errors.industry}
+                icon={Trophy}
+                required
+                options={[
+                  { value: 'technology', label: 'Technology' },
+                  { value: 'finance', label: 'Finance & Banking' },
+                  { value: 'healthcare', label: 'Healthcare' },
+                  { value: 'manufacturing', label: 'Manufacturing' },
+                  { value: 'retail', label: 'Retail & E-commerce' },
+                  { value: 'consulting', label: 'Consulting' },
+                  { value: 'education', label: 'Education' },
+                  { value: 'government', label: 'Government' },
+                  { value: 'other', label: 'Other' }
+                ]}
+              />
+              <EnhancedSelect
+                label="Company Size"
+                name="companySize"
+                placeholder="Number of employees"
+                value={formData.companySize}
+                onChange={handleChange}
+                error={errors.companySize}
+                icon={Users}
+                required
+                options={[
+                  { value: '1-10', label: '1-10 employees' },
+                  { value: '11-50', label: '11-50 employees' },
+                  { value: '51-200', label: '51-200 employees' },
+                  { value: '201-500', label: '201-500 employees' },
+                  { value: '500+', label: '500+ employees' }
+                ]}
+              />
+            </div>
+            
+            <EnhancedInput
+              label="Website"
+              name="website"
+              placeholder="www.yourcompany.com"
+              value={formData.website}
+              onChange={handleChange}
+              error={errors.website}
+              icon={Sparkles}
+            />
+            
+            <div className="space-y-3">
+              <label className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                Company Address
+              </label>
+              <textarea 
+                name="address"
+                rows={3}
+                placeholder="Full company address"
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full px-4 py-4 text-base text-white placeholder-gray-400 focus:outline-none transition-all duration-300 font-light tracking-wide rounded-lg border-2 border-gray-600 bg-gray-800/40 hover:border-gray-500 focus:border-yellow-400 focus:bg-gray-800/70 focus:shadow-lg focus:shadow-yellow-400/20 resize-none"
+                style={{fontFamily: 'Montserrat, sans-serif'}}
+              />
+            </div>
+          </div>
+        );
+
       case 2:
-        return renderAddress();
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h3 className="text-xl sm:text-2xl font-light text-white mb-4" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                Contact Information
+              </h3>
+              <p className="text-gray-400 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>Primary contact person details</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <EnhancedInput
+                label="Full Name"
+                name="contactName"
+                placeholder="Contact person name"
+                value={formData.contactName}
+                onChange={handleChange}
+                error={errors.contactName}
+                icon={User}
+                required
+              />
+              <EnhancedInput
+                label="Position/Title"
+                name="position"
+                placeholder="Job title"
+                value={formData.position}
+                onChange={handleChange}
+                error={errors.position}
+                icon={Award}
+                required
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <EnhancedInput
+                label="Email Address"
+                name="email"
+                type="email"
+                placeholder="contact@company.com"
+                value={formData.email}
+                onChange={handleChange}
+                error={errors.email}
+                icon={Mail}
+                required
+              />
+              <EnhancedInput
+                label="Phone Number"
+                name="phone"
+                placeholder="+60 12-345-6789"
+                value={formData.phone}
+                onChange={handleChange}
+                error={errors.phone}
+                icon={Phone}
+                required
+              />
+            </div>
+          </div>
+        );
+
       case 3:
-        return renderPlanSelection();
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h3 className="text-xl sm:text-2xl font-light text-white mb-4" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                Partnership Preferences
+              </h3>
+              <p className="text-gray-400 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>Choose your preferred partnership tier and event types</p>
+            </div>
+            
+            <EnhancedSelect
+              label="Partnership Tier"
+              name="partnershipTier"
+              placeholder="Select partnership tier"
+              value={formData.partnershipTier}
+              onChange={handleChange}
+              error={errors.partnershipTier}
+              icon={Crown}
+              required
+              options={[
+                { value: 'gold', label: 'Gold Partner - RM 50,000' },
+                { value: 'platinum', label: 'Platinum Partner - RM 100,000' },
+                { value: 'diamond', label: 'Diamond Partner - RM 200,000' }
+              ]}
+            />
+            
+            <div className="space-y-4">
+              <label className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                Event Types (Select all that apply)
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  'Corporate Meetings',
+                  'Product Launches', 
+                  'Team Building',
+                  'Training Sessions',
+                  'Conferences',
+                  'Networking Events',
+                  'Award Ceremonies',
+                  'Holiday Parties'
+                ].map(type => (
+                  <label key={type} className="flex items-center space-x-3 cursor-pointer group p-2 rounded-lg hover:bg-gray-800/30 transition-colors duration-200">
+                    <input
+                      type="checkbox"
+                      name="eventTypes"
+                      value={type}
+                      checked={formData.eventTypes.includes(type)}
+                      onChange={handleChange}
+                      className="w-5 h-5 border-gray-600 rounded focus:ring-2"
+                      style={{
+                        accentColor: '#F4C430',
+                        backgroundColor: '#1f2937'
+                      }}
+                    />
+                    <span className="text-gray-300 text-sm group-hover:text-white transition-colors" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                      {type}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            
+            <EnhancedSelect
+              label="Expected Events Per Year"
+              name="expectedEvents"
+              placeholder="How many events do you plan?"
+              value={formData.expectedEvents}
+              onChange={handleChange}
+              error={errors.expectedEvents}
+              icon={Calendar}
+              required
+              options={[
+                { value: '1-5', label: '1-5 events' },
+                { value: '6-10', label: '6-10 events' },
+                { value: '11-20', label: '11-20 events' },
+                { value: '21+', label: '21+ events' }
+              ]}
+            />
+            
+            <div className="space-y-4">
+              <label className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                Preferred Event Seasons
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                {['Spring', 'Summer', 'Autumn', 'Winter'].map(season => (
+                  <label key={season} className="flex items-center space-x-3 cursor-pointer group p-2 rounded-lg hover:bg-gray-800/30 transition-colors duration-200">
+                    <input
+                      type="checkbox"
+                      name="preferredSeasons"
+                      value={season}
+                      checked={formData.preferredSeasons.includes(season)}
+                      onChange={handleChange}
+                      className="w-5 h-5 border-gray-600 rounded focus:ring-2"
+                      style={{
+                        accentColor: '#F4C430',
+                        backgroundColor: '#1f2937'
+                      }}
+                    />
+                    <span className="text-gray-300 text-sm group-hover:text-white transition-colors" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                      {season}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
       case 4:
-        return renderReview();
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h3 className="text-xl sm:text-2xl font-light text-white mb-4" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                Additional Information
+              </h3>
+              <p className="text-gray-400 text-sm" style={{fontFamily: 'Montserrat, sans-serif'}}>Help us understand your event planning needs</p>
+            </div>
+            
+            <div className="space-y-3">
+              <label className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                Previous Event Experience
+              </label>
+              <textarea 
+                name="experience"
+                rows={4}
+                placeholder="Tell us about your previous corporate event experiences..."
+                value={formData.experience}
+                onChange={handleChange}
+                className="w-full px-4 py-4 text-base text-white placeholder-gray-400 focus:outline-none transition-all duration-300 font-light tracking-wide rounded-lg border-2 border-gray-600 bg-gray-800/40 hover:border-gray-500 focus:border-yellow-400 focus:bg-gray-800/70 focus:shadow-lg focus:shadow-yellow-400/20 resize-none"
+                style={{fontFamily: 'Montserrat, sans-serif'}}
+              />
+            </div>
+            
+            <EnhancedSelect
+              label="Annual Event Budget Range"
+              name="budget"
+              placeholder="Select your budget range"
+              value={formData.budget}
+              onChange={handleChange}
+              icon={CreditCard}
+              options={[
+                { value: 'under-50k', label: 'Under RM 50,000' },
+                { value: '50k-100k', label: 'RM 50,000 - RM 100,000' },
+                { value: '100k-250k', label: 'RM 100,000 - RM 250,000' },
+                { value: '250k-500k', label: 'RM 250,000 - RM 500,000' },
+                { value: 'over-500k', label: 'Over RM 500,000' }
+              ]}
+            />
+            
+            <div className="space-y-3">
+              <label className="block text-sm font-semibold text-gray-100 tracking-wide" style={{fontFamily: 'Montserrat, sans-serif'}}>
+                Special Requirements
+              </label>
+              <textarea 
+                name="specialRequirements"
+                rows={4}
+                placeholder="Any special requirements for your events (AV equipment, catering preferences, accessibility needs, etc.)"
+                value={formData.specialRequirements}
+                onChange={handleChange}
+                className="w-full px-4 py-4 text-base text-white placeholder-gray-400 focus:outline-none transition-all duration-300 font-light tracking-wide rounded-lg border-2 border-gray-600 bg-gray-800/40 hover:border-gray-500 focus:border-yellow-400 focus:bg-gray-800/70 focus:shadow-lg focus:shadow-yellow-400/20 resize-none"
+                style={{fontFamily: 'Montserrat, sans-serif'}}
+              />
+            </div>
+            
+            <EnhancedSelect
+              label="How did you hear about us?"
+              name="marketing"
+              placeholder="Select marketing channel"
+              value={formData.marketing}
+              onChange={handleChange}
+              icon={Sparkles}
+              options={[
+                { value: 'website', label: 'Website/Google Search' },
+                { value: 'social-media', label: 'Social Media' },
+                { value: 'referral', label: 'Referral from partner' },
+                { value: 'event', label: 'Industry Event' },
+                { value: 'advertisement', label: 'Advertisement' },
+                { value: 'other', label: 'Other' }
+              ]}
+            />
+          </div>
+        );
+
       default:
-        return renderPersonalInfo();
+        return null;
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700 p-6 sm:p-8">
-        {renderProgressBar()}
-        
-        <div className="mb-8">
-          {renderStepContent()}
+      {/* Progress Bar */}
+      <div className="mb-12">
+        <div className="flex items-center justify-between mb-6">
+          {[1, 2, 3, 4].map((step) => (
+            <div 
+              key={step} 
+              className={`flex items-center ${step < 4 ? 'flex-1' : ''}`}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300`}
+                style={{
+                  backgroundColor: currentStep >= step ? '#F4C430' : 'transparent',
+                  borderColor: currentStep >= step ? '#F4C430' : '#4b5563',
+                  color: currentStep >= step ? 'black' : '#9ca3af'
+                }}
+              >
+                {currentStep > step ? (
+                  <Check className="w-5 h-5" />
+                ) : (
+                  <span className="text-sm font-semibold" style={{fontFamily: 'Montserrat, sans-serif'}}>{step}</span>
+                )}
+              </div>
+              {step < 4 && (
+                <div className={`h-px flex-1 mx-4 transition-all duration-300`}
+                  style={{backgroundColor: currentStep > step ? '#F4C430' : '#4b5563'}}
+                ></div>
+              )}
+            </div>
+          ))}
         </div>
+        
+        <div className="text-center">
+          <div className="text-sm text-gray-400 tracking-widest uppercase mb-2" style={{fontFamily: 'Montserrat, sans-serif'}}>
+            Step {currentStep} of 4
+          </div>
+          <div className="text-xs text-gray-500" style={{fontFamily: 'Montserrat, sans-serif'}}>
+            {currentStep === 1 && 'Company Information'}
+            {currentStep === 2 && 'Contact Information'}
+            {currentStep === 3 && 'Partnership Preferences'}
+            {currentStep === 4 && 'Additional Information'}
+          </div>
+        </div>
+      </div>
 
+      {/* Form Content */}
+      <div className="rounded-2xl p-8 lg:p-12 border-2"
+        style={{
+          backgroundColor: '#1a1a1a',
+          borderColor: 'rgba(244, 196, 48, 0.2)'
+        }}
+      >
+        {renderStep()}
+        
         {/* Navigation Buttons */}
-        <div className="flex justify-between items-center pt-6 border-t border-gray-700">
+        <div className="flex justify-between mt-12 pt-8 border-t border-gray-700">
           <button
             onClick={prevStep}
             disabled={currentStep === 1}
-            className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
+            className={`flex items-center gap-2 px-6 py-3 text-sm font-light tracking-widest uppercase transition-all duration-300 border-2 rounded-lg ${
               currentStep === 1
-                ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                : 'bg-gray-700 text-white hover:bg-gray-600'
+                ? 'text-gray-500 cursor-not-allowed border-gray-600'
+                : 'text-gray-300 hover:text-yellow-400 border-gray-600 hover:border-yellow-400'
             }`}
+            style={{fontFamily: 'Montserrat, sans-serif'}}
           >
+            <ArrowLeft className="w-4 h-4" />
             Previous
           </button>
-
-          <div className="text-center">
-            <span className="text-gray-400 text-sm">
-              Step {currentStep} of {steps.length}
-            </span>
-          </div>
-
-          {currentStep < steps.length ? (
+          
+          {currentStep < 4 ? (
             <button
               onClick={nextStep}
-              className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-black font-medium rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+              className="flex items-center gap-2 px-6 py-3 text-black text-sm font-semibold tracking-widest uppercase transition-all duration-300 rounded-lg hover:shadow-lg hover:shadow-yellow-400/30"
+              style={{
+                background: '#F4C430',
+                fontFamily: 'Montserrat, sans-serif'
+              }}
             >
-              Next Step
+              Next
+              <ArrowRight className="w-4 h-4" />
             </button>
           ) : (
             <button
               onClick={handleSubmit}
-              className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 transform hover:scale-105 shadow-lg"
+              disabled={isSubmitting}
+              className="flex items-center gap-2 px-8 py-3 text-black text-sm font-semibold tracking-widest uppercase transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg hover:shadow-lg hover:shadow-yellow-400/30"
+              style={{
+                background: '#F4C430',
+                fontFamily: 'Montserrat, sans-serif'
+              }}
             >
-              Submit Application
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-4 h-4" />
+                  Submit Application
+                </>
+              )}
             </button>
           )}
         </div>
