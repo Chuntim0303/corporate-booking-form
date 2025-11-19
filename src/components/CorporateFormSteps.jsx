@@ -494,87 +494,207 @@ const CorporateFormSteps = ({ onComplete }) => {
               error={errors.nric}
               icon={CreditCard}
               required
-              helpText="Malaysian NRIC format: 6 digits + 2 digits + 4 digits"
               maxLength={14}
             />
           </div>
         );
 
-      case 2:
-        return (
-          <div className="space-y-4 sm:space-y-6">
+case 2:
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Info Card */}
+      <div className="rounded-lg p-4 border" style={{
+        backgroundColor: 'rgba(218, 171, 45, 0.05)',
+        borderColor: 'rgba(218, 171, 45, 0.2)'
+      }}>
+        <div className="flex items-start gap-3">
+          <Building className="w-5 h-5 mt-0.5" style={{color: '#DAAB2D'}} />
+          <div>
+            <h4 className="text-sm font-semibold text-white mb-1">Company Details</h4>
+            <p className="text-xs text-gray-400">
+              Help us understand your business better. This information will be used to tailor partnership opportunities to your needs.
+            </p>
+          </div>
+        </div>
+      </div>
 
-            
-            <EnhancedInput
-              label="Company Name"
-              name="companyName"
-              placeholder="Your company name"
-              value={formData.companyName}
-              onChange={handleChange}
-              error={errors.companyName}
-              icon={Building}
-              required
-            />
+      <EnhancedInput
+        label="Company Name"
+        name="companyName"
+        placeholder="Your company name"
+        value={formData.companyName}
+        onChange={handleChange}
+        error={errors.companyName}
+        icon={Building}
+        required
+      />
 
-            <EnhancedSelect
-              label="Industry"
-              name="industry"
-              placeholder="Select your industry"
-              value={formData.industry}
-              onChange={handleChange}
-              error={errors.industry}
-              icon={Trophy}
-              required
-              options={[
-                { value: 'technology', label: 'Technology' },
-                { value: 'finance', label: 'Finance & Banking' },
-                { value: 'healthcare', label: 'Healthcare' },
-                { value: 'manufacturing', label: 'Manufacturing' },
-                { value: 'retail', label: 'Retail & E-commerce' },
-                { value: 'consulting', label: 'Consulting' },
-                { value: 'education', label: 'Education' },
-                { value: 'government', label: 'Government' },
-                { value: 'other', label: 'Other' }
-              ]}
-            />
-            
-            {formData.industry === 'other' && (
-              <EnhancedInput
-                label="Please specify your industry"
-                name="industryOther"
-                placeholder="Enter your industry"
-                value={formData.industryOther}
-                onChange={handleChange}
-                error={errors.industryOther}
-                icon={Building}
-                required
-              />
+      <EnhancedSelect
+        label="Industry"
+        name="industry"
+        placeholder="Select your industry"
+        value={formData.industry}
+        onChange={handleChange}
+        error={errors.industry}
+        icon={Trophy}
+        required
+        options={[
+          { value: 'technology', label: 'Technology' },
+          { value: 'finance', label: 'Finance & Banking' },
+          { value: 'healthcare', label: 'Healthcare' },
+          { value: 'manufacturing', label: 'Manufacturing' },
+          { value: 'retail', label: 'Retail & E-commerce' },
+          { value: 'consulting', label: 'Consulting' },
+          { value: 'education', label: 'Education' },
+          { value: 'government', label: 'Government' },
+          { value: 'other', label: 'Other' }
+        ]}
+      />
+      
+      {formData.industry === 'other' && (
+        <EnhancedInput
+          label="Please specify your industry"
+          name="industryOther"
+          placeholder="Enter your industry"
+          value={formData.industryOther}
+          onChange={handleChange}
+          error={errors.industryOther}
+          icon={Building}
+          required
+        />
+      )}
+
+      {/* Additional Fields */}
+      <EnhancedInput
+        label="Company Registration Number"
+        name="companyRegNumber"
+        placeholder="e.g., 202001234567 (1234567-X)"
+        value={formData.companyRegNumber}
+        onChange={handleChange}
+        error={errors.companyRegNumber}
+        icon={CreditCard}
+        helpText="Your SSM registration number"
+      />
+
+      <EnhancedInput
+        label="Number of Employees"
+        name="employeeCount"
+        type="number"
+        placeholder="e.g., 50"
+        value={formData.employeeCount}
+        onChange={handleChange}
+        error={errors.employeeCount}
+        icon={Users}
+        helpText="Approximate headcount"
+      />
+    </div>
+  );
+
+case 3:
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Info Header */}
+      <div className="text-center space-y-2 mb-6">
+        <h3 className="text-lg font-bold text-white">Choose Your Partnership Level</h3>
+        <p className="text-sm text-gray-400">Select the tier that best fits your business goals</p>
+      </div>
+
+      {/* Tier Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {[
+          {
+            value: 'gold',
+            name: 'Gold Partner',
+            price: 'RM 50,000',
+            icon: Trophy,
+            color: '#FFD700',
+            benefits: ['Brand visibility', 'Event booth', 'Marketing materials']
+          },
+          {
+            value: 'platinum',
+            name: 'Platinum Partner',
+            price: 'RM 100,000',
+            icon: Award,
+            color: '#E5E4E2',
+            benefits: ['All Gold benefits', 'VIP access', 'Speaking slot', 'Premium placement']
+          },
+          {
+            value: 'diamond',
+            name: 'Diamond Partner',
+            price: 'RM 200,000',
+            icon: Crown,
+            color: '#B9F2FF',
+            benefits: ['All Platinum benefits', 'Exclusive branding', 'Custom activation', 'Year-round promotion']
+          }
+        ].map((tier) => (
+          <button
+            key={tier.value}
+            type="button"
+            onClick={() => {
+              handleChange({
+                target: { name: 'partnershipTier', value: tier.value }
+              });
+            }}
+            className={`relative p-6 rounded-xl border-2 transition-all duration-300 text-left ${
+              formData.partnershipTier === tier.value
+                ? 'transform scale-105'
+                : 'hover:transform hover:scale-102'
+            }`}
+            style={{
+              backgroundColor: formData.partnershipTier === tier.value 
+                ? 'rgba(218, 171, 45, 0.1)' 
+                : 'rgba(46, 46, 49, 0.4)',
+              borderColor: formData.partnershipTier === tier.value 
+                ? '#DAAB2D' 
+                : 'rgba(107, 114, 128, 0.3)',
+              boxShadow: formData.partnershipTier === tier.value 
+                ? '0 0 30px rgba(218, 171, 45, 0.3)' 
+                : 'none'
+            }}
+          >
+            {formData.partnershipTier === tier.value && (
+              <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center"
+                style={{backgroundColor: '#DAAB2D'}}
+              >
+                <Check className="w-5 h-5 text-black" />
+              </div>
             )}
-          </div>
-        );
+            
+            <tier.icon className="w-8 h-8 mb-4" style={{color: tier.color}} />
+            <h4 className="text-lg font-bold text-white mb-2">{tier.name}</h4>
+            <p className="text-2xl font-bold mb-4" style={{color: '#DAAB2D'}}>{tier.price}</p>
+            <ul className="space-y-2">
+              {tier.benefits.map((benefit, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-xs text-gray-300">
+                  <Sparkles className="w-3 h-3 mt-0.5 flex-shrink-0" style={{color: '#DAAB2D'}} />
+                  <span>{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          </button>
+        ))}
+      </div>
 
-      case 3:
-        return (
-          <div className="space-y-4 sm:space-y-6">
+      {errors.partnershipTier && (
+        <div className="flex items-center justify-center gap-2 text-sm text-red-400 mt-4">
+          <AlertCircle className="w-4 h-4" />
+          <span>{errors.partnershipTier}</span>
+        </div>
+      )}
 
-
-            <EnhancedSelect
-              label="Partnership Tier"
-              name="partnershipTier"
-              placeholder="Select partnership tier"
-              value={formData.partnershipTier}
-              onChange={handleChange}
-              error={errors.partnershipTier}
-              icon={Crown}
-              required
-              options={[
-                { value: 'gold', label: 'Gold Partner - RM 50,000' },
-                { value: 'platinum', label: 'Platinum Partner - RM 100,000' },
-                { value: 'diamond', label: 'Diamond Partner - RM 200,000' }
-              ]}
-            />
-          </div>
-        );
+      {/* Additional Info */}
+      {formData.partnershipTier && (
+        <div className="rounded-lg p-4 border animate-fadeIn" style={{
+          backgroundColor: 'rgba(218, 171, 45, 0.05)',
+          borderColor: 'rgba(218, 171, 45, 0.2)'
+        }}>
+          <p className="text-sm text-gray-300">
+            <strong className="text-white">What's included:</strong> All partnership tiers include access to our exclusive partner network, quarterly business reviews, and dedicated account management.
+          </p>
+        </div>
+      )}
+    </div>
+  );
 
       case 4:
         return (
