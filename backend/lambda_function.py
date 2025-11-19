@@ -75,19 +75,16 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         logger.info("Request body parsed successfully", extra={
             'body_keys': list(body.keys()) if body else [],
             'email_provided': 'email' in body,
-            'has_first_name': 'firstName' in body,
-            'has_last_name': 'lastName' in body
+            'has_contact_name': 'contactName' in body
         })
         
-        # Validate required fields
+        # Validate required fields (updated to match frontend form)
         required_fields = [
-            'firstName', 'lastName', 'email', 'gender', 'phone',
-            'addressLine1', 'city', 'state', 'postalCode',
-            'position', 'countryCode', 'nric',
-            'companyName', 'industry', 'companySize', 'partnershipTier',
-            'expectedEvents', 'termsAccepted'
+            'contactName', 'position', 'email', 'phone',
+            'countryCode', 'nric', 'companyName', 'industry',
+            'partnershipTier', 'termsAccepted'
         ]
-        
+
         missing_fields = [field for field in required_fields if not body.get(field)]
         if missing_fields:
             logger.warning("Missing required fields in request", extra={
@@ -120,23 +117,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         logger.debug("Email format validation passed", extra={'email': email_value})
-        
-        # Validate gender
-        valid_genders = ['male', 'female', 'other', 'prefer_not_to_say']
-        gender_value = body['gender'].lower().strip()
-        if gender_value not in valid_genders:
-            logger.warning("Invalid gender value provided", extra={
-                'gender_provided': body['gender'],
-                'valid_genders': valid_genders
-            })
-            return {
-                'statusCode': 400,
-                'headers': headers,
-                'body': json.dumps({'error': 'Invalid gender value'})
-            }
-        
-        logger.debug("Gender validation passed", extra={'gender': gender_value})
-        
+
         # Validate NRIC format
         nric_value = body['nric']
         nric_digits = re.sub(r'[^0-9]', '', nric_value)
@@ -153,29 +134,11 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         logger.debug("NRIC validation passed", extra={'nric_digits': nric_digits})
-        
-        # Validate postal code
-        postal_code_value = body['postalCode']
-        postal_digits = re.sub(r'[^0-9]', '', postal_code_value)
-        if len(postal_digits) != 5:
-            logger.warning("Invalid postal code format provided", extra={
-                'postal_code_provided': postal_code_value,
-                'postal_digits_extracted': postal_digits,
-                'digit_count': len(postal_digits)
-            })
-            return {
-                'statusCode': 400,
-                'headers': headers,
-                'body': json.dumps({'error': 'Invalid postal code - must be 5 digits'})
-            }
-        
-        logger.debug("Postal code validation passed", extra={'postal_digits': postal_digits})
-        
+
         # Insert data into both tables
         logger.info("Starting database insertion process", extra={
             'email': email_value,
-            'first_name': body.get('firstName'),
-            'last_name': body.get('lastName')
+            'contact_name': body.get('contactName')
         })
         result = insert_lead_and_partner_application(body)
         
@@ -281,13 +244,16 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
     """
     connection = None
     email = data['email'].lower()
-    
-    # Get first and last name
-    first_name = data.get('firstName', '').strip()
-    last_name = data.get('lastName', '').strip()
-    
+
+    # Parse contactName into first and last name
+    contact_name = data.get('contactName', '').strip()
+    name_parts = contact_name.split(None, 1)  # Split on first whitespace
+    first_name = name_parts[0] if len(name_parts) > 0 else ''
+    last_name = name_parts[1] if len(name_parts) > 1 else ''
+
     logger.info("Starting database transaction", extra={
         'email': email,
+        'contact_name': contact_name,
         'first_name': first_name,
         'last_name': last_name
     })
@@ -314,13 +280,13 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'first_name': first_name,
                 'last_name': last_name,
                 'email_address': email,
-                'gender': data['gender'].lower(),
+                'gender': data.get('gender', 'prefer_not_to_say'),  # Default if not provided
                 'phone_number': data['phone'],
-                'address_line_1': data['addressLine1'],
+                'address_line_1': data.get('addressLine1', 'Not provided'),  # Default if not provided
                 'address_line_2': data.get('addressLine2', ''),
-                'city': data['city'],
-                'state': data['state'],
-                'postal_code': data['postalCode']
+                'city': data.get('city', 'Not provided'),  # Default if not provided
+                'state': data.get('state', 'Not provided'),  # Default if not provided
+                'postal_code': data.get('postalCode', '00000')  # Default if not provided
             }
             
             logger.debug("Executing lead insertion query", extra={
@@ -360,10 +326,10 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'position': data['position'],
                 'company_name': data['companyName'],
                 'industry': data['industry'],
-                'company_size': data['companySize'],
+                'company_size': data.get('companySize', 'Not specified'),  # Default if not provided
                 'partnership_tier': data['partnershipTier'],
                 'event_types': json.dumps(data.get('eventTypes', [])),
-                'expected_events': data['expectedEvents'],
+                'expected_events': data.get('expectedEvents', 0),  # Default to 0 if not provided
                 'terms_accepted': data['termsAccepted']
             }
             
