@@ -75,12 +75,13 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         logger.info("Request body parsed successfully", extra={
             'body_keys': list(body.keys()) if body else [],
             'email_provided': 'email' in body,
-            'has_contact_name': 'contactName' in body
+            'has_first_name': 'firstName' in body,
+            'has_last_name': 'lastName' in body
         })
-        
+
         # Validate required fields (updated to match frontend form)
         required_fields = [
-            'contactName', 'position', 'email', 'phone',
+            'firstName', 'lastName', 'position', 'email', 'phone',
             'countryCode', 'nric', 'companyName', 'industry',
             'partnershipTier', 'termsAccepted'
         ]
@@ -138,7 +139,8 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Insert data into both tables
         logger.info("Starting database insertion process", extra={
             'email': email_value,
-            'contact_name': body.get('contactName')
+            'first_name': body.get('firstName'),
+            'last_name': body.get('lastName')
         })
         result = insert_lead_and_partner_application(body)
         
@@ -245,15 +247,12 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
     connection = None
     email = data['email'].lower()
 
-    # Parse contactName into first and last name
-    contact_name = data.get('contactName', '').strip()
-    name_parts = contact_name.split(None, 1)  # Split on first whitespace
-    first_name = name_parts[0] if len(name_parts) > 0 else ''
-    last_name = name_parts[1] if len(name_parts) > 1 else ''
+    # Get first and last name directly from data
+    first_name = data.get('firstName', '').strip()
+    last_name = data.get('lastName', '').strip()
 
     logger.info("Starting database transaction", extra={
         'email': email,
-        'contact_name': contact_name,
         'first_name': first_name,
         'last_name': last_name
     })

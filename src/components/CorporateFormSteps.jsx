@@ -177,7 +177,8 @@ const CorporateFormSteps = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     // Step 1: Contact Person
-    contactName: '',
+    firstName: '',
+    lastName: '',
     position: '',
     email: '',
     countryCode: '+60',
@@ -245,19 +246,20 @@ const CorporateFormSteps = ({ onComplete }) => {
 
   const validateStep = (step) => {
     const newErrors = {};
-    
+
     switch (step) {
       case 1:
-        if (!formData.contactName.trim()) newErrors.contactName = 'Contact name is required';
+        if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+        if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
         if (!formData.position.trim()) newErrors.position = 'Position is required';
         if (!formData.email.trim()) newErrors.email = 'Email is required';
         if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
         if (!formData.nric.trim()) newErrors.nric = 'NRIC is required';
-        
+
         if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
           newErrors.email = 'Please enter a valid email address';
         }
-        
+
         // Phone number validation for Malaysia
         if (formData.phone && formData.countryCode === '+60') {
           const cleanPhone = formData.phone.replace(/[\s\-]/g, '');
@@ -265,7 +267,7 @@ const CorporateFormSteps = ({ onComplete }) => {
             newErrors.phone = 'Malaysian phone numbers should not start with 0 when using country code';
           }
         }
-        
+
         // NRIC validation - must be exactly 12 digits
         if (formData.nric) {
           const nricDigits = formData.nric.replace(/\D/g, '');
@@ -305,9 +307,9 @@ const CorporateFormSteps = ({ onComplete }) => {
 
   const handleSubmit = async () => {
     if (!validateStep(currentStep)) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const response = await fetch('https://s8uentbcpd.execute-api.ap-southeast-1.amazonaws.com/dev/applications', {
         method: 'POST',
@@ -315,7 +317,8 @@ const CorporateFormSteps = ({ onComplete }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          contactName: formData.contactName,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
           position: formData.position,
           email: formData.email,
           countryCode: formData.countryCode,
@@ -356,29 +359,40 @@ const CorporateFormSteps = ({ onComplete }) => {
         return (
           <div className="space-y-4 sm:space-y-6">
 
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <EnhancedInput
-                label="Full Name"
-                name="contactName"
-                placeholder="Contact person name"
-                value={formData.contactName}
+                label="First Name"
+                name="firstName"
+                placeholder="First name"
+                value={formData.firstName}
                 onChange={handleChange}
-                error={errors.contactName}
+                error={errors.firstName}
                 icon={User}
                 required
               />
               <EnhancedInput
-                label="Position/Title"
-                name="position"
-                placeholder="Job title"
-                value={formData.position}
+                label="Last Name"
+                name="lastName"
+                placeholder="Last name"
+                value={formData.lastName}
                 onChange={handleChange}
-                error={errors.position}
-                icon={Award}
+                error={errors.lastName}
+                icon={User}
                 required
               />
             </div>
+
+            <EnhancedInput
+              label="Position/Title"
+              name="position"
+              placeholder="Job title"
+              value={formData.position}
+              onChange={handleChange}
+              error={errors.position}
+              icon={Award}
+              required
+            />
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <EnhancedInput
@@ -674,7 +688,8 @@ case 3:
               <div>
                 <h4 className="text-sm font-semibold mb-3 uppercase tracking-wide" style={{color: '#DAAB2D'}}>Contact Information</h4>
                 <div className="text-gray-300 space-y-2 pl-2">
-                  <p className="flex justify-between"><span className="text-gray-400">Name:</span> <span className="font-medium text-white">{formData.contactName}</span></p>
+                  <p className="flex justify-between"><span className="text-gray-400">First Name:</span> <span className="font-medium text-white">{formData.firstName}</span></p>
+                  <p className="flex justify-between"><span className="text-gray-400">Last Name:</span> <span className="font-medium text-white">{formData.lastName}</span></p>
                   <p className="flex justify-between"><span className="text-gray-400">Position:</span> <span className="font-medium text-white">{formData.position}</span></p>
                   <p className="flex justify-between"><span className="text-gray-400">Email:</span> <span className="font-medium text-white">{formData.email}</span></p>
                   <p className="flex justify-between"><span className="text-gray-400">Phone:</span> <span className="font-medium text-white">{formData.countryCode} {formData.phone}</span></p>
