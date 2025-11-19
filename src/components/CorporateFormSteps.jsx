@@ -342,12 +342,7 @@ const CorporateFormSteps = ({ onComplete }) => {
       case 1:
         return (
           <div className="space-y-4 sm:space-y-6">
-            <div className="text-center mb-6 sm:mb-8">
-              <h3 className="text-base sm:text-lg font-medium text-white mb-2">
-                Contact Information
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-400">Primary contact person details</p>
-            </div>
+
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <EnhancedInput
@@ -464,12 +459,7 @@ const CorporateFormSteps = ({ onComplete }) => {
       case 2:
         return (
           <div className="space-y-4 sm:space-y-6">
-            <div className="text-center mb-6 sm:mb-8">
-              <h3 className="text-base sm:text-lg font-medium text-white mb-2">
-                Company Information
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-400">Tell us about your organization</p>
-            </div>
+
             
             <EnhancedInput
               label="Company Name"
@@ -522,12 +512,7 @@ const CorporateFormSteps = ({ onComplete }) => {
       case 3:
         return (
           <div className="space-y-4 sm:space-y-6">
-            <div className="text-center mb-6 sm:mb-8">
-              <h3 className="text-base sm:text-lg font-medium text-white mb-2">
-                Partnership Preferences
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-400">Choose your preferred partnership tier</p>
-            </div>
+
 
             <EnhancedSelect
               label="Partnership Tier"
@@ -550,12 +535,7 @@ const CorporateFormSteps = ({ onComplete }) => {
       case 4:
         return (
           <div className="space-y-4 sm:space-y-6">
-            <div className="text-center mb-6 sm:mb-8">
-              <h3 className="text-base sm:text-lg font-medium text-white mb-2">
-                Review & Confirm
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-400">Please review your details before submitting</p>
-            </div>
+
             
             <div className="bg-gray-800/40 rounded-lg p-4 sm:p-6 space-y-4 text-sm border border-gray-700/50">
               <div>

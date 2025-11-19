@@ -355,17 +355,7 @@ function App() {
             </button>
             
             <div className="p-6 sm:p-8 lg:p-12">
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
-                  style={{
-                    backgroundColor: 'rgba(244, 196, 48, 0.1)',
-                    border: '1px solid rgba(244, 196, 48, 0.2)'
-                  }}
-                >
-                  <Sparkles className="w-4 h-4 text-yellow-400" />
-                  <span className="text-xs font-medium uppercase text-yellow-400 tracking-wide">Partner Application</span>
-                </div>
-              </div>
+
 
               <CorporateFormSteps 
                 onClose={handleCloseForm}
