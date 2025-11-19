@@ -174,12 +174,9 @@ const CorporateFormSteps = ({ onComplete }) => {
     companyName: '',
     industry: '',
     industryOther: '',
-    companySize: '',
 
     // Step 3: Partnership Preferences
     partnershipTier: '',
-    eventTypes: [],
-    expectedEvents: '',
 
     // Step 4: Terms
     termsAccepted: false
@@ -190,21 +187,8 @@ const CorporateFormSteps = ({ onComplete }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
-    if (type === 'checkbox' && name === 'eventTypes') {
-      const currentArray = formData[name] || [];
-      if (checked) {
-        setFormData(prev => ({
-          ...prev,
-          [name]: [...currentArray, value]
-        }));
-      } else {
-        setFormData(prev => ({
-          ...prev,
-          [name]: currentArray.filter(item => item !== value)
-        }));
-      }
-    } else if (type === 'checkbox') {
+
+    if (type === 'checkbox') {
       setFormData(prev => ({
         ...prev,
         [name]: checked
@@ -282,11 +266,9 @@ const CorporateFormSteps = ({ onComplete }) => {
         if (formData.industry === 'other' && !formData.industryOther.trim()) {
           newErrors.industryOther = 'Please specify your industry';
         }
-        if (!formData.companySize) newErrors.companySize = 'Company size is required';
         break;
       case 3:
         if (!formData.partnershipTier) newErrors.partnershipTier = 'Partnership tier selection is required';
-        if (!formData.expectedEvents) newErrors.expectedEvents = 'Expected events per year is required';
         break;
       case 4:
         if (!formData.termsAccepted) newErrors.termsAccepted = 'You must accept terms and conditions';
@@ -327,10 +309,7 @@ const CorporateFormSteps = ({ onComplete }) => {
           nric: formData.nric,
           companyName: formData.companyName,
           industry: formData.industry === 'other' ? formData.industryOther : formData.industry,
-          companySize: formData.companySize,
           partnershipTier: formData.partnershipTier,
-          eventTypes: formData.eventTypes,
-          expectedEvents: formData.expectedEvents,
           termsAccepted: formData.termsAccepted
         })
       });
@@ -487,47 +466,28 @@ const CorporateFormSteps = ({ onComplete }) => {
               icon={Building}
               required
             />
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <EnhancedSelect
-                label="Industry"
-                name="industry"
-                placeholder="Select your industry"
-                value={formData.industry}
-                onChange={handleChange}
-                error={errors.industry}
-                icon={Trophy}
-                required
-                options={[
-                  { value: 'technology', label: 'Technology' },
-                  { value: 'finance', label: 'Finance & Banking' },
-                  { value: 'healthcare', label: 'Healthcare' },
-                  { value: 'manufacturing', label: 'Manufacturing' },
-                  { value: 'retail', label: 'Retail & E-commerce' },
-                  { value: 'consulting', label: 'Consulting' },
-                  { value: 'education', label: 'Education' },
-                  { value: 'government', label: 'Government' },
-                  { value: 'other', label: 'Other' }
-                ]}
-              />
-              <EnhancedSelect
-                label="Company Size"
-                name="companySize"
-                placeholder="Number of employees"
-                value={formData.companySize}
-                onChange={handleChange}
-                error={errors.companySize}
-                icon={Users}
-                required
-                options={[
-                  { value: '1-10', label: '1-10 employees' },
-                  { value: '11-50', label: '11-50 employees' },
-                  { value: '51-200', label: '51-200 employees' },
-                  { value: '201-500', label: '201-500 employees' },
-                  { value: '500+', label: '500+ employees' }
-                ]}
-              />
-            </div>
+
+            <EnhancedSelect
+              label="Industry"
+              name="industry"
+              placeholder="Select your industry"
+              value={formData.industry}
+              onChange={handleChange}
+              error={errors.industry}
+              icon={Trophy}
+              required
+              options={[
+                { value: 'technology', label: 'Technology' },
+                { value: 'finance', label: 'Finance & Banking' },
+                { value: 'healthcare', label: 'Healthcare' },
+                { value: 'manufacturing', label: 'Manufacturing' },
+                { value: 'retail', label: 'Retail & E-commerce' },
+                { value: 'consulting', label: 'Consulting' },
+                { value: 'education', label: 'Education' },
+                { value: 'government', label: 'Government' },
+                { value: 'other', label: 'Other' }
+              ]}
+            />
             
             {formData.industry === 'other' && (
               <EnhancedInput
@@ -551,9 +511,9 @@ const CorporateFormSteps = ({ onComplete }) => {
               <h3 className="text-base sm:text-lg font-medium text-white mb-2">
                 Partnership Preferences
               </h3>
-              <p className="text-xs sm:text-sm text-gray-400">Choose your preferred partnership tier and event types</p>
+              <p className="text-xs sm:text-sm text-gray-400">Choose your preferred partnership tier</p>
             </div>
-            
+
             <EnhancedSelect
               label="Partnership Tier"
               name="partnershipTier"
@@ -567,59 +527,6 @@ const CorporateFormSteps = ({ onComplete }) => {
                 { value: 'gold', label: 'Gold Partner - RM 50,000' },
                 { value: 'platinum', label: 'Platinum Partner - RM 100,000' },
                 { value: 'diamond', label: 'Diamond Partner - RM 200,000' }
-              ]}
-            />
-            
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-100">
-                Event Types <span className="text-gray-400">(Select all that apply)</span>
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                {[
-                  'Corporate Meetings',
-                  'Product Launches', 
-                  'Team Building',
-                  'Training Sessions',
-                  'Conferences',
-                  'Networking Events',
-                  'Award Ceremonies',
-                  'Holiday Parties'
-                ].map(type => (
-                  <label key={type} className="flex items-center space-x-3 cursor-pointer group p-3 rounded-lg hover:bg-gray-800/30 transition-colors duration-200 border border-transparent hover:border-gray-700">
-                    <input
-                      type="checkbox"
-                      name="eventTypes"
-                      value={type}
-                      checked={formData.eventTypes.includes(type)}
-                      onChange={handleChange}
-                      className="w-4 h-4 border-gray-600 rounded focus:ring-2 focus:ring-yellow-400"
-                      style={{
-                        accentColor: '#F4C430',
-                        backgroundColor: '#1f2937'
-                      }}
-                    />
-                    <span className="text-gray-300 text-sm group-hover:text-white transition-colors">
-                      {type}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-            
-            <EnhancedSelect
-              label="Expected Events Per Year"
-              name="expectedEvents"
-              placeholder="How many events do you plan?"
-              value={formData.expectedEvents}
-              onChange={handleChange}
-              error={errors.expectedEvents}
-              icon={Calendar}
-              required
-              options={[
-                { value: '1-5', label: '1-5 events' },
-                { value: '6-10', label: '6-10 events' },
-                { value: '11-20', label: '11-20 events' },
-                { value: '21+', label: '21+ events' }
               ]}
             />
           </div>
@@ -656,7 +563,6 @@ const CorporateFormSteps = ({ onComplete }) => {
                       ? formData.industryOther
                       : formData.industry
                   }</span></p>
-                  <p className="flex justify-between"><span className="text-gray-400">Size:</span> <span className="font-medium text-white">{formData.companySize}</span></p>
                 </div>
               </div>
 
@@ -664,8 +570,6 @@ const CorporateFormSteps = ({ onComplete }) => {
                 <h4 className="text-sm font-semibold text-yellow-400 mb-3 uppercase tracking-wide">Partnership Preferences</h4>
                 <div className="text-gray-300 space-y-2 pl-2">
                   <p className="flex justify-between"><span className="text-gray-400">Tier:</span> <span className="font-medium text-white capitalize">{formData.partnershipTier}</span></p>
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1"><span className="text-gray-400">Events:</span> <span className="font-medium text-white">{formData.eventTypes.join(', ') || 'None selected'}</span></p>
-                  <p className="flex justify-between"><span className="text-gray-400">Expected Events:</span> <span className="font-medium text-white">{formData.expectedEvents || 'Not specified'}</span></p>
                 </div>
               </div>
             </div>
