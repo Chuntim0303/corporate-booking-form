@@ -363,10 +363,10 @@ const CorporateFormSteps = ({ onComplete }) => {
         return (
           <div className="space-y-4 sm:space-y-6">
             <div className="text-center mb-6 sm:mb-8">
-              <h3 className="text-lg sm:text-xl font-medium text-white mb-2">
+              <h3 className="text-base sm:text-lg font-medium text-white mb-2">
                 Contact Information
               </h3>
-              <p className="text-sm text-gray-400">Primary contact person details</p>
+              <p className="text-xs sm:text-sm text-gray-400">Primary contact person details</p>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -471,10 +471,10 @@ const CorporateFormSteps = ({ onComplete }) => {
         return (
           <div className="space-y-4 sm:space-y-6">
             <div className="text-center mb-6 sm:mb-8">
-              <h3 className="text-lg sm:text-xl font-medium text-white mb-2">
+              <h3 className="text-base sm:text-lg font-medium text-white mb-2">
                 Company Information
               </h3>
-              <p className="text-sm text-gray-400">Tell us about your organization</p>
+              <p className="text-xs sm:text-sm text-gray-400">Tell us about your organization</p>
             </div>
             
             <EnhancedInput
@@ -548,10 +548,10 @@ const CorporateFormSteps = ({ onComplete }) => {
         return (
           <div className="space-y-4 sm:space-y-6">
             <div className="text-center mb-6 sm:mb-8">
-              <h3 className="text-lg sm:text-xl font-medium text-white mb-2">
+              <h3 className="text-base sm:text-lg font-medium text-white mb-2">
                 Partnership Preferences
               </h3>
-              <p className="text-sm text-gray-400">Choose your preferred partnership tier and event types</p>
+              <p className="text-xs sm:text-sm text-gray-400">Choose your preferred partnership tier and event types</p>
             </div>
             
             <EnhancedSelect
@@ -629,43 +629,43 @@ const CorporateFormSteps = ({ onComplete }) => {
         return (
           <div className="space-y-4 sm:space-y-6">
             <div className="text-center mb-6 sm:mb-8">
-              <h3 className="text-lg sm:text-xl font-medium text-white mb-2">
+              <h3 className="text-base sm:text-lg font-medium text-white mb-2">
                 Review & Confirm
               </h3>
-              <p className="text-sm text-gray-400">Please review your details before submitting</p>
+              <p className="text-xs sm:text-sm text-gray-400">Please review your details before submitting</p>
             </div>
             
-            <div className="bg-gray-800/40 rounded-lg p-4 sm:p-6 space-y-3 text-sm">
+            <div className="bg-gray-800/40 rounded-lg p-4 sm:p-6 space-y-4 text-sm border border-gray-700/50">
               <div>
-                <h4 className="font-medium text-white mb-2">Contact Information</h4>
-                <div className="text-gray-300 space-y-1">
-                  <p><span className="text-gray-400">Name:</span> {formData.contactName}</p>
-                  <p><span className="text-gray-400">Position:</span> {formData.position}</p>
-                  <p><span className="text-gray-400">Email:</span> {formData.email}</p>
-                  <p><span className="text-gray-400">Phone:</span> {formData.countryCode} {formData.phone}</p>
-                  <p><span className="text-gray-400">NRIC:</span> {formData.nric}</p>
+                <h4 className="text-sm font-semibold text-yellow-400 mb-3 uppercase tracking-wide">Contact Information</h4>
+                <div className="text-gray-300 space-y-2 pl-2">
+                  <p className="flex justify-between"><span className="text-gray-400">Name:</span> <span className="font-medium text-white">{formData.contactName}</span></p>
+                  <p className="flex justify-between"><span className="text-gray-400">Position:</span> <span className="font-medium text-white">{formData.position}</span></p>
+                  <p className="flex justify-between"><span className="text-gray-400">Email:</span> <span className="font-medium text-white">{formData.email}</span></p>
+                  <p className="flex justify-between"><span className="text-gray-400">Phone:</span> <span className="font-medium text-white">{formData.countryCode} {formData.phone}</span></p>
+                  <p className="flex justify-between"><span className="text-gray-400">NRIC:</span> <span className="font-medium text-white">{formData.nric}</span></p>
                 </div>
               </div>
 
-              <div className="border-t border-gray-700 pt-3">
-                <h4 className="font-medium text-white mb-2">Company Information</h4>
-                <div className="text-gray-300 space-y-1">
-                  <p><span className="text-gray-400">Company:</span> {formData.companyName}</p>
-                  <p><span className="text-gray-400">Industry:</span> {
-                    formData.industry === 'other' && formData.industryOther 
-                      ? formData.industryOther 
+              <div className="border-t border-gray-700 pt-4">
+                <h4 className="text-sm font-semibold text-yellow-400 mb-3 uppercase tracking-wide">Company Information</h4>
+                <div className="text-gray-300 space-y-2 pl-2">
+                  <p className="flex justify-between"><span className="text-gray-400">Company:</span> <span className="font-medium text-white">{formData.companyName}</span></p>
+                  <p className="flex justify-between"><span className="text-gray-400">Industry:</span> <span className="font-medium text-white">{
+                    formData.industry === 'other' && formData.industryOther
+                      ? formData.industryOther
                       : formData.industry
-                  }</p>
-                  <p><span className="text-gray-400">Size:</span> {formData.companySize}</p>
+                  }</span></p>
+                  <p className="flex justify-between"><span className="text-gray-400">Size:</span> <span className="font-medium text-white">{formData.companySize}</span></p>
                 </div>
               </div>
 
-              <div className="border-t border-gray-700 pt-3">
-                <h4 className="font-medium text-white mb-2">Partnership Preferences</h4>
-                <div className="text-gray-300 space-y-1">
-                  <p><span className="text-gray-400">Tier:</span> {formData.partnershipTier}</p>
-                  <p><span className="text-gray-400">Events:</span> {formData.eventTypes.join(', ') || 'None selected'}</p>
-                  <p><span className="text-gray-400">Expected Events:</span> {formData.expectedEvents || 'Not specified'}</p>
+              <div className="border-t border-gray-700 pt-4">
+                <h4 className="text-sm font-semibold text-yellow-400 mb-3 uppercase tracking-wide">Partnership Preferences</h4>
+                <div className="text-gray-300 space-y-2 pl-2">
+                  <p className="flex justify-between"><span className="text-gray-400">Tier:</span> <span className="font-medium text-white capitalize">{formData.partnershipTier}</span></p>
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1"><span className="text-gray-400">Events:</span> <span className="font-medium text-white">{formData.eventTypes.join(', ') || 'None selected'}</span></p>
+                  <p className="flex justify-between"><span className="text-gray-400">Expected Events:</span> <span className="font-medium text-white">{formData.expectedEvents || 'Not specified'}</span></p>
                 </div>
               </div>
             </div>
@@ -701,42 +701,63 @@ const CorporateFormSteps = ({ onComplete }) => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Mobile-friendly Progress Bar */}
+      {/* Enhanced Progress Bar */}
       <div className="mb-8 sm:mb-12">
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <div className="flex items-center justify-between mb-6">
           {[1, 2, 3, 4].map((step) => (
-            <div 
-              key={step} 
+            <div
+              key={step}
               className={`flex items-center ${step < 4 ? 'flex-1' : ''}`}
             >
-              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 text-xs sm:text-sm font-medium`}
-                style={{
-                  backgroundColor: currentStep >= step ? '#F4C430' : 'transparent',
-                  borderColor: currentStep >= step ? '#F4C430' : '#6b7280',
-                  color: currentStep >= step ? 'black' : '#9ca3af'
-                }}
-              >
-                {currentStep > step ? (
-                  <Check className="w-4 h-4 sm:w-5 sm:h-5" />
-                ) : (
-                  <span>{step}</span>
-                )}
+              <div className="flex flex-col items-center">
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 text-sm font-semibold shadow-lg`}
+                  style={{
+                    backgroundColor: currentStep >= step ? '#F4C430' : currentStep === step ? 'rgba(244, 196, 48, 0.1)' : 'transparent',
+                    borderColor: currentStep >= step ? '#F4C430' : currentStep === step ? '#F4C430' : '#4b5563',
+                    color: currentStep >= step ? 'black' : currentStep === step ? '#F4C430' : '#6b7280',
+                    boxShadow: currentStep === step ? '0 0 20px rgba(244, 196, 48, 0.4)' : 'none',
+                    transform: currentStep === step ? 'scale(1.1)' : 'scale(1)'
+                  }}
+                >
+                  {currentStep > step ? (
+                    <Check className="w-5 h-5 sm:w-6 sm:h-6" />
+                  ) : (
+                    <span>{step}</span>
+                  )}
+                </div>
+                <div className={`hidden sm:block mt-2 text-xs font-medium transition-colors duration-300`}
+                  style={{
+                    color: currentStep >= step ? '#F4C430' : '#6b7280'
+                  }}
+                >
+                  {stepTitles[step - 1].split(' ')[0]}
+                </div>
               </div>
               {step < 4 && (
-                <div className={`h-px flex-1 mx-2 sm:mx-4 transition-all duration-300`}
-                  style={{backgroundColor: currentStep > step ? '#F4C430' : '#6b7280'}}
-                ></div>
+                <div className={`h-0.5 flex-1 mx-2 sm:mx-3 transition-all duration-300 relative`}
+                  style={{
+                    backgroundColor: '#374151'
+                  }}
+                >
+                  <div
+                    className="h-full transition-all duration-500"
+                    style={{
+                      backgroundColor: '#F4C430',
+                      width: currentStep > step ? '100%' : '0%'
+                    }}
+                  ></div>
+                </div>
               )}
             </div>
           ))}
         </div>
-        
+
         <div className="text-center">
-          <div className="text-xs sm:text-sm text-gray-400 uppercase tracking-wide mb-1">
-            Step {currentStep} of 4
-          </div>
-          <div className="text-xs text-gray-500">
+          <div className="text-sm sm:text-base font-medium text-white mb-1">
             {stepTitles[currentStep - 1]}
+          </div>
+          <div className="text-xs text-gray-400">
+            Step {currentStep} of 4
           </div>
         </div>
       </div>
@@ -751,49 +772,50 @@ const CorporateFormSteps = ({ onComplete }) => {
         {renderStep()}
         
         {/* Navigation Buttons */}
-        <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-700">
+        <div className="flex flex-col sm:flex-row justify-between gap-3 mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-700">
           <button
             onClick={prevStep}
             disabled={currentStep === 1}
-            className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-3 text-sm font-medium uppercase transition-all duration-300 border rounded-md ${
+            className={`flex items-center justify-center gap-2 px-5 sm:px-7 py-3.5 text-sm font-semibold uppercase transition-all duration-300 border-2 rounded-lg ${
               currentStep === 1
-                ? 'text-gray-500 cursor-not-allowed border-gray-600 bg-gray-800/20'
-                : 'text-gray-300 hover:text-yellow-400 border-gray-600 hover:border-yellow-400 bg-gray-800/40 hover:bg-gray-800/60'
+                ? 'text-gray-500 cursor-not-allowed border-gray-700 bg-gray-800/20 opacity-50'
+                : 'text-gray-300 hover:text-white border-gray-600 hover:border-yellow-400 bg-gray-800/40 hover:bg-gray-800/60 hover:shadow-md'
             }`}
           >
             <ArrowLeft className="w-4 h-4" />
-            Previous
+            <span className="hidden sm:inline">Previous</span>
+            <span className="sm:hidden">Back</span>
           </button>
-          
+
           {currentStep < 4 ? (
             <button
               onClick={nextStep}
-              className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 text-black text-sm font-medium uppercase transition-all duration-300 rounded-md hover:shadow-lg hover:shadow-yellow-400/20"
+              className="flex items-center justify-center gap-2 px-5 sm:px-7 py-3.5 text-black text-sm font-semibold uppercase transition-all duration-300 rounded-lg hover:shadow-xl hover:shadow-yellow-400/30 transform hover:scale-105"
               style={{
-                background: '#F4C430'
+                background: 'linear-gradient(135deg, #F4C430, #FFD700)'
               }}
             >
-              Next
+              <span>Next Step</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           ) : (
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 text-black text-sm font-medium uppercase transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-md hover:shadow-lg hover:shadow-yellow-400/20"
+              className="flex items-center justify-center gap-2 px-6 sm:px-10 py-3.5 text-black text-sm font-semibold uppercase transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg hover:shadow-xl hover:shadow-yellow-400/30 transform hover:scale-105 disabled:transform-none"
               style={{
-                background: '#F4C430'
+                background: 'linear-gradient(135deg, #F4C430, #FFD700)'
               }}
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Submitting...
+                  <span>Submitting...</span>
                 </>
               ) : (
                 <>
-                  <CheckCircle className="w-4 h-4" />
-                  Submit Application
+                  <CheckCircle className="w-5 h-5" />
+                  <span>Submit Application</span>
                 </>
               )}
             </button>
