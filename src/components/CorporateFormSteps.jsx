@@ -12,7 +12,6 @@ import {
   Users,
   Calendar,
   Trophy,
-  Sparkles,
   Crown,
   Check,
   Loader2,
@@ -563,30 +562,6 @@ case 2:
           required
         />
       )}
-
-      {/* Additional Fields */}
-      <EnhancedInput
-        label="Company Registration Number"
-        name="companyRegNumber"
-        placeholder="e.g., 202001234567 (1234567-X)"
-        value={formData.companyRegNumber}
-        onChange={handleChange}
-        error={errors.companyRegNumber}
-        icon={CreditCard}
-        helpText="Your SSM registration number"
-      />
-
-      <EnhancedInput
-        label="Number of Employees"
-        name="employeeCount"
-        type="number"
-        placeholder="e.g., 50"
-        value={formData.employeeCount}
-        onChange={handleChange}
-        error={errors.employeeCount}
-        icon={Users}
-        helpText="Approximate headcount"
-      />
     </div>
   );
 
@@ -607,24 +582,21 @@ case 3:
             name: 'Gold Partner',
             price: 'RM 50,000',
             icon: Trophy,
-            color: '#FFD700',
-            benefits: ['Brand visibility', 'Event booth', 'Marketing materials']
+            color: '#FFD700'
           },
           {
             value: 'platinum',
             name: 'Platinum Partner',
             price: 'RM 100,000',
             icon: Award,
-            color: '#E5E4E2',
-            benefits: ['All Gold benefits', 'VIP access', 'Speaking slot', 'Premium placement']
+            color: '#E5E4E2'
           },
           {
             value: 'diamond',
             name: 'Diamond Partner',
             price: 'RM 200,000',
             icon: Crown,
-            color: '#B9F2FF',
-            benefits: []
+            color: '#B9F2FF'
           }
         ].map((tier) => (
           <button
@@ -662,15 +634,7 @@ case 3:
             
             <tier.icon className="w-8 h-8 mb-4" style={{color: tier.color}} />
             <h4 className="text-lg font-bold text-white mb-2">{tier.name}</h4>
-            <p className="text-2xl font-bold mb-4" style={{color: '#DAAB2D'}}>{tier.price}</p>
-            <ul className="space-y-2">
-              {tier.benefits.map((benefit, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-xs text-gray-300">
-                  <Sparkles className="w-3 h-3 mt-0.5 flex-shrink-0" style={{color: '#DAAB2D'}} />
-                  <span>{benefit}</span>
-                </li>
-              ))}
-            </ul>
+            <p className="text-2xl font-bold" style={{color: '#DAAB2D'}}>{tier.price}</p>
           </button>
         ))}
       </div>
