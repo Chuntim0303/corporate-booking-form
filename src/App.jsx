@@ -45,13 +45,13 @@ const EnhancedInput = ({
   return (
     <div className="space-y-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-100" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
-        {label} {required && <span className="text-yellow-400">*</span>}
+        {label} {required && <span style={{color: '#DAAB2D'}}>*</span>}
       </label>
       
       <div className={`relative transition-all duration-200 ${isFocused ? 'transform scale-[1.01]' : ''}`}>
         {Icon && (
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#F4C430' : '#6b7280'}} />
+            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#DAAB2D' : '#6b7280'}} />
           </div>
         )}
         
@@ -68,13 +68,19 @@ const EnhancedInput = ({
           disabled={disabled}
           maxLength={maxLength}
           className={`block w-full ${Icon ? 'pl-10' : 'pl-3'} pr-3 py-3 text-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 rounded-md border ${
-            error 
-              ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400' 
+            error
+              ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400'
               : isFocused
-              ? 'border-yellow-400 bg-gray-800/60 shadow-md shadow-yellow-400/10 focus:ring-1 focus:ring-yellow-400'
+              ? 'bg-gray-800/60 focus:ring-1'
               : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-          style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}
+          style={{
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            ...(isFocused && !error ? {
+              borderColor: '#DAAB2D',
+              boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
+            } : {})
+          }}
         />
       </div>
       
@@ -111,13 +117,13 @@ const EnhancedSelect = ({
   return (
     <div className="space-y-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-100" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
-        {label} {required && <span className="text-yellow-400">*</span>}
+        {label} {required && <span style={{color: '#DAAB2D'}}>*</span>}
       </label>
       
       <div className={`relative transition-all duration-200 ${isFocused ? 'transform scale-[1.01]' : ''}`}>
         {Icon && (
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#F4C430' : '#6b7280'}} />
+            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#DAAB2D' : '#6b7280'}} />
           </div>
         )}
         
@@ -131,13 +137,19 @@ const EnhancedSelect = ({
           required={required}
           disabled={disabled}
           className={`block w-full ${Icon ? 'pl-10' : 'pl-3'} pr-10 py-3 text-sm text-white focus:outline-none appearance-none transition-all duration-200 rounded-md border ${
-            error 
-              ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400' 
+            error
+              ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400'
               : isFocused
-              ? 'border-yellow-400 bg-gray-800/60 shadow-md shadow-yellow-400/10 focus:ring-1 focus:ring-yellow-400'
+              ? 'bg-gray-800/60 focus:ring-1'
               : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-          style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}
+          style={{
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            ...(isFocused && !error ? {
+              borderColor: '#DAAB2D',
+              boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
+            } : {})
+          }}
         >
           <option value="" style={{backgroundColor: '#1f2937', color: '#9ca3af'}}>{placeholder}</option>
           {options.map((option) => (
@@ -181,7 +193,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen" style={{background: `linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 50%, #1a1a1a 100%)`}}>
+    <div className="min-h-screen" style={{background: `linear-gradient(135deg, #262626 0%, #020B13 50%, #262626 100%)`}}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -205,12 +217,12 @@ function App() {
         }
 
         ::selection {
-          background-color: #F4C430;
-          color: #1a1a1a;
+          background-color: #DAAB2D;
+          color: #020B13;
         }
         ::-moz-selection {
-          background-color: #F4C430;
-          color: #1a1a1a;
+          background-color: #DAAB2D;
+          color: #020B13;
         }
 
         .smooth-scroll {
@@ -226,7 +238,7 @@ function App() {
         }
 
         .glow-border:hover {
-          box-shadow: 0 0 0 1px rgba(244, 196, 48, 0.3), 0 4px 20px rgba(244, 196, 48, 0.1);
+          box-shadow: 0 0 0 1px rgba(218, 171, 45, 0.3), 0 4px 20px rgba(218, 171, 45, 0.1);
         }
 
         @media (max-width: 640px) {
@@ -239,8 +251,8 @@ function App() {
       {/* Header */}
       <header className="backdrop-blur-xl border-b sticky top-0 z-50"
         style={{
-          backgroundColor: 'rgba(26, 26, 26, 0.95)',
-          borderBottomColor: 'rgba(244, 196, 48, 0.1)'
+          backgroundColor: 'rgba(38, 38, 38, 0.95)',
+          borderBottomColor: 'rgba(218, 171, 45, 0.1)'
         }}
       >
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -255,8 +267,8 @@ function App() {
                   alt="Confetti KL Logo" 
                   className="w-8 h-8 sm:w-10 sm:h-10 object-contain transition-transform duration-300 group-hover:scale-110"
                 />
-                <span className="text-lg sm:text-xl lg:text-2xl font-medium text-white tracking-tight transition-colors duration-300 group-hover:text-yellow-400">
-                  CONFETTI <span className="text-yellow-400">KL</span>
+                <span className="text-lg sm:text-xl lg:text-2xl font-medium text-white tracking-tight transition-colors duration-300" style={{'--hover-color': '#DAAB2D'}}>
+                  CONFETTI <span style={{color: '#DAAB2D'}}>KL</span>
                 </span>
               </div>
             </div>
@@ -279,8 +291,8 @@ function App() {
       {/* Footer */}
       <footer className="border-t mt-16 sm:mt-24"
         style={{
-          backgroundColor: '#0f0f0f',
-          borderTopColor: 'rgba(244, 196, 48, 0.1)'
+          backgroundColor: '#020B13',
+          borderTopColor: 'rgba(218, 171, 45, 0.1)'
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -288,7 +300,7 @@ function App() {
             <div className="sm:col-span-2">
               <div className="flex items-center space-x-3 mb-6">
                 <span className="text-xl font-medium text-white tracking-tight">
-                  CONFETTI <span className="text-yellow-400">KL</span>
+                  CONFETTI <span style={{color: '#DAAB2D'}}>KL</span>
                 </span>
               </div>
               <p className="text-gray-400 text-base leading-relaxed max-w-md mb-6">
@@ -299,10 +311,10 @@ function App() {
             <div>
               <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wide">Partnership Tiers</h3>
               <ul className="space-y-3">
-                <li><a href="#" className="text-gray-400 text-sm transition-colors duration-300 hover:text-yellow-400">Gold Partner</a></li>
-                <li><a href="#" className="text-gray-400 text-sm transition-colors duration-300 hover:text-yellow-400">Platinum Partner</a></li>
-                <li><a href="#" className="text-gray-400 text-sm transition-colors duration-300 hover:text-yellow-400">Diamond Partner</a></li>
-                <li><a href="#" className="text-gray-400 text-sm transition-colors duration-300 hover:text-yellow-400">Event Packages</a></li>
+                <li><a href="#" className="text-gray-400 text-sm transition-colors duration-300" style={{'--hover-color': '#DAAB2D'}} onMouseEnter={(e) => e.target.style.color = '#DAAB2D'} onMouseLeave={(e) => e.target.style.color = ''}>Gold Partner</a></li>
+                <li><a href="#" className="text-gray-400 text-sm transition-colors duration-300" style={{'--hover-color': '#DAAB2D'}} onMouseEnter={(e) => e.target.style.color = '#DAAB2D'} onMouseLeave={(e) => e.target.style.color = ''}>Platinum Partner</a></li>
+                <li><a href="#" className="text-gray-400 text-sm transition-colors duration-300" style={{'--hover-color': '#DAAB2D'}} onMouseEnter={(e) => e.target.style.color = '#DAAB2D'} onMouseLeave={(e) => e.target.style.color = ''}>Diamond Partner</a></li>
+                <li><a href="#" className="text-gray-400 text-sm transition-colors duration-300" style={{'--hover-color': '#DAAB2D'}} onMouseEnter={(e) => e.target.style.color = '#DAAB2D'} onMouseLeave={(e) => e.target.style.color = ''}>Event Packages</a></li>
               </ul>
             </div>
             
@@ -310,22 +322,22 @@ function App() {
               <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wide">Contact</h3>
               <ul className="space-y-3 text-gray-400 text-sm">
                 <li className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-yellow-400 flex-shrink-0" />
+                  <MapPin className="w-4 h-4 flex-shrink-0" style={{color: '#DAAB2D'}} />
                   <span>Kuala Lumpur, Malaysia</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-yellow-400 flex-shrink-0" />
+                  <Phone className="w-4 h-4 flex-shrink-0" style={{color: '#DAAB2D'}} />
                   <span>+60 3-1234-5678</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-yellow-400 flex-shrink-0" />
+                  <Mail className="w-4 h-4 flex-shrink-0" style={{color: '#DAAB2D'}} />
                   <span>partners@confettikl.com</span>
                 </li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t pt-6 mt-8" style={{borderColor: 'rgba(244, 196, 48, 0.1)'}}>
+          <div className="border-t pt-6 mt-8" style={{borderColor: 'rgba(218, 171, 45, 0.1)'}}>
             <p className="text-center text-gray-500 text-xs uppercase tracking-wider">
               © 2025 Confetti KL. All Rights Reserved.
             </p>
@@ -340,16 +352,18 @@ function App() {
         >
           <div className="border shadow-2xl w-full max-w-4xl relative overflow-hidden max-h-[90vh] overflow-y-auto rounded-xl"
             style={{
-              backgroundColor: '#0f0f0f',
-              borderColor: 'rgba(244, 196, 48, 0.2)',
+              backgroundColor: '#020B13',
+              borderColor: 'rgba(218, 171, 45, 0.2)',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
             }}
           >
-            <div className="absolute top-0 left-0 w-full h-0.5" style={{background: `linear-gradient(to right, #F4C430, #FFD700)`}}></div>
+            <div className="absolute top-0 left-0 w-full h-0.5" style={{background: `linear-gradient(to right, #DAAB2D, #A57A03)`}}></div>
             
-            <button 
+            <button
               onClick={handleCloseForm}
-              className="absolute top-4 right-4 text-gray-400 hover:text-yellow-400 transition-colors z-10 p-2 rounded-full hover:bg-gray-800/50"
+              className="absolute top-4 right-4 text-gray-400 transition-colors z-10 p-2 rounded-full hover:bg-gray-800/50"
+              onMouseEnter={(e) => e.currentTarget.querySelector('svg').style.color = '#DAAB2D'}
+              onMouseLeave={(e) => e.currentTarget.querySelector('svg').style.color = ''}
             >
               <X className="w-5 h-5" />
             </button>
@@ -394,7 +408,7 @@ const HomePage = ({ onJoinNetwork }) => {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 z-10" style={{background: `linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(15, 15, 15, 0.8) 50%, rgba(26, 26, 26, 0.9) 100%)`}}></div>
+          <div className="absolute inset-0 z-10" style={{background: `linear-gradient(135deg, rgba(38, 38, 38, 0.8) 0%, rgba(2, 11, 19, 0.8) 50%, rgba(38, 38, 38, 0.9) 100%)`}}></div>
           <img 
             src="/main02.jpeg" 
             alt="Confetti KL event venue" 
@@ -405,7 +419,7 @@ const HomePage = ({ onJoinNetwork }) => {
         <div className="relative z-20 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
           <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-4xl font-light text-white mb-6 sm:mb-8 leading-tight tracking-tight">
             ELEVATE YOUR
-            <span className="block mt-2 font-medium text-yellow-400">
+            <span className="block mt-2 font-medium" style={{color: '#DAAB2D'}}>
               CORPORATE EVENTS
             </span>
           </h1>
@@ -415,10 +429,10 @@ const HomePage = ({ onJoinNetwork }) => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
-            <button 
+            <button
               onClick={onJoinNetwork}
               className="group relative px-8 sm:px-12 py-3 sm:py-4 text-black font-semibold text-sm sm:text-base uppercase overflow-hidden transition-all duration-300 hover-lift w-full sm:w-auto rounded-md"
-              style={{backgroundColor: "#F4C430"}}
+              style={{backgroundColor: "#DAAB2D"}}
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
                 <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -431,7 +445,7 @@ const HomePage = ({ onJoinNetwork }) => {
 
         <div className="absolute bottom-8 sm:bottom-12 left-1/2 transform -translate-x-1/2 z-20">
           <div className="flex flex-col items-center text-gray-400">
-            <div className="w-px h-16 sm:h-20 animate-pulse" style={{background: `linear-gradient(to bottom, rgba(244, 196, 48, 0.6), transparent)`}}></div>
+            <div className="w-px h-16 sm:h-20 animate-pulse" style={{background: `linear-gradient(to bottom, rgba(218, 171, 45, 0.6), transparent)`}}></div>
           </div>
         </div>
       </section>
