@@ -1,0 +1,238 @@
+      {/* Value Proposition Section
+      <section className="py-16 sm:py-20 lg:py-24 relative" style={{backgroundColor: '#1a1a1a'}}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 sm:mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
+              style={{
+                backgroundColor: 'rgba(244, 196, 48, 0.1)',
+                border: '1px solid rgba(244, 196, 48, 0.2)'
+              }}
+            >
+              <Star className="w-4 h-4 text-yellow-400" />
+              <span className="text-xs font-medium uppercase text-yellow-400 tracking-wide">Why Choose Us</span>
+            </div>
+            <h2 className="text-2xl sm:text-2xl lg:text-3xl font-light text-white mb-4 sm:mb-6 tracking-tight">
+              Premium Benefits
+              <span className="block text-yellow-400">Await You</span>
+            </h2>
+            <div className="w-16 h-0.5 mx-auto mb-4 sm:mb-6" style={{background: 'linear-gradient(90deg, #F4C430, #FFD700)'}}></div>
+            <p className="text-sm sm:text-base lg:text-base text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              Experience unparalleled advantages designed exclusively for our Class Partners
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
+            {features.map((feature, index) => (
+              <div 
+                key={index}
+                className="group text-center hover-lift"
+              >
+                <div className="relative mb-6 sm:mb-8">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto flex items-center justify-center rounded-xl transition-all duration-300 group-hover:scale-110"
+                    style={{backgroundColor: '#F4C430', boxShadow: '0 4px 20px rgba(244, 196, 48, 0.3)'}}
+                  >
+                    <feature.icon className="w-8 h-8 sm:w-10 sm:h-10 text-black" />
+                  </div>
+                </div>
+                <h3 className="text-base sm:text-lg font-medium text-white mb-4 tracking-tight">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-400 text-sm sm:text-sm leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Plans Section */}
+      <section className="py-16 sm:py-20 lg:py-24" style={{backgroundColor: '#0f0f0f'}}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 sm:mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
+              style={{
+                backgroundColor: 'rgba(244, 196, 48, 0.1)',
+                border: '1px solid rgba(244, 196, 48, 0.2)'
+              }}
+            >
+              <Trophy className="w-4 h-4 text-yellow-400" />
+              <span className="text-xs font-medium uppercase text-yellow-400 tracking-wide">Pricing Plans</span>
+            </div>
+            <h2 className="text-2xl sm:text-2xl lg:text-3xl font-light text-white mb-4 sm:mb-6 tracking-tight">
+              Choose Your
+              <span className="block text-yellow-400">Partnership Level</span>
+            </h2>
+            <div className="w-16 h-0.5 mx-auto mb-4 sm:mb-6" style={{background: 'linear-gradient(90deg, #F4C430, #FFD700)'}}></div>
+            <p className="text-sm sm:text-base lg:text-base text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              Select the partnership tier that best fits your corporate event needs and budget
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+            {/* Gold Tier */}
+            <div className="border rounded-xl p-6 sm:p-8 text-center group transition-all duration-300 hover-lift glow-border"
+              style={{
+                background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
+                borderColor: 'rgba(255, 215, 0, 0.3)'
+              }}
+            >
+              <div className="mb-6 sm:mb-8">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                  style={{backgroundColor: 'rgba(255, 215, 0, 0.1)', border: '2px solid rgba(255, 215, 0, 0.3)'}}
+                >
+                  <Award className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-medium text-white mb-4 tracking-tight">Gold Partner</h3>
+                <div className="mb-4 sm:mb-6">
+                  <div className="text-xl sm:text-2xl font-light text-yellow-500 tracking-tight">RM 50,000</div>
+                  <div className="text-gray-400 text-xs sm:text-xs uppercase mt-1 tracking-wide">Partnership Investment</div>
+                </div>
+              </div>
+              
+              <div className="space-y-3 mb-6 sm:mb-8 text-left">
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 text-sm">Points Value:</span>
+                  <span className="text-yellow-500 font-semibold text-sm">150,000</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 text-sm">Birthday Points:</span>
+                  <span className="text-yellow-500 font-semibold text-sm">RM 5,000 x 2Y</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 text-sm">Referral Fee:</span>
+                  <span className="text-yellow-500 font-semibold text-sm">6%</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 text-sm">Yearly Buyback:</span>
+                  <span className="text-yellow-500 font-semibold text-sm">RM 3,000 x 2Y</span>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-gray-300 text-sm">Validity:</span>
+                  <span className="text-yellow-500 font-semibold text-sm">3 Months</span>
+                </div>
+              </div>
+              
+              <button 
+                onClick={onJoinNetwork}
+                className="w-full py-3 sm:py-4 border-2 border-yellow-500 text-yellow-500 font-medium text-sm uppercase transition-all duration-300 hover:bg-yellow-500 hover:text-black hover:shadow-lg hover:shadow-yellow-500/20 rounded-md"
+              >
+                Apply for Gold
+              </button>
+            </div>
+            
+            {/* Platinum Tier - Featured */}
+            <div className="border rounded-xl p-6 sm:p-8 text-center relative group transition-all duration-300 hover-lift lg:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%)',
+                borderColor: 'rgba(244, 196, 48, 0.5)',
+                boxShadow: '0 8px 40px rgba(244, 196, 48, 0.2)'
+              }}
+            >
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <div className="px-4 py-1 rounded-full text-xs font-bold uppercase" 
+                  style={{background: 'linear-gradient(90deg, #F4C430, #FFD700)', color: '#1a1a1a'}}>
+                  Most Popular
+                </div>
+              </div>
+              
+              <div className="mb-6 sm:mb-8">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                  style={{background: 'linear-gradient(135deg, #F4C430, #FFD700)'}}
+                >
+                  <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-black" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-medium text-white mb-4 tracking-tight">Platinum Partner</h3>
+                <div className="mb-4 sm:mb-6">
+                  <div className="text-xl sm:text-2xl font-light text-white tracking-tight">RM 100,000</div>
+                  <div className="text-gray-400 text-xs sm:text-xs uppercase mt-1 tracking-wide">Partnership Investment</div>
+                </div>
+              </div>
+              
+              <div className="space-y-3 mb-6 sm:mb-8 text-left">
+                <div className="flex items-center justify-between py-2 border-b border-gray-600">
+                  <span className="text-gray-300 text-sm">Points Value:</span>
+                  <span className="text-white font-semibold text-sm">350,000</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-600">
+                  <span className="text-gray-300 text-sm">Birthday Points:</span>
+                  <span className="text-white font-semibold text-sm">RM 10,000 x 5Y</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-600">
+                  <span className="text-gray-300 text-sm">Referral Fee:</span>
+                  <span className="text-white font-semibold text-sm">10%</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-600">
+                  <span className="text-gray-300 text-sm">Yearly Buyback:</span>
+                  <span className="text-white font-semibold text-sm">RM 10,000 x 2Y</span>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-gray-300 text-sm">Validity:</span>
+                  <span className="text-white font-semibold text-sm">1 Month</span>
+                </div>
+              </div>
+              
+              <button 
+                onClick={onJoinNetwork}
+                className="w-full py-3 sm:py-4 text-black font-medium text-sm uppercase transition-all duration-300 hover:shadow-xl hover:shadow-yellow-400/30 rounded-md"
+                style={{
+                  background: 'linear-gradient(135deg, #F4C430, #FFD700)'
+                }}
+              >
+                Apply for Platinum
+              </button>
+            </div>
+            
+            {/* Diamond Tier */}
+            <div className="border rounded-xl p-6 sm:p-8 text-center group transition-all duration-300 hover-lift glow-border"
+              style={{
+                background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
+                borderColor: 'rgba(0, 255, 255, 0.3)'
+              }}
+            >
+              <div className="mb-6 sm:mb-8">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                  style={{backgroundColor: 'rgba(0, 255, 255, 0.1)', border: '2px solid rgba(0, 255, 255, 0.3)'}}
+                >
+                  <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-medium text-white mb-4 tracking-tight">Diamond Partner</h3>
+                <div className="mb-4 sm:mb-6">
+                  <div className="text-xl sm:text-2xl font-light text-cyan-400 tracking-tight">RM 200,000</div>
+                  <div className="text-gray-400 text-xs sm:text-xs uppercase mt-1 tracking-wide">Partnership Investment</div>
+                </div>
+              </div>
+              
+              <div className="space-y-3 mb-6 sm:mb-8 text-left">
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 text-sm">Points Value:</span>
+                  <span className="text-cyan-400 font-semibold text-sm">800,000</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 text-sm">Birthday Points:</span>
+                  <span className="text-cyan-400 font-semibold text-sm">RM 30,000 x 8Y</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 text-sm">Referral Fee:</span>
+                  <span className="text-cyan-400 font-semibold text-sm">15%</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-700">
+                  <span className="text-gray-300 text-sm">Yearly Buyback:</span>
+                  <span className="text-cyan-400 font-semibold text-sm">RM 30,000 x 2Y</span>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-gray-300 text-sm">Validity:</span>
+                  <span className="text-cyan-400 font-semibold text-sm">Immediately</span>
+                </div>
+              </div>
+              
+              <button 
+                onClick={onJoinNetwork}
+                className="w-full py-3 sm:py-4 border-2 border-cyan-400 text-cyan-400 font-medium text-sm uppercase transition-all duration-300 hover:bg-cyan-400 hover:text-black hover:shadow-lg hover:shadow-cyan-400/20 rounded-md"
+              >
+                Apply for Diamond
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
