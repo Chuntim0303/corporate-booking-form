@@ -624,7 +624,7 @@ case 3:
             price: 'RM 200,000',
             icon: Crown,
             color: '#B9F2FF',
-            benefits: ['All Platinum benefits', 'Exclusive branding', 'Custom activation', 'Year-round promotion']
+            benefits: []
           }
         ].map((tier) => (
           <button
