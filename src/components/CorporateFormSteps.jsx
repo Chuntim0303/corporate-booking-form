@@ -1,11 +1,11 @@
 import React, { useState, useId } from 'react';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  Building, 
-  CreditCard, 
-  ArrowRight, 
+import {
+  User,
+  Mail,
+  Phone,
+  Building,
+  CreditCard,
+  ArrowRight,
   ArrowLeft,
   CheckCircle,
   AlertCircle,
@@ -19,6 +19,7 @@ import {
   Award,
   ChevronDown
 } from 'lucide-react';
+import { popularCountryCodes, countryCodes } from '../data/countryCodes';
 
 // Enhanced Input Component
 const EnhancedInput = ({ 
@@ -392,17 +393,31 @@ const CorporateFormSteps = ({ onComplete }) => {
                     name="countryCode"
                     value={formData.countryCode}
                     onChange={handleChange}
-                    className="w-24 px-3 py-3 text-sm text-white bg-gray-800/40 border border-gray-600 rounded-md focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
+                    className="w-32 px-3 py-3 text-sm text-white bg-gray-800/40 border border-gray-600 rounded-md focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
                     style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}
                   >
-                    <option value="+60" style={{backgroundColor: '#1f2937'}}>🇲🇾 +60</option>
-                    <option value="+65" style={{backgroundColor: '#1f2937'}}>🇸🇬 +65</option>
-                    <option value="+66" style={{backgroundColor: '#1f2937'}}>🇹🇭 +66</option>
-                    <option value="+62" style={{backgroundColor: '#1f2937'}}>🇮🇩 +62</option>
-                    <option value="+1" style={{backgroundColor: '#1f2937'}}>🇺🇸 +1</option>
-                    <option value="+44" style={{backgroundColor: '#1f2937'}}>🇬🇧 +44</option>
-                    <option value="+86" style={{backgroundColor: '#1f2937'}}>🇨🇳 +86</option>
-                    <option value="+91" style={{backgroundColor: '#1f2937'}}>🇮🇳 +91</option>
+                    <optgroup label="Popular">
+                      {popularCountryCodes.map((country) => (
+                        <option
+                          key={`popular-${country.code}`}
+                          value={country.code}
+                          style={{backgroundColor: '#1f2937'}}
+                        >
+                          {country.flag} {country.code}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="All Countries">
+                      {countryCodes.map((country) => (
+                        <option
+                          key={country.code}
+                          value={country.code}
+                          style={{backgroundColor: '#1f2937'}}
+                        >
+                          {country.flag} {country.code} ({country.country})
+                        </option>
+                      ))}
+                    </optgroup>
                   </select>
                   <div className="flex-1 relative">
                     <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
