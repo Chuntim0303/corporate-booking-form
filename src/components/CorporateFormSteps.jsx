@@ -42,13 +42,13 @@ const EnhancedInput = ({
   return (
     <div className="space-y-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-100" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
-        {label} {required && <span className="text-yellow-400">*</span>}
+        {label} {required && <span style={{color: '#DAAB2D'}}>*</span>}
       </label>
       
       <div className={`relative transition-all duration-200 ${isFocused ? 'transform scale-[1.01]' : ''}`}>
         {Icon && (
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#F4C430' : '#6b7280'}} />
+            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#DAAB2D' : '#6b7280'}} />
           </div>
         )}
         
@@ -65,13 +65,19 @@ const EnhancedInput = ({
           disabled={disabled}
           maxLength={maxLength}
           className={`block w-full ${Icon ? 'pl-10' : 'pl-3'} pr-3 py-3 text-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 rounded-md border ${
-            error 
-              ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400' 
+            error
+              ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400'
               : isFocused
-              ? 'border-yellow-400 bg-gray-800/60 shadow-md shadow-yellow-400/10 focus:ring-1 focus:ring-yellow-400'
+              ? 'bg-gray-800/60 focus:ring-1'
               : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-          style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}
+          style={{
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            ...(isFocused && !error ? {
+              borderColor: '#DAAB2D',
+              boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
+            } : {})
+          }}
         />
       </div>
       
@@ -108,13 +114,13 @@ const EnhancedSelect = ({
   return (
     <div className="space-y-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-100" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
-        {label} {required && <span className="text-yellow-400">*</span>}
+        {label} {required && <span style={{color: '#DAAB2D'}}>*</span>}
       </label>
       
       <div className={`relative transition-all duration-200 ${isFocused ? 'transform scale-[1.01]' : ''}`}>
         {Icon && (
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#F4C430' : '#6b7280'}} />
+            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#DAAB2D' : '#6b7280'}} />
           </div>
         )}
         
@@ -128,13 +134,19 @@ const EnhancedSelect = ({
           required={required}
           disabled={disabled}
           className={`block w-full ${Icon ? 'pl-10' : 'pl-3'} pr-10 py-3 text-sm text-white focus:outline-none appearance-none transition-all duration-200 rounded-md border ${
-            error 
-              ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400' 
+            error
+              ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400'
               : isFocused
-              ? 'border-yellow-400 bg-gray-800/60 shadow-md shadow-yellow-400/10 focus:ring-1 focus:ring-yellow-400'
+              ? 'bg-gray-800/60 focus:ring-1'
               : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-          style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}
+          style={{
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            ...(isFocused && !error ? {
+              borderColor: '#DAAB2D',
+              boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
+            } : {})
+          }}
         >
           <option value="" style={{backgroundColor: '#1f2937', color: '#9ca3af'}}>{placeholder}</option>
           {options.map((option) => (
@@ -381,15 +393,23 @@ const CorporateFormSteps = ({ onComplete }) => {
               />
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-100">
-                  Phone Number <span className="text-yellow-400">*</span>
+                  Phone Number <span style={{color: '#DAAB2D'}}>*</span>
                 </label>
                 <div className="flex gap-2">
                   <select
                     name="countryCode"
                     value={formData.countryCode}
                     onChange={handleChange}
-                    className="w-32 px-3 py-3 text-sm text-white bg-gray-800/40 border border-gray-600 rounded-md focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
+                    className="w-32 px-3 py-3 text-sm text-white bg-gray-800/40 border border-gray-600 rounded-md focus:outline-none focus:ring-1"
                     style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#DAAB2D';
+                      e.target.style.boxShadow = '0 0 0 1px rgba(218, 171, 45, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '';
+                      e.target.style.boxShadow = '';
+                    }}
                   >
                     <optgroup label="Popular">
                       {popularCountryCodes.map((country) => (
@@ -423,11 +443,23 @@ const CorporateFormSteps = ({ onComplete }) => {
                       value={formData.phone}
                       onChange={handleChange}
                       className={`block w-full pl-10 pr-3 py-3 text-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 rounded-md border ${
-                        errors.phone 
-                          ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400' 
-                          : 'border-gray-600 bg-gray-800/40 hover:border-gray-500 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400'
+                        errors.phone
+                          ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400'
+                          : 'border-gray-600 bg-gray-800/40 hover:border-gray-500 focus:ring-1'
                       }`}
                       style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}
+                      onFocus={(e) => {
+                        if (!errors.phone) {
+                          e.target.style.borderColor = '#DAAB2D';
+                          e.target.style.boxShadow = '0 0 0 1px rgba(218, 171, 45, 0.1)';
+                        }
+                      }}
+                      onBlur={(e) => {
+                        if (!errors.phone) {
+                          e.target.style.borderColor = '';
+                          e.target.style.boxShadow = '';
+                        }
+                      }}
                       required
                     />
                   </div>
@@ -539,7 +571,7 @@ const CorporateFormSteps = ({ onComplete }) => {
             
             <div className="bg-gray-800/40 rounded-lg p-4 sm:p-6 space-y-4 text-sm border border-gray-700/50">
               <div>
-                <h4 className="text-sm font-semibold text-yellow-400 mb-3 uppercase tracking-wide">Contact Information</h4>
+                <h4 className="text-sm font-semibold mb-3 uppercase tracking-wide" style={{color: '#DAAB2D'}}>Contact Information</h4>
                 <div className="text-gray-300 space-y-2 pl-2">
                   <p className="flex justify-between"><span className="text-gray-400">Name:</span> <span className="font-medium text-white">{formData.contactName}</span></p>
                   <p className="flex justify-between"><span className="text-gray-400">Position:</span> <span className="font-medium text-white">{formData.position}</span></p>
@@ -550,7 +582,7 @@ const CorporateFormSteps = ({ onComplete }) => {
               </div>
 
               <div className="border-t border-gray-700 pt-4">
-                <h4 className="text-sm font-semibold text-yellow-400 mb-3 uppercase tracking-wide">Company Information</h4>
+                <h4 className="text-sm font-semibold mb-3 uppercase tracking-wide" style={{color: '#DAAB2D'}}>Company Information</h4>
                 <div className="text-gray-300 space-y-2 pl-2">
                   <p className="flex justify-between"><span className="text-gray-400">Company:</span> <span className="font-medium text-white">{formData.companyName}</span></p>
                   <p className="flex justify-between"><span className="text-gray-400">Industry:</span> <span className="font-medium text-white">{
@@ -562,7 +594,7 @@ const CorporateFormSteps = ({ onComplete }) => {
               </div>
 
               <div className="border-t border-gray-700 pt-4">
-                <h4 className="text-sm font-semibold text-yellow-400 mb-3 uppercase tracking-wide">Partnership Preferences</h4>
+                <h4 className="text-sm font-semibold mb-3 uppercase tracking-wide" style={{color: '#DAAB2D'}}>Partnership Preferences</h4>
                 <div className="text-gray-300 space-y-2 pl-2">
                   <p className="flex justify-between"><span className="text-gray-400">Tier:</span> <span className="font-medium text-white capitalize">{formData.partnershipTier}</span></p>
                 </div>
@@ -576,11 +608,13 @@ const CorporateFormSteps = ({ onComplete }) => {
                   name="termsAccepted" 
                   checked={formData.termsAccepted}
                   onChange={handleChange}
-                  className="w-4 h-4 mt-0.5 border-gray-600 rounded focus:ring-2 focus:ring-yellow-400"
-                  style={{ accentColor: '#F4C430' }}
+                  className="w-4 h-4 mt-0.5 border-gray-600 rounded focus:ring-2"
+                  style={{ accentColor: '#DAAB2D' }}
+                  onFocus={(e) => e.target.style.boxShadow = '0 0 0 2px rgba(218, 171, 45, 0.3)'}
+                  onBlur={(e) => e.target.style.boxShadow = ''}
                 />
                 <span className="text-sm text-gray-300 leading-relaxed">
-                  I agree to the <button type="button" className="text-yellow-400 hover:underline">Terms & Conditions</button> and authorize Confetti KL to contact me regarding this partnership application.
+                  I agree to the <button type="button" style={{color: '#DAAB2D'}} className="hover:underline">Terms & Conditions</button> and authorize Confetti KL to contact me regarding this partnership application.
                 </span>
               </label>
               {errors.termsAccepted && (
@@ -611,10 +645,10 @@ const CorporateFormSteps = ({ onComplete }) => {
               <div className="flex flex-col items-center">
                 <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 text-sm font-semibold shadow-lg`}
                   style={{
-                    backgroundColor: currentStep >= step ? '#F4C430' : currentStep === step ? 'rgba(244, 196, 48, 0.1)' : 'transparent',
-                    borderColor: currentStep >= step ? '#F4C430' : currentStep === step ? '#F4C430' : '#4b5563',
-                    color: currentStep >= step ? 'black' : currentStep === step ? '#F4C430' : '#6b7280',
-                    boxShadow: currentStep === step ? '0 0 20px rgba(244, 196, 48, 0.4)' : 'none',
+                    backgroundColor: currentStep >= step ? '#DAAB2D' : currentStep === step ? 'rgba(218, 171, 45, 0.1)' : 'transparent',
+                    borderColor: currentStep >= step ? '#DAAB2D' : currentStep === step ? '#DAAB2D' : '#4b5563',
+                    color: currentStep >= step ? 'black' : currentStep === step ? '#DAAB2D' : '#6b7280',
+                    boxShadow: currentStep === step ? '0 0 20px rgba(218, 171, 45, 0.4)' : 'none',
                     transform: currentStep === step ? 'scale(1.1)' : 'scale(1)'
                   }}
                 >
@@ -626,7 +660,7 @@ const CorporateFormSteps = ({ onComplete }) => {
                 </div>
                 <div className={`hidden sm:block mt-2 text-xs font-medium transition-colors duration-300`}
                   style={{
-                    color: currentStep >= step ? '#F4C430' : '#6b7280'
+                    color: currentStep >= step ? '#DAAB2D' : '#6b7280'
                   }}
                 >
                   {stepTitles[step - 1].split(' ')[0]}
@@ -641,7 +675,7 @@ const CorporateFormSteps = ({ onComplete }) => {
                   <div
                     className="h-full transition-all duration-500"
                     style={{
-                      backgroundColor: '#F4C430',
+                      backgroundColor: '#DAAB2D',
                       width: currentStep > step ? '100%' : '0%'
                     }}
                   ></div>
@@ -664,8 +698,8 @@ const CorporateFormSteps = ({ onComplete }) => {
       {/* Form Content */}
       <div className="rounded-xl p-4 sm:p-6 lg:p-8 border"
         style={{
-          backgroundColor: '#1a1a1a',
-          borderColor: 'rgba(244, 196, 48, 0.2)'
+          backgroundColor: '#262626',
+          borderColor: 'rgba(218, 171, 45, 0.2)'
         }}
       >
         {renderStep()}
@@ -678,8 +712,18 @@ const CorporateFormSteps = ({ onComplete }) => {
             className={`flex items-center justify-center gap-2 px-5 sm:px-7 py-3.5 text-sm font-semibold uppercase transition-all duration-300 border-2 rounded-lg ${
               currentStep === 1
                 ? 'text-gray-500 cursor-not-allowed border-gray-700 bg-gray-800/20 opacity-50'
-                : 'text-gray-300 hover:text-white border-gray-600 hover:border-yellow-400 bg-gray-800/40 hover:bg-gray-800/60 hover:shadow-md'
+                : 'text-gray-300 hover:text-white border-gray-600 bg-gray-800/40 hover:bg-gray-800/60 hover:shadow-md'
             }`}
+            onMouseEnter={(e) => {
+              if (currentStep !== 1) {
+                e.currentTarget.style.borderColor = '#DAAB2D';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (currentStep !== 1) {
+                e.currentTarget.style.borderColor = '';
+              }
+            }}
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">Previous</span>
@@ -689,10 +733,13 @@ const CorporateFormSteps = ({ onComplete }) => {
           {currentStep < 4 ? (
             <button
               onClick={nextStep}
-              className="flex items-center justify-center gap-2 px-5 sm:px-7 py-3.5 text-black text-sm font-semibold uppercase transition-all duration-300 rounded-lg hover:shadow-xl hover:shadow-yellow-400/30 transform hover:scale-105"
+              className="flex items-center justify-center gap-2 px-5 sm:px-7 py-3.5 text-black text-sm font-semibold uppercase transition-all duration-300 rounded-lg transform hover:scale-105"
               style={{
-                background: 'linear-gradient(135deg, #F4C430, #FFD700)'
+                background: 'linear-gradient(135deg, #DAAB2D, #A57A03)',
+                boxShadow: '0 0 0 0 rgba(218, 171, 45, 0.3)'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(218, 171, 45, 0.3), 0 10px 10px -5px rgba(218, 171, 45, 0.04)'}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 0 0 rgba(218, 171, 45, 0.3)'}
             >
               <span>Next Step</span>
               <ArrowRight className="w-4 h-4" />
@@ -701,9 +748,20 @@ const CorporateFormSteps = ({ onComplete }) => {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex items-center justify-center gap-2 px-6 sm:px-10 py-3.5 text-black text-sm font-semibold uppercase transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg hover:shadow-xl hover:shadow-yellow-400/30 transform hover:scale-105 disabled:transform-none"
+              className="flex items-center justify-center gap-2 px-6 sm:px-10 py-3.5 text-black text-sm font-semibold uppercase transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transform hover:scale-105 disabled:transform-none"
               style={{
-                background: 'linear-gradient(135deg, #F4C430, #FFD700)'
+                background: 'linear-gradient(135deg, #DAAB2D, #A57A03)',
+                boxShadow: '0 0 0 0 rgba(218, 171, 45, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                if (!isSubmitting) {
+                  e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(218, 171, 45, 0.3), 0 10px 10px -5px rgba(218, 171, 45, 0.04)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isSubmitting) {
+                  e.currentTarget.style.boxShadow = '0 0 0 0 rgba(218, 171, 45, 0.3)';
+                }
               }}
             >
               {isSubmitting ? (
