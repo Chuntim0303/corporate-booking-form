@@ -406,7 +406,7 @@ const HomePage = ({ onJoinNetwork }) => {
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 z-10" style={{background: `linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(15, 15, 15, 0.8) 50%, rgba(26, 26, 26, 0.9) 100%)`}}></div>
           <img 
-            src="/cf_125.jpg" 
+            src="/main02.jpeg" 
             alt="Confetti KL event venue" 
             className="w-full h-full object-cover"
           />
