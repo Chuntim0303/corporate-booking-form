@@ -76,7 +76,7 @@ const EnhancedInput = ({
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           style={{
             fontFamily: 'system-ui, -apple-system, sans-serif',
-            backgroundColor: isFocused ? 'rgba(2, 11, 19, 0.4)' : 'rgba(38, 38, 38, 0.3)',
+            backgroundColor: isFocused ? 'rgba(30, 30, 33, 0.4)' : 'rgba(46, 46, 49, 0.3)',
             ...(isFocused && !error ? {
               borderColor: '#DAAB2D',
               boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
@@ -146,7 +146,7 @@ const EnhancedSelect = ({
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           style={{
             fontFamily: 'system-ui, -apple-system, sans-serif',
-            backgroundColor: isFocused ? 'rgba(2, 11, 19, 0.4)' : 'rgba(38, 38, 38, 0.3)',
+            backgroundColor: isFocused ? 'rgba(30, 30, 33, 0.4)' : 'rgba(46, 46, 49, 0.3)',
             ...(isFocused && !error ? {
               borderColor: '#DAAB2D',
               boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
@@ -195,7 +195,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen" style={{background: `linear-gradient(135deg, #262626 0%, #020B13 50%, #262626 100%)`}}>
+    <div className="min-h-screen" style={{background: `linear-gradient(135deg, #2E2E31 0%, #1E1E21 50%, #2E2E31 100%)`}}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -220,11 +220,11 @@ function App() {
 
         ::selection {
           background-color: #DAAB2D;
-          color: #020B13;
+          color: #1E1E21;
         }
         ::-moz-selection {
           background-color: #DAAB2D;
-          color: #020B13;
+          color: #1E1E21;
         }
 
         .smooth-scroll {
@@ -253,7 +253,7 @@ function App() {
       {/* Header */}
       <header className="backdrop-blur-xl border-b sticky top-0 z-50"
         style={{
-          backgroundColor: 'rgba(38, 38, 38, 0.95)',
+          backgroundColor: 'rgba(46, 46, 49, 0.95)',
           borderBottomColor: 'rgba(218, 171, 45, 0.1)'
         }}
       >
@@ -293,7 +293,7 @@ function App() {
       {/* Footer */}
       <footer className="border-t mt-16 sm:mt-24"
         style={{
-          backgroundColor: '#020B13',
+          backgroundColor: '#1E1E21',
           borderTopColor: 'rgba(218, 171, 45, 0.1)'
         }}
       >
@@ -354,7 +354,7 @@ function App() {
         >
           <div className="border shadow-2xl w-full max-w-4xl relative overflow-hidden max-h-[90vh] overflow-y-auto rounded-xl"
             style={{
-              backgroundColor: '#020B13',
+              backgroundColor: '#1E1E21',
               borderColor: 'rgba(218, 171, 45, 0.2)',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
             }}
@@ -410,7 +410,7 @@ const HomePage = ({ onJoinNetwork }) => {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 z-10" style={{background: `linear-gradient(135deg, rgba(38, 38, 38, 0.8) 0%, rgba(2, 11, 19, 0.8) 50%, rgba(38, 38, 38, 0.9) 100%)`}}></div>
+          <div className="absolute inset-0 z-10" style={{background: `linear-gradient(135deg, rgba(46, 46, 49, 0.8) 0%, rgba(30, 30, 33, 0.8) 50%, rgba(46, 46, 49, 0.9) 100%)`}}></div>
           <img 
             src="/main02.jpeg" 
             alt="Confetti KL event venue" 
