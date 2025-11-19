@@ -71,11 +71,12 @@ const EnhancedInput = ({
             error
               ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400'
               : isFocused
-              ? 'bg-gray-800/60 focus:ring-1'
-              : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
+              ? 'focus:ring-1'
+              : 'border-gray-600 hover:border-gray-500'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           style={{
             fontFamily: 'system-ui, -apple-system, sans-serif',
+            backgroundColor: isFocused ? 'rgba(2, 11, 19, 0.4)' : 'rgba(38, 38, 38, 0.3)',
             ...(isFocused && !error ? {
               borderColor: '#DAAB2D',
               boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
@@ -140,11 +141,12 @@ const EnhancedSelect = ({
             error
               ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400'
               : isFocused
-              ? 'bg-gray-800/60 focus:ring-1'
-              : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
+              ? 'focus:ring-1'
+              : 'border-gray-600 hover:border-gray-500'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           style={{
             fontFamily: 'system-ui, -apple-system, sans-serif',
+            backgroundColor: isFocused ? 'rgba(2, 11, 19, 0.4)' : 'rgba(38, 38, 38, 0.3)',
             ...(isFocused && !error ? {
               borderColor: '#DAAB2D',
               boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
