@@ -68,11 +68,12 @@ const EnhancedInput = ({
             error
               ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400'
               : isFocused
-              ? 'bg-gray-800/60 focus:ring-1'
-              : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
+              ? 'focus:ring-1'
+              : 'border-gray-600 hover:border-gray-500'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           style={{
             fontFamily: 'system-ui, -apple-system, sans-serif',
+            backgroundColor: isFocused ? 'rgba(2, 11, 19, 0.4)' : 'rgba(38, 38, 38, 0.3)',
             ...(isFocused && !error ? {
               borderColor: '#DAAB2D',
               boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
@@ -137,11 +138,12 @@ const EnhancedSelect = ({
             error
               ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400'
               : isFocused
-              ? 'bg-gray-800/60 focus:ring-1'
-              : 'border-gray-600 bg-gray-800/40 hover:border-gray-500'
+              ? 'focus:ring-1'
+              : 'border-gray-600 hover:border-gray-500'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           style={{
             fontFamily: 'system-ui, -apple-system, sans-serif',
+            backgroundColor: isFocused ? 'rgba(2, 11, 19, 0.4)' : 'rgba(38, 38, 38, 0.3)',
             ...(isFocused && !error ? {
               borderColor: '#DAAB2D',
               boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
@@ -400,14 +402,19 @@ const CorporateFormSteps = ({ onComplete }) => {
                     name="countryCode"
                     value={formData.countryCode}
                     onChange={handleChange}
-                    className="w-32 px-3 py-3 text-sm text-white bg-gray-800/40 border border-gray-600 rounded-md focus:outline-none focus:ring-1"
-                    style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}
+                    className="w-32 px-3 py-3 text-sm text-white border border-gray-600 rounded-md focus:outline-none focus:ring-1"
+                    style={{
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      backgroundColor: 'rgba(38, 38, 38, 0.3)'
+                    }}
                     onFocus={(e) => {
                       e.target.style.borderColor = '#DAAB2D';
+                      e.target.style.backgroundColor = 'rgba(2, 11, 19, 0.4)';
                       e.target.style.boxShadow = '0 0 0 1px rgba(218, 171, 45, 0.1)';
                     }}
                     onBlur={(e) => {
                       e.target.style.borderColor = '';
+                      e.target.style.backgroundColor = 'rgba(38, 38, 38, 0.3)';
                       e.target.style.boxShadow = '';
                     }}
                   >
@@ -445,18 +452,23 @@ const CorporateFormSteps = ({ onComplete }) => {
                       className={`block w-full pl-10 pr-3 py-3 text-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 rounded-md border ${
                         errors.phone
                           ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400'
-                          : 'border-gray-600 bg-gray-800/40 hover:border-gray-500 focus:ring-1'
+                          : 'border-gray-600 hover:border-gray-500 focus:ring-1'
                       }`}
-                      style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}
+                      style={{
+                        fontFamily: 'system-ui, -apple-system, sans-serif',
+                        backgroundColor: errors.phone ? '' : 'rgba(38, 38, 38, 0.3)'
+                      }}
                       onFocus={(e) => {
                         if (!errors.phone) {
                           e.target.style.borderColor = '#DAAB2D';
+                          e.target.style.backgroundColor = 'rgba(2, 11, 19, 0.4)';
                           e.target.style.boxShadow = '0 0 0 1px rgba(218, 171, 45, 0.1)';
                         }
                       }}
                       onBlur={(e) => {
                         if (!errors.phone) {
                           e.target.style.borderColor = '';
+                          e.target.style.backgroundColor = 'rgba(38, 38, 38, 0.3)';
                           e.target.style.boxShadow = '';
                         }
                       }}
@@ -569,7 +581,12 @@ const CorporateFormSteps = ({ onComplete }) => {
           <div className="space-y-4 sm:space-y-6">
 
             
-            <div className="bg-gray-800/40 rounded-lg p-4 sm:p-6 space-y-4 text-sm border border-gray-700/50">
+            <div className="rounded-lg p-4 sm:p-6 space-y-4 text-sm border"
+              style={{
+                backgroundColor: 'rgba(2, 11, 19, 0.6)',
+                borderColor: 'rgba(218, 171, 45, 0.15)'
+              }}
+            >
               <div>
                 <h4 className="text-sm font-semibold mb-3 uppercase tracking-wide" style={{color: '#DAAB2D'}}>Contact Information</h4>
                 <div className="text-gray-300 space-y-2 pl-2">
@@ -581,7 +598,7 @@ const CorporateFormSteps = ({ onComplete }) => {
                 </div>
               </div>
 
-              <div className="border-t border-gray-700 pt-4">
+              <div className="border-t pt-4" style={{borderColor: 'rgba(218, 171, 45, 0.1)'}}>
                 <h4 className="text-sm font-semibold mb-3 uppercase tracking-wide" style={{color: '#DAAB2D'}}>Company Information</h4>
                 <div className="text-gray-300 space-y-2 pl-2">
                   <p className="flex justify-between"><span className="text-gray-400">Company:</span> <span className="font-medium text-white">{formData.companyName}</span></p>
@@ -593,7 +610,7 @@ const CorporateFormSteps = ({ onComplete }) => {
                 </div>
               </div>
 
-              <div className="border-t border-gray-700 pt-4">
+              <div className="border-t pt-4" style={{borderColor: 'rgba(218, 171, 45, 0.1)'}}>
                 <h4 className="text-sm font-semibold mb-3 uppercase tracking-wide" style={{color: '#DAAB2D'}}>Partnership Preferences</h4>
                 <div className="text-gray-300 space-y-2 pl-2">
                   <p className="flex justify-between"><span className="text-gray-400">Tier:</span> <span className="font-medium text-white capitalize">{formData.partnershipTier}</span></p>
@@ -705,23 +722,29 @@ const CorporateFormSteps = ({ onComplete }) => {
         {renderStep()}
         
         {/* Navigation Buttons */}
-        <div className="flex flex-col sm:flex-row justify-between gap-3 mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-700">
+        <div className="flex flex-col sm:flex-row justify-between gap-3 mt-8 sm:mt-12 pt-6 sm:pt-8 border-t" style={{borderColor: 'rgba(218, 171, 45, 0.1)'}}>
           <button
             onClick={prevStep}
             disabled={currentStep === 1}
             className={`flex items-center justify-center gap-2 px-5 sm:px-7 py-3.5 text-sm font-semibold uppercase transition-all duration-300 border-2 rounded-lg ${
               currentStep === 1
-                ? 'text-gray-500 cursor-not-allowed border-gray-700 bg-gray-800/20 opacity-50'
-                : 'text-gray-300 hover:text-white border-gray-600 bg-gray-800/40 hover:bg-gray-800/60 hover:shadow-md'
+                ? 'text-gray-500 cursor-not-allowed opacity-50'
+                : 'text-gray-300 hover:text-white hover:shadow-md'
             }`}
+            style={{
+              backgroundColor: currentStep === 1 ? 'rgba(38, 38, 38, 0.2)' : 'rgba(38, 38, 38, 0.4)',
+              borderColor: currentStep === 1 ? 'rgba(107, 114, 128, 0.3)' : 'rgba(107, 114, 128, 0.5)'
+            }}
             onMouseEnter={(e) => {
               if (currentStep !== 1) {
                 e.currentTarget.style.borderColor = '#DAAB2D';
+                e.currentTarget.style.backgroundColor = 'rgba(2, 11, 19, 0.4)';
               }
             }}
             onMouseLeave={(e) => {
               if (currentStep !== 1) {
-                e.currentTarget.style.borderColor = '';
+                e.currentTarget.style.borderColor = 'rgba(107, 114, 128, 0.5)';
+                e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.4)';
               }
             }}
           >
