@@ -184,11 +184,26 @@ function App() {
     <div className="min-h-screen" style={{background: `linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 50%, #1a1a1a 100%)`}}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
+
         * {
           font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
-        
+
+        body {
+          line-height: 1.6;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+          line-height: 1.2;
+          letter-spacing: -0.02em;
+        }
+
+        p {
+          line-height: 1.7;
+        }
+
         ::selection {
           background-color: #F4C430;
           color: #1a1a1a;
@@ -197,23 +212,23 @@ function App() {
           background-color: #F4C430;
           color: #1a1a1a;
         }
-        
+
         .smooth-scroll {
           scroll-behavior: smooth;
         }
-        
+
         .hover-lift {
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         .hover-lift:hover {
           transform: translateY(-4px);
         }
-        
+
         .glow-border:hover {
           box-shadow: 0 0 0 1px rgba(244, 196, 48, 0.3), 0 4px 20px rgba(244, 196, 48, 0.1);
         }
-        
+
         @media (max-width: 640px) {
           .hover-lift:hover {
             transform: none;
@@ -398,14 +413,14 @@ const HomePage = ({ onJoinNetwork }) => {
         </div>
 
         <div className="relative z-20 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-white mb-6 sm:mb-8 leading-tight tracking-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-4xl font-light text-white mb-6 sm:mb-8 leading-tight tracking-tight">
             ELEVATE YOUR
             <span className="block mt-2 font-medium text-yellow-400">
               CORPORATE EVENTS
             </span>
           </h1>
-          
-          <p className="text-base sm:text-lg lg:text-xl text-gray-200 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed">
+
+          <p className="text-base sm:text-base lg:text-lg text-gray-200 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed">
             Join Confetti KL's exclusive Class Partner program and unlock premium benefits for your corporate events. From product launches to team building - create memorable experiences.
           </p>
           
@@ -444,12 +459,12 @@ const HomePage = ({ onJoinNetwork }) => {
               <Star className="w-4 h-4 text-yellow-400" />
               <span className="text-xs font-medium uppercase text-yellow-400 tracking-wide">Why Choose Us</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-light text-white mb-4 sm:mb-6 tracking-tight">
+            <h2 className="text-2xl sm:text-2xl lg:text-3xl font-light text-white mb-4 sm:mb-6 tracking-tight">
               Premium Benefits
               <span className="block text-yellow-400">Await You</span>
             </h2>
             <div className="w-16 h-0.5 mx-auto mb-4 sm:mb-6" style={{background: 'linear-gradient(90deg, #F4C430, #FFD700)'}}></div>
-            <p className="text-base sm:text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base lg:text-base text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Experience unparalleled advantages designed exclusively for our Class Partners
             </p>
           </div>
@@ -467,10 +482,10 @@ const HomePage = ({ onJoinNetwork }) => {
                     <feature.icon className="w-8 h-8 sm:w-10 sm:h-10 text-black" />
                   </div>
                 </div>
-                <h3 className="text-lg sm:text-xl font-medium text-white mb-4 tracking-tight">
+                <h3 className="text-base sm:text-lg font-medium text-white mb-4 tracking-tight">
                   {feature.title}
                 </h3>
-                <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+                <p className="text-gray-400 text-sm sm:text-sm leading-relaxed">
                   {feature.description}
                 </p>
               </div>
@@ -492,12 +507,12 @@ const HomePage = ({ onJoinNetwork }) => {
               <Trophy className="w-4 h-4 text-yellow-400" />
               <span className="text-xs font-medium uppercase text-yellow-400 tracking-wide">Pricing Plans</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-light text-white mb-4 sm:mb-6 tracking-tight">
+            <h2 className="text-2xl sm:text-2xl lg:text-3xl font-light text-white mb-4 sm:mb-6 tracking-tight">
               Choose Your
               <span className="block text-yellow-400">Partnership Level</span>
             </h2>
             <div className="w-16 h-0.5 mx-auto mb-4 sm:mb-6" style={{background: 'linear-gradient(90deg, #F4C430, #FFD700)'}}></div>
-            <p className="text-base sm:text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base lg:text-base text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Select the partnership tier that best fits your corporate event needs and budget
             </p>
           </div>
@@ -516,10 +531,10 @@ const HomePage = ({ onJoinNetwork }) => {
                 >
                   <Award className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500" />
                 </div>
-                <h3 className="text-xl sm:text-2xl font-medium text-white mb-4 tracking-tight">Gold Partner</h3>
+                <h3 className="text-lg sm:text-xl font-medium text-white mb-4 tracking-tight">Gold Partner</h3>
                 <div className="mb-4 sm:mb-6">
-                  <div className="text-2xl sm:text-3xl font-light text-yellow-500 tracking-tight">RM 50,000</div>
-                  <div className="text-gray-400 text-xs sm:text-sm uppercase mt-1 tracking-wide">Partnership Investment</div>
+                  <div className="text-xl sm:text-2xl font-light text-yellow-500 tracking-tight">RM 50,000</div>
+                  <div className="text-gray-400 text-xs sm:text-xs uppercase mt-1 tracking-wide">Partnership Investment</div>
                 </div>
               </div>
               
@@ -575,10 +590,10 @@ const HomePage = ({ onJoinNetwork }) => {
                 >
                   <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-black" />
                 </div>
-                <h3 className="text-xl sm:text-2xl font-medium text-white mb-4 tracking-tight">Platinum Partner</h3>
+                <h3 className="text-lg sm:text-xl font-medium text-white mb-4 tracking-tight">Platinum Partner</h3>
                 <div className="mb-4 sm:mb-6">
-                  <div className="text-2xl sm:text-3xl font-light text-white tracking-tight">RM 100,000</div>
-                  <div className="text-gray-400 text-xs sm:text-sm uppercase mt-1 tracking-wide">Partnership Investment</div>
+                  <div className="text-xl sm:text-2xl font-light text-white tracking-tight">RM 100,000</div>
+                  <div className="text-gray-400 text-xs sm:text-xs uppercase mt-1 tracking-wide">Partnership Investment</div>
                 </div>
               </div>
               
@@ -629,10 +644,10 @@ const HomePage = ({ onJoinNetwork }) => {
                 >
                   <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
                 </div>
-                <h3 className="text-xl sm:text-2xl font-medium text-white mb-4 tracking-tight">Diamond Partner</h3>
+                <h3 className="text-lg sm:text-xl font-medium text-white mb-4 tracking-tight">Diamond Partner</h3>
                 <div className="mb-4 sm:mb-6">
-                  <div className="text-2xl sm:text-3xl font-light text-cyan-400 tracking-tight">RM 200,000</div>
-                  <div className="text-gray-400 text-xs sm:text-sm uppercase mt-1 tracking-wide">Partnership Investment</div>
+                  <div className="text-xl sm:text-2xl font-light text-cyan-400 tracking-tight">RM 200,000</div>
+                  <div className="text-gray-400 text-xs sm:text-xs uppercase mt-1 tracking-wide">Partnership Investment</div>
                 </div>
               </div>
               
