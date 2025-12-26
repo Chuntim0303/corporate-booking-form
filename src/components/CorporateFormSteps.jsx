@@ -965,7 +965,7 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
       {/* Form Content */}
       <div className="rounded-xl p-4 sm:p-6 lg:p-8 border"
         style={{
-          backgroundColor: '#F2F2F2',
+          backgroundColor: '#FFFFFF',
           borderColor: 'rgba(218, 171, 45, 0.2)'
         }}
       >
