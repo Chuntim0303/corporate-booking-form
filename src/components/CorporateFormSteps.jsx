@@ -40,7 +40,7 @@ const EnhancedInput = ({
 
   return (
     <div className="space-y-2">
-      <label htmlFor={id} className="block text-sm font-medium text-gray-100" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
+      <label htmlFor={id} className="block text-sm font-medium text-black" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
         {label} {required && <span style={{color: '#DAAB2D'}}>*</span>}
       </label>
       
@@ -113,7 +113,7 @@ const EnhancedSelect = ({
 
   return (
     <div className="space-y-2">
-      <label htmlFor={id} className="block text-sm font-medium text-gray-100" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
+      <label htmlFor={id} className="block text-sm font-medium text-black" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
         {label} {required && <span style={{color: '#DAAB2D'}}>*</span>}
       </label>
       
@@ -505,7 +505,7 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
                 required
               />
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-100">
+                <label className="block text-sm font-medium text-black">
                   Phone Number <span style={{color: '#DAAB2D'}}>*</span>
                 </label>
                 <div className="flex gap-2">
@@ -622,8 +622,8 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
               <div className="flex items-start gap-3">
                 <Building className="w-5 h-5 mt-0.5 flex-shrink-0" style={{color: '#DAAB2D'}} />
                 <div>
-                  <h4 className="text-sm sm:text-base font-semibold text-white mb-1.5">About Your Company</h4>
-                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  <h4 className="text-sm sm:text-base font-semibold text-black mb-1.5">About Your Company</h4>
+                  <p className="text-xs sm:text-sm text-gray-800 leading-relaxed">
                     Tell us about your business so we can customize partnership opportunities to match your industry and goals.
                   </p>
                 </div>
@@ -686,33 +686,33 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
                 backgroundColor: 'rgba(218, 171, 45, 0.05)',
                 borderColor: 'rgba(218, 171, 45, 0.2)'
               }}>
-                <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Bank Transfer Details</h3>
-                <p className="text-xs sm:text-sm text-gray-400 mb-4">Please transfer the amount below to complete your partnership application</p>
-                <div className="mt-3 space-y-2.5 text-sm text-gray-300">
+                <h3 className="text-base sm:text-lg font-semibold text-black mb-1">Bank Transfer Details</h3>
+                <p className="text-xs sm:text-sm text-gray-700 mb-4">Please transfer the amount below to complete your partnership application</p>
+                <div className="mt-3 space-y-2.5 text-sm text-gray-900">
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-gray-400 font-medium">Bank</span>
-                    <span className="font-semibold text-white">Maybank</span>
+                    <span className="text-gray-600 font-medium">Bank</span>
+                    <span className="font-semibold text-black">Maybank</span>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-gray-400 font-medium">Account Name</span>
-                    <span className="font-semibold text-white">Confetti KL Sdn Bhd</span>
+                    <span className="text-gray-600 font-medium">Account Name</span>
+                    <span className="font-semibold text-black">Confetti KL Sdn Bhd</span>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-gray-400 font-medium">Account No.</span>
-                    <span className="font-semibold text-white tracking-wide">1234567890</span>
+                    <span className="text-gray-600 font-medium">Account No.</span>
+                    <span className="font-semibold text-black tracking-wide">1234567890</span>
                   </div>
                   <div className="flex items-start justify-between gap-4">
-                    <span className="text-gray-400 font-medium">Reference</span>
-                    <span className="font-semibold text-white text-right break-words">{formData.companyName || 'Company Name'} - IBPP</span>
+                    <span className="text-gray-600 font-medium">Reference</span>
+                    <span className="font-semibold text-black text-right break-words">{formData.companyName || 'Company Name'} - IBPP</span>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm sm:text-base font-medium text-gray-100">
+                <label className="block text-sm sm:text-base font-medium text-black">
                   Upload Payment Receipt <span style={{color: '#DAAB2D'}}>*</span>
                 </label>
-                <p className="text-xs sm:text-sm text-gray-400 mb-2">
+                <p className="text-xs sm:text-sm text-gray-700 mb-2">
                   Upload a clear screenshot or PDF of your bank transfer confirmation
                 </p>
                 <input
@@ -742,14 +742,14 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
                   </div>
                 )}
                 {formData.receiptFileName && !errors.receiptFile && (
-                  <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-300 bg-gray-800/30 rounded-md px-3 py-2 mt-2">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-800 bg-gray-200 rounded-md px-3 py-2 mt-2">
                     <CheckCircle className="w-4 h-4 flex-shrink-0" style={{color: '#DAAB2D'}} />
                     <span className="truncate">{formData.receiptFileName}</span>
                   </div>
                 )}
                 {formData.receiptStorageKey && (
-                  <div className="flex items-center gap-2 text-xs sm:text-sm font-medium mt-2 px-3 py-2 rounded-md" style={{color: '#DAAB2D', backgroundColor: 'rgba(218, 171, 45, 0.1)'}}>
-                    <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                  <div className="flex items-center gap-2 text-xs sm:text-sm font-medium mt-2 px-3 py-2 rounded-md text-black" style={{backgroundColor: 'rgba(218, 171, 45, 0.15)'}}>
+                    <CheckCircle className="w-4 h-4 flex-shrink-0" style={{color: '#DAAB2D'}} />
                     <span>Receipt uploaded successfully</span>
                   </div>
                 )}
@@ -757,34 +757,34 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
             </div>
 
             <div className="rounded-lg p-5 sm:p-6 border" style={{
-              backgroundColor: 'rgba(30, 30, 33, 0.6)',
-              borderColor: 'rgba(218, 171, 45, 0.15)'
+              backgroundColor: 'rgba(218, 171, 45, 0.08)',
+              borderColor: 'rgba(218, 171, 45, 0.25)'
             }}>
-              <div className="text-sm sm:text-base font-semibold uppercase tracking-wide" style={{color: '#DAAB2D'}}>Payment Summary</div>
+              <div className="text-sm sm:text-base font-semibold uppercase tracking-wide" style={{color: '#A57A03'}}>Payment Summary</div>
 
-              <div className="mt-4 p-4 rounded-lg" style={{backgroundColor: 'rgba(218, 171, 45, 0.05)'}}>
+              <div className="mt-4 p-4 rounded-lg" style={{backgroundColor: 'rgba(255, 255, 255, 0.5)'}}>
                 <div className="flex items-center justify-between gap-4 mb-2">
-                  <div className="text-xs sm:text-sm text-gray-400 font-medium">Partnership Tier</div>
-                  <div className="text-base sm:text-lg font-bold text-white capitalize">{tierPricing[formData.partnershipTier]?.label || formData.partnershipTier || '-'}</div>
+                  <div className="text-xs sm:text-sm text-gray-700 font-medium">Partnership Tier</div>
+                  <div className="text-base sm:text-lg font-bold text-black capitalize">{tierPricing[formData.partnershipTier]?.label || formData.partnershipTier || '-'}</div>
                 </div>
                 <div className="flex items-center justify-between gap-4">
-                  <div className="text-xs sm:text-sm text-gray-400 font-medium">Amount Due</div>
-                  <div className="text-2xl sm:text-3xl font-bold text-white">{formatRM(totalPayable)}</div>
+                  <div className="text-xs sm:text-sm text-gray-700 font-medium">Amount Due</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-black">{formatRM(totalPayable)}</div>
                 </div>
               </div>
 
-              <div className="mt-5 pt-5 space-y-3 border-t" style={{borderColor: 'rgba(218, 171, 45, 0.1)'}}>
-                <div className="flex items-center justify-between text-sm text-gray-300">
-                  <span className="text-gray-400 font-medium">Subtotal</span>
-                  <span className="font-semibold text-white">{formatRM(totalPayable)}</span>
+              <div className="mt-5 pt-5 space-y-3 border-t" style={{borderColor: 'rgba(218, 171, 45, 0.2)'}}>
+                <div className="flex items-center justify-between text-sm text-gray-900">
+                  <span className="text-gray-700 font-medium">Subtotal</span>
+                  <span className="font-semibold text-black">{formatRM(totalPayable)}</span>
                 </div>
-                <div className="flex items-center justify-between text-sm text-gray-300">
-                  <span className="text-gray-400 font-medium">Tax (SST)</span>
-                  <span className="font-semibold text-white">RM 0</span>
+                <div className="flex items-center justify-between text-sm text-gray-900">
+                  <span className="text-gray-700 font-medium">Tax (SST)</span>
+                  <span className="font-semibold text-black">RM 0</span>
                 </div>
-                <div className="flex items-center justify-between text-base pt-3 border-t" style={{borderColor: 'rgba(218, 171, 45, 0.1)'}}>
-                  <span className="font-semibold" style={{color: '#DAAB2D'}}>Total Amount</span>
-                  <span className="text-xl font-bold text-white">{formatRM(totalPayable)}</span>
+                <div className="flex items-center justify-between text-base pt-3 border-t" style={{borderColor: 'rgba(218, 171, 45, 0.2)'}}>
+                  <span className="font-semibold" style={{color: '#A57A03'}}>Total Amount</span>
+                  <span className="text-xl font-bold text-black">{formatRM(totalPayable)}</span>
                 </div>
               </div>
 
@@ -809,8 +809,8 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
               <div className="flex items-start gap-3">
                 <CheckCircle className="w-5 h-5 mt-0.5 flex-shrink-0" style={{color: '#DAAB2D'}} />
                 <div>
-                  <h4 className="text-sm sm:text-base font-semibold text-white mb-1.5">Almost Done!</h4>
-                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  <h4 className="text-sm sm:text-base font-semibold text-black mb-1.5">Almost Done!</h4>
+                  <p className="text-xs sm:text-sm text-gray-800 leading-relaxed">
                     Please review your information below and confirm that everything is correct before submitting your partnership application.
                   </p>
                 </div>
@@ -819,32 +819,32 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
 
             <div className="rounded-lg p-4 sm:p-6 space-y-5 text-sm border"
               style={{
-                backgroundColor: 'rgba(30, 30, 33, 0.6)',
-                borderColor: 'rgba(218, 171, 45, 0.15)'
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                borderColor: 'rgba(218, 171, 45, 0.25)'
               }}
             >
               <div>
-                <h4 className="text-sm sm:text-base font-semibold mb-4 uppercase tracking-wide flex items-center gap-2" style={{color: '#DAAB2D'}}>
+                <h4 className="text-sm sm:text-base font-semibold mb-4 uppercase tracking-wide flex items-center gap-2" style={{color: '#A57A03'}}>
                   <User className="w-4 h-4" />
                   Contact Information
                 </h4>
-                <div className="text-gray-300 space-y-2.5 pl-0 sm:pl-2">
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-400 text-xs sm:text-sm font-medium">Full Name</span> <span className="font-semibold text-white text-sm sm:text-base">{formData.firstName} {formData.lastName}</span></p>
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-400 text-xs sm:text-sm font-medium">Position/Title</span> <span className="font-semibold text-white text-sm sm:text-base">{formData.position}</span></p>
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-400 text-xs sm:text-sm font-medium">Email Address</span> <span className="font-semibold text-white text-sm sm:text-base break-all">{formData.email}</span></p>
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-400 text-xs sm:text-sm font-medium">Phone Number</span> <span className="font-semibold text-white text-sm sm:text-base">{formData.countryCode} {formData.phone}</span></p>
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-400 text-xs sm:text-sm font-medium">NRIC</span> <span className="font-semibold text-white text-sm sm:text-base">{formData.nric}</span></p>
+                <div className="text-gray-900 space-y-2.5 pl-0 sm:pl-2">
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Full Name</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.firstName} {formData.lastName}</span></p>
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Position/Title</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.position}</span></p>
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Email Address</span> <span className="font-semibold text-black text-sm sm:text-base break-all">{formData.email}</span></p>
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Phone Number</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.countryCode} {formData.phone}</span></p>
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">NRIC</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.nric}</span></p>
                 </div>
               </div>
 
-              <div className="border-t pt-5" style={{borderColor: 'rgba(218, 171, 45, 0.1)'}}>
-                <h4 className="text-sm sm:text-base font-semibold mb-4 uppercase tracking-wide flex items-center gap-2" style={{color: '#DAAB2D'}}>
+              <div className="border-t pt-5" style={{borderColor: 'rgba(218, 171, 45, 0.2)'}}>
+                <h4 className="text-sm sm:text-base font-semibold mb-4 uppercase tracking-wide flex items-center gap-2" style={{color: '#A57A03'}}>
                   <Building className="w-4 h-4" />
                   Company Information
                 </h4>
-                <div className="text-gray-300 space-y-2.5 pl-0 sm:pl-2">
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-400 text-xs sm:text-sm font-medium">Company Name</span> <span className="font-semibold text-white text-sm sm:text-base">{formData.companyName}</span></p>
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-400 text-xs sm:text-sm font-medium">Industry</span> <span className="font-semibold text-white text-sm sm:text-base capitalize">{
+                <div className="text-gray-900 space-y-2.5 pl-0 sm:pl-2">
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Company Name</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.companyName}</span></p>
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Industry</span> <span className="font-semibold text-black text-sm sm:text-base capitalize">{
                     formData.industry === 'other' && formData.industryOther
                       ? formData.industryOther
                       : formData.industry
@@ -852,26 +852,26 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
                 </div>
               </div>
 
-              <div className="border-t pt-5" style={{borderColor: 'rgba(218, 171, 45, 0.1)'}}>
-                <h4 className="text-sm sm:text-base font-semibold mb-4 uppercase tracking-wide flex items-center gap-2" style={{color: '#DAAB2D'}}>
+              <div className="border-t pt-5" style={{borderColor: 'rgba(218, 171, 45, 0.2)'}}>
+                <h4 className="text-sm sm:text-base font-semibold mb-4 uppercase tracking-wide flex items-center gap-2" style={{color: '#A57A03'}}>
                   <Award className="w-4 h-4" />
                   Partnership Details
                 </h4>
-                <div className="text-gray-300 space-y-2.5 pl-0 sm:pl-2">
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-400 text-xs sm:text-sm font-medium">Selected Tier</span> <span className="font-semibold text-white text-sm sm:text-base capitalize">{formData.partnershipTier}</span></p>
+                <div className="text-gray-900 space-y-2.5 pl-0 sm:pl-2">
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Selected Tier</span> <span className="font-semibold text-black text-sm sm:text-base capitalize">{formData.partnershipTier}</span></p>
                 </div>
               </div>
 
-              <div className="border-t pt-5" style={{borderColor: 'rgba(218, 171, 45, 0.1)'}}>
-                <h4 className="text-sm sm:text-base font-semibold mb-4 uppercase tracking-wide flex items-center gap-2" style={{color: '#DAAB2D'}}>
+              <div className="border-t pt-5" style={{borderColor: 'rgba(218, 171, 45, 0.2)'}}>
+                <h4 className="text-sm sm:text-base font-semibold mb-4 uppercase tracking-wide flex items-center gap-2" style={{color: '#A57A03'}}>
                   <CreditCard className="w-4 h-4" />
                   Payment Information
                 </h4>
-                <div className="text-gray-300 space-y-2.5 pl-0 sm:pl-2">
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-400 text-xs sm:text-sm font-medium">Total Amount</span> <span className="font-bold text-white text-base sm:text-lg">{formatRM(totalPayable)}</span></p>
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-400 text-xs sm:text-sm font-medium">Receipt Status</span> <span className="font-semibold text-sm sm:text-base" style={{color: formData.receiptFileName ? '#DAAB2D' : '#ef4444'}}>{formData.receiptFileName ? '✓ Uploaded' : 'Not uploaded'}</span></p>
+                <div className="text-gray-900 space-y-2.5 pl-0 sm:pl-2">
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Total Amount</span> <span className="font-bold text-black text-base sm:text-lg">{formatRM(totalPayable)}</span></p>
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Receipt Status</span> <span className="font-semibold text-sm sm:text-base" style={{color: formData.receiptFileName ? '#16a34a' : '#dc2626'}}>{formData.receiptFileName ? '✓ Uploaded' : 'Not uploaded'}</span></p>
                   {formData.receiptFileName && (
-                    <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-400 text-xs sm:text-sm font-medium">File Name</span> <span className="font-medium text-white text-xs sm:text-sm truncate max-w-xs">{formData.receiptFileName}</span></p>
+                    <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">File Name</span> <span className="font-medium text-black text-xs sm:text-sm truncate max-w-xs">{formData.receiptFileName}</span></p>
                   )}
                 </div>
               </div>
@@ -879,7 +879,7 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
 
             <div className="border rounded-lg p-4 sm:p-5" style={{
               borderColor: errors.termsAccepted ? '#ef4444' : 'rgba(107, 114, 128, 0.5)',
-              backgroundColor: errors.termsAccepted ? 'rgba(239, 68, 68, 0.05)' : 'rgba(30, 30, 33, 0.3)'
+              backgroundColor: errors.termsAccepted ? 'rgba(239, 68, 68, 0.05)' : 'rgba(255, 255, 255, 0.5)'
             }}>
               <label className="flex items-start space-x-3 cursor-pointer group">
                 <input
@@ -892,12 +892,12 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
                   onFocus={(e) => e.target.style.boxShadow = '0 0 0 2px rgba(218, 171, 45, 0.3)'}
                   onBlur={(e) => e.target.style.boxShadow = ''}
                 />
-                <span className="text-sm sm:text-base text-gray-300 leading-relaxed">
-                  I agree to the <button type="button" style={{color: '#DAAB2D'}} className="font-semibold hover:underline transition-all">Terms & Conditions</button> and authorize Confetti KL to contact me regarding this partnership application.
+                <span className="text-sm sm:text-base text-gray-900 leading-relaxed">
+                  I agree to the <button type="button" style={{color: '#A57A03'}} className="font-semibold hover:underline transition-all">Terms & Conditions</button> and authorize Confetti KL to contact me regarding this partnership application.
                 </span>
               </label>
               {errors.termsAccepted && (
-                <p className="text-xs sm:text-sm text-red-400 mt-3 flex items-center gap-2 font-medium">
+                <p className="text-xs sm:text-sm text-red-600 mt-3 flex items-center gap-2 font-medium">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   {errors.termsAccepted}
                 </p>
@@ -918,10 +918,10 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
         <div className="flex items-center justify-between">
           {/* Left: Step Title */}
           <div className="flex-1">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-white mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '-0.02em'}}>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-black mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '-0.02em'}}>
               {stepTitles[currentStep - 1]}
             </h2>
-            <p className="text-sm sm:text-base text-gray-400 mt-1">
+            <p className="text-sm sm:text-base text-gray-700 mt-1">
               Complete the form below to continue
             </p>
           </div>
