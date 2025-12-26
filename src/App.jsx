@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
+import {
+  Mail,
+  Phone,
+  MapPin,
   Menu,
   ArrowRight
 } from 'lucide-react';
 import CorporateFormSteps from './components/CorporateFormSteps';
 import LandingPage from './LandingPage';
+import EnvDebug from './components/EnvDebug';
 
 // Main App Component
 function App() {
@@ -125,6 +126,9 @@ function App() {
             <main>
               <LandingPage onJoinNetwork={handleJoinNetwork} />
             </main>
+
+            {/* Environment Debug Panel - Remove in production */}
+            {import.meta.env.DEV && <EnvDebug />}
 
             {/* Footer */}
             <footer className="border-t mt-16 sm:mt-24"

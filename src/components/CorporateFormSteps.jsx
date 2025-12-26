@@ -226,8 +226,39 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
     if (!formData.receiptFile || formData.receiptStorageKey) return;
 
     const presignEndpoint = import.meta?.env?.VITE_RECEIPT_PRESIGN_URL;
+
+    // Debug logging
+    console.group('🔍 Receipt Upload Debug');
+    console.log('Environment check:', {
+      hasEnv: !!import.meta.env,
+      presignEndpoint,
+      isDev: import.meta.env.DEV,
+      mode: import.meta.env.MODE,
+      allEnv: import.meta.env
+    });
+    console.groupEnd();
+
     if (!presignEndpoint) {
-      alert('Receipt upload is not configured yet. Please set VITE_RECEIPT_PRESIGN_URL.');
+      const errorMsg = `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  Environment Variable Not Configured
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+VITE_RECEIPT_PRESIGN_URL is not set.
+
+Quick Fix:
+1. Check if .env file exists in project root
+2. Verify it contains: VITE_RECEIPT_PRESIGN_URL=https://...
+3. Restart your dev server (Ctrl+C, then: npm run dev)
+
+For detailed help, see TROUBLESHOOTING.md
+
+Current value: ${presignEndpoint || '(undefined)'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      `.trim();
+
+      console.error(errorMsg);
+      alert('Receipt upload is not configured yet.\n\nPlease:\n1. Restart your dev server\n2. Check TROUBLESHOOTING.md for help\n3. Look at browser console for details');
       throw new Error('Missing VITE_RECEIPT_PRESIGN_URL');
     }
 
