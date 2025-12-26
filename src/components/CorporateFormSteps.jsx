@@ -41,13 +41,13 @@ const EnhancedInput = ({
   return (
     <div className="space-y-2">
       <label htmlFor={id} className="block text-sm font-medium text-black" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
-        {label} {required && <span style={{color: '#DAAB2D'}}>*</span>}
+        {label} {required && <span style={{color: '#6b7280'}}>*</span>}
       </label>
       
       <div className={`relative transition-all duration-200 ${isFocused ? 'transform scale-[1.01]' : ''}`}>
         {Icon && (
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#DAAB2D' : '#6b7280'}} />
+            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#6b7280' : '#6b7280'}} />
           </div>
         )}
         
@@ -74,7 +74,7 @@ const EnhancedInput = ({
             fontFamily: 'system-ui, -apple-system, sans-serif',
             backgroundColor: error ? '' : 'white',
             ...(isFocused && !error ? {
-              borderColor: '#DAAB2D',
+              borderColor: '#6B7280',
               boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
             } : {})
           }}
@@ -114,13 +114,13 @@ const EnhancedSelect = ({
   return (
     <div className="space-y-2">
       <label htmlFor={id} className="block text-sm font-medium text-black" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
-        {label} {required && <span style={{color: '#DAAB2D'}}>*</span>}
+        {label} {required && <span style={{color: '#6b7280'}}>*</span>}
       </label>
       
       <div className={`relative transition-all duration-200 ${isFocused ? 'transform scale-[1.01]' : ''}`}>
         {Icon && (
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#DAAB2D' : '#6b7280'}} />
+            <Icon className={`h-4 w-4 transition-colors duration-200`} style={{color: error ? '#ef4444' : isFocused ? '#6b7280' : '#6b7280'}} />
           </div>
         )}
         
@@ -144,7 +144,7 @@ const EnhancedSelect = ({
             fontFamily: 'system-ui, -apple-system, sans-serif',
             backgroundColor: error ? '' : 'white',
             ...(isFocused && !error ? {
-              borderColor: '#DAAB2D',
+              borderColor: '#6B7280',
               boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
             } : {})
           }}
@@ -538,7 +538,7 @@ Current value: ${presignEndpoint || '(undefined)'}
               />
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-black">
-                  Phone Number <span style={{color: '#DAAB2D'}}>*</span>
+                  Phone Number <span style={{color: '#6b7280'}}>*</span>
                 </label>
                 <div className="flex gap-2">
                   <select
@@ -551,7 +551,7 @@ Current value: ${presignEndpoint || '(undefined)'}
                       backgroundColor: 'white'
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = '#DAAB2D';
+                      e.target.style.borderColor = '#6b7280';
                       e.target.style.backgroundColor = 'white';
                       e.target.style.boxShadow = '0 0 0 1px rgba(218, 171, 45, 0.1)';
                     }}
@@ -604,7 +604,7 @@ Current value: ${presignEndpoint || '(undefined)'}
                       }}
                       onFocus={(e) => {
                         if (!errors.phone) {
-                          e.target.style.borderColor = '#DAAB2D';
+                          e.target.style.borderColor = '#6b7280';
                           e.target.style.backgroundColor = 'white';
                           e.target.style.boxShadow = '0 0 0 1px rgba(218, 171, 45, 0.1)';
                         }
@@ -652,7 +652,7 @@ Current value: ${presignEndpoint || '(undefined)'}
               borderColor: 'rgba(218, 171, 45, 0.2)'
             }}>
               <div className="flex items-start gap-3">
-                <Building className="w-5 h-5 mt-0.5 flex-shrink-0" style={{color: '#DAAB2D'}} />
+                <Building className="w-5 h-5 mt-0.5 flex-shrink-0" style={{color: '#6b7280'}} />
                 <div>
                   <h4 className="text-sm sm:text-base font-semibold text-black mb-1.5">About Your Company</h4>
                   <p className="text-xs sm:text-sm text-gray-800 leading-relaxed">
@@ -742,7 +742,7 @@ Current value: ${presignEndpoint || '(undefined)'}
 
               <div className="space-y-2">
                 <label className="block text-sm sm:text-base font-medium text-black">
-                  Upload Payment Receipt <span style={{color: '#DAAB2D'}}>*</span>
+                  Upload Payment Receipt <span style={{color: '#6b7280'}}>*</span>
                 </label>
                 <p className="text-xs sm:text-sm text-gray-700 mb-2">
                   Upload a clear screenshot or PDF of your bank transfer confirmation
@@ -1019,14 +1019,16 @@ Current value: ${presignEndpoint || '(undefined)'}
             }}
             onMouseEnter={(e) => {
               if (currentStep !== 1) {
-                e.currentTarget.style.borderColor = '#DAAB2D';
-                e.currentTarget.style.backgroundColor = 'rgba(30, 30, 33, 0.4)';
+                e.currentTarget.style.borderColor = '#9ca3af'; // gray-400
+                e.currentTarget.style.backgroundColor = 'rgba(75, 85, 99, 0.3)'; // slightly darker gray
+                e.currentTarget.style.color = '#ffffff';
               }
             }}
             onMouseLeave={(e) => {
               if (currentStep !== 1) {
                 e.currentTarget.style.borderColor = 'rgba(107, 114, 128, 0.5)';
                 e.currentTarget.style.backgroundColor = 'rgba(46, 46, 49, 0.4)';
+                e.currentTarget.style.color = '#d1d5db'; // gray-300
               }
             }}
           >
