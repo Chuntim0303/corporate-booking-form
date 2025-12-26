@@ -454,13 +454,12 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
             partner_insert_query = """
             INSERT INTO partner_applications (
                 lead_id, position, company_name, industry, partnership_tier,
-                event_types, expected_events, terms_accepted, total_payable,
+                terms_accepted, total_payable,
                 receipt_storage_key, receipt_file_name,
                 submitted_at, status, created_at, updated_at
             ) VALUES (
                 %(lead_id)s, %(position)s, %(company_name)s, %(industry)s,
-                %(partnership_tier)s, %(event_types)s,
-                %(expected_events)s, %(terms_accepted)s, %(total_payable)s,
+                %(partnership_tier)s, %(terms_accepted)s, %(total_payable)s,
                 %(receipt_storage_key)s, %(receipt_file_name)s,
                 NOW(), 'pending', NOW(), NOW()
             )
@@ -472,8 +471,6 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'company_name': data['companyName'],
                 'industry': data['industry'],
                 'partnership_tier': data['partnershipTier'],
-                'event_types': json.dumps(data.get('eventTypes', [])),
-                'expected_events': data.get('expectedEvents', 0),
                 'terms_accepted': data['termsAccepted'],
                 'total_payable': data.get('totalPayable', 0),
                 'receipt_storage_key': data.get('receiptStorageKey', ''),
