@@ -391,6 +391,7 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
         return;
       }
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setCurrentStep(prev => Math.min(prev + 1, 4));
   };
 
@@ -976,7 +977,7 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
           <button
             onClick={prevStep}
             disabled={currentStep === 1}
-            className={`flex items-center justify-center gap-2 px-5 sm:px-7 py-3.5 text-sm sm:text-base font-semibold uppercase tracking-wide transition-all duration-300 border-2 rounded-lg ${
+            className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-2 text-xs sm:text-sm font-semibold uppercase tracking-wide transition-all duration-300 border-2 rounded-lg ${
               currentStep === 1
                 ? 'text-gray-500 cursor-not-allowed opacity-50'
                 : 'text-gray-300 hover:text-white hover:shadow-md'
@@ -1007,7 +1008,7 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
             <button
               onClick={nextStep}
               disabled={isUploadingReceipt}
-              className="flex items-center justify-center gap-2 px-5 sm:px-7 py-3.5 text-black text-sm sm:text-base font-bold uppercase tracking-wide transition-all duration-300 rounded-lg transform hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+              className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 text-black text-xs sm:text-sm font-bold uppercase tracking-wide transition-all duration-300 rounded-lg transform hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
               style={{
                 background: 'linear-gradient(135deg, #DAAB2D, #A57A03)',
                 boxShadow: '0 4px 14px rgba(218, 171, 45, 0.3)'

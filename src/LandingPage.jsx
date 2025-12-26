@@ -140,7 +140,10 @@ const LandingPage = ({ onJoinNetwork }) => {
 
                   <button
                     type="button"
-                    onClick={() => onJoinNetwork(plan.key)}
+                    onClick={() => {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      onJoinNetwork(plan.key);
+                    }}
                     className={`mt-6 w-full rounded-lg px-4 py-3 text-sm font-semibold transition-colors ${plan.popular ? 'bg-gray-900 text-white hover:bg-black' : 'bg-white text-gray-900 border hover:bg-gray-50'}`}
                     style={{borderColor: plan.popular ? 'transparent' : 'rgba(17, 24, 39, 0.2)'}}
                   >

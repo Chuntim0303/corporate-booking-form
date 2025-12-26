@@ -310,16 +310,18 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
             partner_insert_query = """
             INSERT INTO partner_applications (
                 lead_id, position, company_name, industry, company_size, partnership_tier,
-                event_types, expected_events, terms_accepted,
+                event_types, expected_events, terms_accepted, total_payable,
+                receipt_storage_key, receipt_file_name,
                 submitted_at, status, created_at, updated_at
             ) VALUES (
-                %(lead_id)s, %(position)s, %(company_name)s, %(industry)s, 
-                %(company_size)s, %(partnership_tier)s, %(event_types)s, 
-                %(expected_events)s, %(terms_accepted)s,
+                %(lead_id)s, %(position)s, %(company_name)s, %(industry)s,
+                %(company_size)s, %(partnership_tier)s, %(event_types)s,
+                %(expected_events)s, %(terms_accepted)s, %(total_payable)s,
+                %(receipt_storage_key)s, %(receipt_file_name)s,
                 NOW(), 'pending', NOW(), NOW()
             )
             """
-            
+
             partner_data = {
                 'lead_id': lead_id,
                 'position': data['position'],
@@ -329,7 +331,10 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'partnership_tier': data['partnershipTier'],
                 'event_types': json.dumps(data.get('eventTypes', [])),
                 'expected_events': data.get('expectedEvents', 0),  # Default to 0 if not provided
-                'terms_accepted': data['termsAccepted']
+                'terms_accepted': data['termsAccepted'],
+                'total_payable': data.get('totalPayable', 0),
+                'receipt_storage_key': data.get('receiptStorageKey', ''),
+                'receipt_file_name': data.get('receiptFileName', '')
             }
             
             logger.debug("Executing partner application insertion query", extra={
