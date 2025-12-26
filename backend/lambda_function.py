@@ -410,12 +410,12 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
             lead_insert_query = """
             INSERT INTO leads (
                 first_name, last_name, email_address, gender, phone_number,
-                address_line_1, address_line_2, city, state, postal_code,
+                address_line_1, address_line_2, city, state, postcode,
                 lead_source, created_at, updated_at
             ) VALUES (
                 %(first_name)s, %(last_name)s, %(email_address)s, %(gender)s, %(phone_number)s,
                 %(address_line_1)s, %(address_line_2)s, %(city)s, %(state)s,
-                %(postal_code)s, 'ccp', NOW(), NOW()
+                %(postcode)s, 'ccp', NOW(), NOW()
             )
             """
 
@@ -429,7 +429,7 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'address_line_2': data.get('addressLine2', ''),
                 'city': data.get('city', 'Not provided'),
                 'state': data.get('state', 'Not provided'),
-                'postal_code': data.get('postalCode', '00000')
+                'postcode': data.get('postalCode', '00000')
             }
 
             logger.debug("Executing lead insertion query", extra={
@@ -453,13 +453,13 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
             # Now insert into partner_applications table with the lead_id
             partner_insert_query = """
             INSERT INTO partner_applications (
-                lead_id, position, company_name, industry, company_size, partnership_tier,
+                lead_id, position, company_name, industry, partnership_tier,
                 event_types, expected_events, terms_accepted, total_payable,
                 receipt_storage_key, receipt_file_name,
                 submitted_at, status, created_at, updated_at
             ) VALUES (
                 %(lead_id)s, %(position)s, %(company_name)s, %(industry)s,
-                %(company_size)s, %(partnership_tier)s, %(event_types)s,
+                %(partnership_tier)s, %(event_types)s,
                 %(expected_events)s, %(terms_accepted)s, %(total_payable)s,
                 %(receipt_storage_key)s, %(receipt_file_name)s,
                 NOW(), 'pending', NOW(), NOW()
@@ -471,7 +471,6 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'position': data['position'],
                 'company_name': data['companyName'],
                 'industry': data['industry'],
-                'company_size': data.get('companySize', 'Not specified'),
                 'partnership_tier': data['partnershipTier'],
                 'event_types': json.dumps(data.get('eventTypes', [])),
                 'expected_events': data.get('expectedEvents', 0),
