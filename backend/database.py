@@ -117,15 +117,11 @@ class Database:
             f"\nCompany: {data.get('companyName', 'N/A')}",
             f"Position: {data.get('position', 'N/A')}",
             f"Industry: {data.get('industry', 'N/A')}",
-            f"NRIC: {data.get('nric', 'N/A')}",
-            f"Expected Events: {data.get('expectedEvents', 'N/A')} per year"
+            f"NRIC: {data.get('nric', 'N/A')}"
         ]
-        
-        if data.get('eventTypes'):
-            notes_parts.append(f"Event Types: {', '.join(data['eventTypes'])}")
-        
+
         notes_parts.append(f"\nSubmitted: {data.get('submittedAt', datetime.utcnow().isoformat())}")
-        
+
         return '\n'.join(notes_parts)
     
     def get_lead(self, lead_id: int) -> Optional[Dict[str, Any]]:
