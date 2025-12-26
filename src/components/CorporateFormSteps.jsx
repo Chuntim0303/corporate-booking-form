@@ -63,16 +63,16 @@ const EnhancedInput = ({
           required={required}
           disabled={disabled}
           maxLength={maxLength}
-          className={`block w-full ${Icon ? 'pl-10' : 'pl-3'} pr-3 py-3 text-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 rounded-md border ${
+          className={`block w-full ${Icon ? 'pl-10' : 'pl-3'} pr-3 py-3 text-sm text-black placeholder-gray-400 focus:outline-none transition-all duration-200 rounded-md border ${
             error
-              ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400'
+              ? 'border-red-500 bg-red-50 focus:border-red-400 focus:ring-1 focus:ring-red-400'
               : isFocused
               ? 'focus:ring-1'
-              : 'border-gray-600 hover:border-gray-500'
+              : 'border-gray-300 hover:border-gray-400'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           style={{
             fontFamily: 'system-ui, -apple-system, sans-serif',
-            backgroundColor: isFocused ? 'rgba(30, 30, 33, 0.4)' : 'rgba(46, 46, 49, 0.3)',
+            backgroundColor: error ? '' : 'white',
             ...(isFocused && !error ? {
               borderColor: '#DAAB2D',
               boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
@@ -133,25 +133,25 @@ const EnhancedSelect = ({
           onBlur={() => setIsFocused(false)}
           required={required}
           disabled={disabled}
-          className={`block w-full ${Icon ? 'pl-10' : 'pl-3'} pr-10 py-3 text-sm text-white focus:outline-none appearance-none transition-all duration-200 rounded-md border ${
+          className={`block w-full ${Icon ? 'pl-10' : 'pl-3'} pr-10 py-3 text-sm text-black focus:outline-none appearance-none transition-all duration-200 rounded-md border ${
             error
-              ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400'
+              ? 'border-red-500 bg-red-50 focus:border-red-400 focus:ring-1 focus:ring-red-400'
               : isFocused
               ? 'focus:ring-1'
-              : 'border-gray-600 hover:border-gray-500'
+              : 'border-gray-300 hover:border-gray-400'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           style={{
             fontFamily: 'system-ui, -apple-system, sans-serif',
-            backgroundColor: isFocused ? 'rgba(30, 30, 33, 0.4)' : 'rgba(46, 46, 49, 0.3)',
+            backgroundColor: error ? '' : 'white',
             ...(isFocused && !error ? {
               borderColor: '#DAAB2D',
               boxShadow: '0 0 0 1px rgba(218, 171, 45, 0.1), 0 4px 6px -1px rgba(218, 171, 45, 0.1)'
             } : {})
           }}
         >
-          <option value="" style={{backgroundColor: '#1f2937', color: '#9ca3af'}}>{placeholder}</option>
+          <option value="" style={{backgroundColor: 'white', color: '#9ca3af'}}>{placeholder}</option>
           {options.map((option) => (
-            <option key={option.value} value={option.value} style={{backgroundColor: '#1f2937', color: 'white'}}>
+            <option key={option.value} value={option.value} style={{backgroundColor: 'white', color: 'black'}}>
               {option.label}
             </option>
           ))}
@@ -513,19 +513,19 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
                     name="countryCode"
                     value={formData.countryCode}
                     onChange={handleChange}
-                    className="w-32 px-3 py-3 text-sm text-white border border-gray-600 rounded-md focus:outline-none focus:ring-1"
+                    className="w-32 px-3 py-3 text-sm text-black border border-gray-300 rounded-md focus:outline-none focus:ring-1"
                     style={{
                       fontFamily: 'system-ui, -apple-system, sans-serif',
-                      backgroundColor: 'rgba(46, 46, 49, 0.3)'
+                      backgroundColor: 'white'
                     }}
                     onFocus={(e) => {
                       e.target.style.borderColor = '#DAAB2D';
-                      e.target.style.backgroundColor = 'rgba(30, 30, 33, 0.4)';
+                      e.target.style.backgroundColor = 'white';
                       e.target.style.boxShadow = '0 0 0 1px rgba(218, 171, 45, 0.1)';
                     }}
                     onBlur={(e) => {
                       e.target.style.borderColor = '';
-                      e.target.style.backgroundColor = 'rgba(46, 46, 49, 0.3)';
+                      e.target.style.backgroundColor = 'white';
                       e.target.style.boxShadow = '';
                     }}
                   >
@@ -534,7 +534,7 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
                         <option
                           key={`popular-${country.code}`}
                           value={country.code}
-                          style={{backgroundColor: '#1f2937'}}
+                          style={{backgroundColor: 'white', color: 'black'}}
                         >
                           {country.flag} {country.code}
                         </option>
@@ -545,7 +545,7 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
                         <option
                           key={country.code}
                           value={country.code}
-                          style={{backgroundColor: '#1f2937'}}
+                          style={{backgroundColor: 'white', color: 'black'}}
                         >
                           {country.flag} {country.code} ({country.country})
                         </option>
@@ -561,26 +561,26 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
                       value={formData.phone}
                       maxLength={formData.countryCode === '+60' ? 10 : 15}
                       onChange={handleChange}
-                      className={`block w-full pl-10 pr-3 py-3 text-sm text-white placeholder-gray-400 focus:outline-none transition-all duration-200 rounded-md border ${
+                      className={`block w-full pl-10 pr-3 py-3 text-sm text-black placeholder-gray-400 focus:outline-none transition-all duration-200 rounded-md border ${
                         errors.phone
-                          ? 'border-red-500 bg-red-900/20 focus:border-red-400 focus:ring-1 focus:ring-red-400'
-                          : 'border-gray-600 hover:border-gray-500 focus:ring-1'
+                          ? 'border-red-500 bg-red-50 focus:border-red-400 focus:ring-1 focus:ring-red-400'
+                          : 'border-gray-300 hover:border-gray-400 focus:ring-1'
                       }`}
                       style={{
                         fontFamily: 'system-ui, -apple-system, sans-serif',
-                        backgroundColor: errors.phone ? '' : 'rgba(46, 46, 49, 0.3)'
+                        backgroundColor: errors.phone ? '' : 'white'
                       }}
                       onFocus={(e) => {
                         if (!errors.phone) {
                           e.target.style.borderColor = '#DAAB2D';
-                          e.target.style.backgroundColor = 'rgba(30, 30, 33, 0.4)';
+                          e.target.style.backgroundColor = 'white';
                           e.target.style.boxShadow = '0 0 0 1px rgba(218, 171, 45, 0.1)';
                         }
                       }}
                       onBlur={(e) => {
                         if (!errors.phone) {
                           e.target.style.borderColor = '';
-                          e.target.style.backgroundColor = 'rgba(46, 46, 49, 0.3)';
+                          e.target.style.backgroundColor = 'white';
                           e.target.style.boxShadow = '';
                         }
                       }}
@@ -727,11 +727,11 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
                       receiptStorageKey: ''
                     }));
                   }}
-                  className={`block w-full text-sm text-gray-300 file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:text-black file:cursor-pointer file:transition-all hover:file:scale-105 rounded-md border ${
-                    errors.receiptFile ? 'border-red-500' : 'border-gray-600'
+                  className={`block w-full text-sm text-gray-700 file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:text-black file:cursor-pointer file:transition-all hover:file:scale-105 rounded-md border ${
+                    errors.receiptFile ? 'border-red-500' : 'border-gray-300'
                   }`}
                   style={{
-                    backgroundColor: 'rgba(46, 46, 49, 0.3)',
+                    backgroundColor: 'white',
                     fontFamily: 'system-ui, -apple-system, sans-serif'
                   }}
                 />
