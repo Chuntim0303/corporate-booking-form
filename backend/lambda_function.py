@@ -96,6 +96,8 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
 def handle_presign_route(event: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, Any]:
     """Handle presign URL generation requests"""
+    logger.info("=== PRESIGN ROUTE DEBUG START ===")
+
     try:
         if not handle_presign_request:
             logger.error("Presign service not available")
@@ -107,6 +109,7 @@ def handle_presign_route(event: Dict[str, Any], headers: Dict[str, str]) -> Dict
 
         # Parse request body
         if 'body' not in event:
+            logger.warning("No request body in presign route")
             return {
                 'statusCode': 400,
                 'headers': headers,
@@ -115,21 +118,49 @@ def handle_presign_route(event: Dict[str, Any], headers: Dict[str, str]) -> Dict
 
         body = json.loads(event['body']) if isinstance(event['body'], str) else event['body']
 
+        logger.info("Presign request parsed", extra={
+            'body_keys': list(body.keys()),
+            'file_name': body.get('fileName'),
+            'file_type': body.get('fileType'),
+            'origin': event.get('headers', {}).get('origin') or event.get('headers', {}).get('Origin')
+        })
+
         # Call presign service
         result = handle_presign_request(body)
 
+        logger.info("Presign service returned", extra={
+            'result_keys': list(result.keys()),
+            'status_code': result.get('statusCode'),
+            'has_upload_url': 'uploadUrl' in result,
+            'has_key': 'key' in result,
+            'has_error': 'error' in result
+        })
+
         # Format response
         if result.get('statusCode') == 200:
+            response_body = {
+                'uploadUrl': result['uploadUrl'],
+                'key': result['key'],
+                'bucket': result.get('bucket')
+            }
+
+            logger.info("Returning presign success response", extra={
+                'upload_url_preview': result['uploadUrl'][:100] + '...',
+                'storage_key': result['key'],
+                'bucket': result.get('bucket')
+            })
+
             return {
                 'statusCode': 200,
                 'headers': headers,
-                'body': json.dumps({
-                    'uploadUrl': result['uploadUrl'],
-                    'key': result['key'],
-                    'bucket': result.get('bucket')
-                })
+                'body': json.dumps(response_body)
             }
         else:
+            logger.warning("Presign service returned error", extra={
+                'status_code': result.get('statusCode'),
+                'error': result.get('error')
+            })
+
             return {
                 'statusCode': result.get('statusCode', 500),
                 'headers': headers,
@@ -137,19 +168,25 @@ def handle_presign_route(event: Dict[str, Any], headers: Dict[str, str]) -> Dict
             }
 
     except json.JSONDecodeError as e:
-        logger.error(f"JSON decode error: {str(e)}")
+        logger.error(f"JSON decode error in presign route: {str(e)}", extra={
+            'body_preview': str(event.get('body', ''))[:200]
+        })
         return {
             'statusCode': 400,
             'headers': headers,
             'body': json.dumps({'error': 'Invalid JSON in request body'})
         }
     except Exception as e:
-        logger.error(f"Error in presign route: {str(e)}", exc_info=True)
+        logger.error(f"Error in presign route: {str(e)}", extra={
+            'error_type': type(e).__name__
+        }, exc_info=True)
         return {
             'statusCode': 500,
             'headers': headers,
             'body': json.dumps({'error': str(e)})
         }
+    finally:
+        logger.info("=== PRESIGN ROUTE DEBUG END ===")
 
 
 def handle_application_route(event: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, Any]:
