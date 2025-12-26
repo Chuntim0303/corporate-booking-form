@@ -47,7 +47,7 @@ const LandingPage = ({ onJoinNetwork }) => {
 
   return (
     <div>
-      <section className="min-h-[72vh] lg:min-h-[620px] flex items-start" style={{backgroundColor: '#1D1E20'}}>
+      <section className="min-h-[72vh] lg:min-h-[620px] flex items-start" style={{backgroundColor: '#040B11'}}>
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-10 sm:pt-10 sm:pb-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
             <div className="text-center lg:text-left">
@@ -89,7 +89,7 @@ const LandingPage = ({ onJoinNetwork }) => {
             <div className="relative overflow-hidden rounded-2xl border" style={{borderColor: 'rgba(218, 171, 45, 0.18)', backgroundColor: 'rgba(255, 255, 255, 0.02)'}}>
               <div className="absolute inset-0 z-10" style={{background: `linear-gradient(135deg, rgba(0, 0, 0, 0.25) 0%, rgba(11, 15, 20, 0.10) 50%, rgba(0, 0, 0, 0.20) 100%)`}}></div>
               <img
-                src="/main02.jpeg"
+                src="/main03.jpg"
                 alt="Confetti KL event venue"
                 className="w-full h-[260px] sm:h-[340px] lg:h-[420px] object-cover"
               />

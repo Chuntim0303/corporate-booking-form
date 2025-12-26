@@ -89,7 +89,7 @@ function App() {
             {/* Header */}
             <header className="backdrop-blur-xl border-b sticky top-0 z-50"
               style={{
-                backgroundColor: '#1D1E20',
+                backgroundColor: '#040B11',
                 borderBottomColor: 'rgba(218, 171, 45, 0.1)'
               }}
             >
@@ -103,7 +103,7 @@ function App() {
                       <img 
                         src="/black_logo.png" 
                         alt="Confetti KL Logo" 
-                        className="w-8 h-8 sm:w-10 sm:h-10 object-contain transition-transform duration-300 group-hover:scale-110"
+                        className="w-8 h-8 sm:w-10 sm:h-10 object-contain rounded-md transition-transform duration-300 group-hover:scale-110"
                       />
                       <span className="text-lg sm:text-xl lg:text-2xl font-medium text-white tracking-tight transition-colors duration-300" style={{'--hover-color': '#DAAB2D'}}>
                         CONFETTI <span style={{color: '#DAAB2D'}}>KL</span>
@@ -188,10 +188,10 @@ function App() {
       <Route
         path="/partnership/apply"
         element={
-          <div className="min-h-screen" style={{backgroundColor: '#1D1E20'}}>
+          <div className="min-h-screen" style={{backgroundColor: '#F2F2F2'}}>
             <header className="backdrop-blur-xl border-b sticky top-0 z-50"
               style={{
-                backgroundColor: '#1D1E20',
+                backgroundColor: '#040B11',
                 borderBottomColor: 'rgba(218, 171, 45, 0.1)'
               }}
             >
@@ -209,7 +209,7 @@ function App() {
                     <img 
                       src="/black_logo.png" 
                       alt="Confetti KL Logo" 
-                      className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+                      className="w-8 h-8 sm:w-10 sm:h-10 object-contain rounded-md"
                     />
                     <span className="text-lg sm:text-xl lg:text-2xl font-medium text-white tracking-tight">
                       CONFETTI <span style={{color: '#DAAB2D'}}>KL</span>

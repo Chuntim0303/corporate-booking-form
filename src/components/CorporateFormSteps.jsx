@@ -348,7 +348,7 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
 
         // Phone number validation for Malaysia
         if (formData.phone && formData.countryCode === '+60') {
-          const cleanPhone = formData.phone.replace(/[\s\-]/g, '');
+          const cleanPhone = formData.phone.replace(/[\s-]/g, '');
           if (cleanPhone.startsWith('0')) {
             newErrors.phone = 'Malaysian phone numbers should not start with 0 when using country code';
           }
@@ -940,7 +940,7 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
       {/* Form Content */}
       <div className="rounded-xl p-4 sm:p-6 lg:p-8 border"
         style={{
-          backgroundColor: '#1D1E20',
+          backgroundColor: '#F2F2F2',
           borderColor: 'rgba(218, 171, 45, 0.2)'
         }}
       >
