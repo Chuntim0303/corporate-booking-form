@@ -156,10 +156,6 @@ def send_partnership_confirmation_email(
 
                     <p>Thank you for applying to become a corporate partner with Confetti. We have successfully received your application and payment.</p>
 
-                    <div class="text-center">
-                        <span class="status-badge">✓ Application Received</span>
-                    </div>
-
                     <div class="application-details">
                         <div class="detail-row">
                             <span class="detail-label">Application ID:</span>

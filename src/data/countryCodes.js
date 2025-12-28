@@ -238,7 +238,6 @@ export const countryCodes = [
   { code: '+84', country: 'Vietnam', flag: '🇻🇳' },
   { code: '+1-340', country: 'U.S. Virgin Islands', flag: '🇻🇮' },
   { code: '+681', country: 'Wallis and Futuna', flag: '🇼🇫' },
-  { code: '+212', country: 'Western Sahara', flag: '🇪🇭' },
   { code: '+967', country: 'Yemen', flag: '🇾🇪' },
   { code: '+260', country: 'Zambia', flag: '🇿🇲' },
   { code: '+263', country: 'Zimbabwe', flag: '🇿🇼' }
