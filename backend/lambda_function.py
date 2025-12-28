@@ -611,7 +611,7 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'partner_application_id': application_id,
                 'amount': payment_amount,
                 'payment_method': 'bank_transfer',  # Assuming bank transfer since they upload receipt
-                'payment_type': 'partnership_fee',
+                'payment_type': 'membership_fee',  # Changed from partnership_fee for proper redirect logic
                 'description': payment_description,
                 'official_receipt': receipt_key,
                 'attachment': receipt_key  # S3 path stored in attachment field
