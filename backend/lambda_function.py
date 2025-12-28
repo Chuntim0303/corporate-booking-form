@@ -288,9 +288,9 @@ def handle_application_route(event: Dict[str, Any], headers: Dict[str, str]) -> 
         })
         result = insert_lead_and_partner_application(body)
 
-        logger.info("Lead and partner application submitted successfully", extra={
+        logger.info("Contact and partner application submitted successfully", extra={
             'email': email_value,
-            'lead_id': result['lead_id'],
+            'contact_id': result['contact_id'],
             'application_id': result['application_id']
         })
 
@@ -299,7 +299,7 @@ def handle_application_route(event: Dict[str, Any], headers: Dict[str, str]) -> 
             'headers': headers,
             'body': json.dumps({
                 'message': 'Application submitted successfully',
-                'leadId': result['lead_id'],
+                'contactId': result['contact_id'],
                 'applicationId': result['application_id']
             })
         }
@@ -385,8 +385,8 @@ def get_db_connection():
 
 def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Insert data into both leads and partner_applications tables in a single transaction.
-    The lead is created first, then its ID is stored in partner_applications.lead_id.
+    Insert data into both contacts and partner_applications tables in a single transaction.
+    The contact is created first, then its ID is stored in partner_applications.contact_id.
     """
     connection = None
     email = data['email'].lower()
@@ -406,9 +406,9 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
         current_time = datetime.utcnow()
 
         with connection.cursor() as cursor:
-            # Insert into leads table FIRST
-            lead_insert_query = """
-            INSERT INTO leads (
+            # Insert into contacts table FIRST
+            contact_insert_query = """
+            INSERT INTO contacts (
                 first_name, last_name, email_address, gender, phone_number,
                 address_line_1, address_line_2, city, state, postcode,
                 lead_source, created_at, updated_at
@@ -419,7 +419,7 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
             )
             """
 
-            lead_data = {
+            contact_data = {
                 'first_name': first_name,
                 'last_name': last_name,
                 'email_address': email,
@@ -432,33 +432,33 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'postcode': data.get('postalCode', '00000')
             }
 
-            logger.debug("Executing lead insertion query", extra={
-                'query_params_keys': list(lead_data.keys()),
+            logger.debug("Executing contact insertion query", extra={
+                'query_params_keys': list(contact_data.keys()),
                 'email': email,
                 'first_name': first_name,
                 'last_name': last_name
             })
 
-            cursor.execute(lead_insert_query, lead_data)
-            lead_id = cursor.lastrowid
+            cursor.execute(contact_insert_query, contact_data)
+            contact_id = cursor.lastrowid
 
-            logger.info("Lead record inserted successfully", extra={
-                'lead_id': lead_id,
+            logger.info("Contact record inserted successfully", extra={
+                'contact_id': contact_id,
                 'email': email,
                 'first_name': first_name,
                 'last_name': last_name,
-                'table': 'leads'
+                'table': 'contacts'
             })
 
-            # Now insert into partner_applications table with the lead_id
+            # Now insert into partner_applications table with the contact_id
             partner_insert_query = """
             INSERT INTO partner_applications (
-                lead_id, position, company_name, industry, partnership_tier,
+                contact_id, position, company_name, industry, partnership_tier,
                 terms_accepted, total_payable,
                 receipt_storage_key, receipt_file_name,
                 submitted_at, status, created_at, updated_at
             ) VALUES (
-                %(lead_id)s, %(position)s, %(company_name)s, %(industry)s,
+                %(contact_id)s, %(position)s, %(company_name)s, %(industry)s,
                 %(partnership_tier)s, %(terms_accepted)s, %(total_payable)s,
                 %(receipt_storage_key)s, %(receipt_file_name)s,
                 NOW(), 'pending', NOW(), NOW()
@@ -466,7 +466,7 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
             """
 
             partner_data = {
-                'lead_id': lead_id,
+                'contact_id': contact_id,
                 'position': data['position'],
                 'company_name': data['companyName'],
                 'industry': data['industry'],
@@ -479,7 +479,7 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
 
             logger.debug("Executing partner application insertion query", extra={
                 'query_params_keys': list(partner_data.keys()),
-                'lead_id': lead_id,
+                'contact_id': contact_id,
                 'table': 'partner_applications'
             })
 
@@ -488,23 +488,23 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
 
             logger.info("Partner application record inserted successfully", extra={
                 'application_id': application_id,
-                'lead_id': lead_id,
+                'contact_id': contact_id,
                 'email': email
             })
 
             # Commit both inserts
             connection.commit()
             logger.info("Database transaction committed successfully", extra={
-                'lead_id': lead_id,
+                'contact_id': contact_id,
                 'application_id': application_id,
                 'email': email,
                 'first_name': first_name,
                 'last_name': last_name,
-                'tables_updated': ['leads', 'partner_applications']
+                'tables_updated': ['contacts', 'partner_applications']
             })
 
             return {
-                'lead_id': lead_id,
+                'contact_id': contact_id,
                 'application_id': application_id
             }
 
