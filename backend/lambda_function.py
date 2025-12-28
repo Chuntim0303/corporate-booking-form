@@ -37,6 +37,12 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     - OPTIONS /* - CORS preflight
     """
 
+    # Get the path and method from event
+    path = event.get('path', event.get('resource', ''))
+    http_method = event.get('httpMethod', 'POST')
+    request_headers = event.get('headers', {}) or {}
+    origin = request_headers.get('origin') or request_headers.get('Origin') or 'UNKNOWN'
+
     # Set CORS headers
     headers = {
         'Content-Type': 'application/json',
@@ -45,16 +51,15 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         'Access-Control-Allow-Headers': 'Content-Type, Authorization'
     }
 
-    # Get the path and method from event
-    path = event.get('path', event.get('resource', ''))
-    http_method = event.get('httpMethod', 'POST')
-
-    logger.info("Lambda function started", extra={
+    logger.info("=== LAMBDA HANDLER START ===", extra={
         'event_type': type(event).__name__,
         'http_method': http_method,
         'path': path,
         'resource': event.get('resource'),
-        'request_id': getattr(context, 'aws_request_id', 'N/A') if context else 'N/A'
+        'request_id': getattr(context, 'aws_request_id', 'N/A') if context else 'N/A',
+        'origin': origin,
+        'cors_headers_set': headers,
+        'all_request_headers': request_headers
     })
 
     try:
@@ -118,15 +123,30 @@ def handle_presign_route(event: Dict[str, Any], headers: Dict[str, str]) -> Dict
 
         body = json.loads(event['body']) if isinstance(event['body'], str) else event['body']
 
+        # Extract request headers and origin information
+        request_headers = event.get('headers', {}) or {}
+        origin = request_headers.get('origin') or request_headers.get('Origin') or 'UNKNOWN'
+
         logger.info("Presign request parsed", extra={
             'body_keys': list(body.keys()),
             'file_name': body.get('fileName'),
             'file_type': body.get('fileType'),
-            'origin': event.get('headers', {}).get('origin') or event.get('headers', {}).get('Origin')
+            'origin': origin,
+            'all_headers': request_headers,
+            'referer': request_headers.get('referer') or request_headers.get('Referer'),
+            'user_agent': request_headers.get('user-agent') or request_headers.get('User-Agent'),
+            'request_id': event.get('requestContext', {}).get('requestId', 'N/A')
         })
 
-        # Call presign service
-        result = handle_presign_request(body)
+        # Build request context
+        request_context = {
+            'origin': origin,
+            'headers': request_headers,
+            'request_id': event.get('requestContext', {}).get('requestId', 'N/A')
+        }
+
+        # Call presign service with context
+        result = handle_presign_request(body, request_context)
 
         logger.info("Presign service returned", extra={
             'result_keys': list(result.keys()),
@@ -144,19 +164,30 @@ def handle_presign_route(event: Dict[str, Any], headers: Dict[str, str]) -> Dict
                 'bucket': result.get('bucket')
             }
 
-            logger.info("Returning presign success response", extra={
+            logger.info("✓ Returning presign success response", extra={
                 'upload_url_preview': result['uploadUrl'][:100] + '...',
+                'upload_url_full': result['uploadUrl'],
                 'storage_key': result['key'],
-                'bucket': result.get('bucket')
+                'bucket': result.get('bucket'),
+                'response_headers': headers,
+                'cors_enabled': 'Access-Control-Allow-Origin' in headers
             })
 
-            return {
+            final_response = {
                 'statusCode': 200,
                 'headers': headers,
                 'body': json.dumps(response_body)
             }
+
+            logger.info("Final response prepared", extra={
+                'status_code': 200,
+                'response_headers': final_response['headers'],
+                'body_keys': list(response_body.keys())
+            })
+
+            return final_response
         else:
-            logger.warning("Presign service returned error", extra={
+            logger.warning("⚠ Presign service returned error", extra={
                 'status_code': result.get('statusCode'),
                 'error': result.get('error')
             })
