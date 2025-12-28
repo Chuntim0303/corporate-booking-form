@@ -28,6 +28,13 @@ except ImportError:
     logger.warning("Could not import textract_service - Receipt amount extraction will not work")
     extract_amount_from_receipt = None
 
+try:
+    from email_service import send_partnership_confirmation_email
+except ImportError:
+    logger = logging.getLogger()
+    logger.warning("Could not import email_service - Confirmation emails will not work")
+    send_partnership_confirmation_email = None
+
 # Configure logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -449,11 +456,15 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
     receipt_file_name = data.get('receiptFileName', '')
     bucket_name = os.environ.get('S3_BUCKET_NAME', '')
 
+    # Get UTM parameters for tracking
+    utm_source = data.get('utmSource', '')  # Will be stored in sales_rep field
+
     logger.info("Starting database transaction", extra={
         'email': email,
         'first_name': first_name,
         'last_name': last_name,
-        'has_receipt': bool(receipt_key)
+        'has_receipt': bool(receipt_key),
+        'utm_source': utm_source
     })
 
     try:
@@ -511,11 +522,13 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 contact_id, position, company_name, industry, partnership_tier,
                 terms_accepted, total_payable,
                 receipt_storage_key, receipt_file_name,
+                sales_rep,
                 submitted_at, status, created_at, updated_at
             ) VALUES (
                 %(contact_id)s, %(position)s, %(company_name)s, %(industry)s,
                 %(partnership_tier)s, %(terms_accepted)s, %(total_payable)s,
                 %(receipt_storage_key)s, %(receipt_file_name)s,
+                %(sales_rep)s,
                 NOW(), 'pending', NOW(), NOW()
             )
             """
@@ -529,7 +542,8 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'terms_accepted': data['termsAccepted'],
                 'total_payable': data.get('totalPayable', 0),
                 'receipt_storage_key': data.get('receiptStorageKey', ''),
-                'receipt_file_name': data.get('receiptFileName', '')
+                'receipt_file_name': data.get('receiptFileName', ''),
+                'sales_rep': utm_source  # UTM source stored in sales_rep field
             }
 
             logger.debug("Executing partner application insertion query", extra={
@@ -579,15 +593,18 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
             INSERT INTO payments (
                 contact_id, partner_application_id, amount,
                 payment_method, payment_type, description,
-                official_receipt, status,
+                official_receipt, attachment, status,
                 transaction_datetime, created_at, updated_at
             ) VALUES (
                 %(contact_id)s, %(partner_application_id)s, %(amount)s,
                 %(payment_method)s, %(payment_type)s, %(description)s,
-                %(official_receipt)s, 'pending',
+                %(official_receipt)s, %(attachment)s, 'pending',
                 NOW(), NOW(), NOW()
             )
             """
+
+            # Format: "membership_fee - LastName FirstName"
+            payment_description = f"membership_fee - {last_name} {first_name}"
 
             payment_data = {
                 'contact_id': contact_id,
@@ -595,8 +612,9 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'amount': payment_amount,
                 'payment_method': 'bank_transfer',  # Assuming bank transfer since they upload receipt
                 'payment_type': 'partnership_fee',
-                'description': f"Partnership fee payment for {data['partnershipTier']} tier - {data['companyName']}",
-                'official_receipt': receipt_key
+                'description': payment_description,
+                'official_receipt': receipt_key,
+                'attachment': receipt_key  # S3 path stored in attachment field
             }
 
             logger.debug("Executing payment insertion query", extra={
@@ -630,6 +648,57 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'payment_amount': payment_amount,
                 'tables_updated': ['contacts', 'partner_applications', 'payments']
             })
+
+            # Send confirmation email after successful commit
+            if send_partnership_confirmation_email:
+                try:
+                    # Get CC addresses from environment variable (comma-separated)
+                    cc_addresses_str = os.environ.get('SES_CC_ADDRESSES', '')
+                    cc_addresses = []
+                    if cc_addresses_str:
+                        cc_addresses = [addr.strip() for addr in cc_addresses_str.split(',') if addr.strip()]
+
+                    logger.info("Sending confirmation email", extra={
+                        'recipient_email': email,
+                        'application_id': application_id,
+                        'has_cc_addresses': bool(cc_addresses),
+                        'cc_count': len(cc_addresses) if cc_addresses else 0
+                    })
+
+                    # Send email
+                    full_name = f"{first_name} {last_name}"
+                    email_sent = send_partnership_confirmation_email(
+                        recipient_email=email,
+                        full_name=full_name,
+                        application_id=application_id,
+                        contact_id=contact_id,
+                        payment_amount=payment_amount,
+                        partnership_tier=data['partnershipTier'],
+                        company_name=data['companyName'],
+                        cc_addresses=cc_addresses if cc_addresses else None
+                    )
+
+                    if email_sent:
+                        logger.info("✓ Confirmation email sent successfully", extra={
+                            'recipient_email': email,
+                            'application_id': application_id
+                        })
+                    else:
+                        logger.warning("⚠ Failed to send confirmation email, but application was saved", extra={
+                            'recipient_email': email,
+                            'application_id': application_id
+                        })
+
+                except Exception as email_error:
+                    # Log email error but don't fail the entire transaction
+                    logger.error("Error sending confirmation email (application still saved)", extra={
+                        'error_type': type(email_error).__name__,
+                        'error_message': str(email_error),
+                        'recipient_email': email,
+                        'application_id': application_id
+                    }, exc_info=True)
+            else:
+                logger.warning("Email service not available - skipping confirmation email")
 
             return {
                 'contact_id': contact_id,
