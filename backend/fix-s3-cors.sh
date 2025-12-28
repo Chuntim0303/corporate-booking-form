@@ -27,7 +27,13 @@ fi
 echo "2️⃣  Applying correct CORS configuration..."
 echo ""
 
-cat > /tmp/cors-config.json << 'EOF'
+# Use the CORS config from the project file
+CORS_CONFIG_FILE="s3-cors-config.json"
+
+if [ ! -f "$CORS_CONFIG_FILE" ]; then
+    echo "❌ CORS config file not found: $CORS_CONFIG_FILE"
+    echo "Creating default CORS configuration..."
+    cat > /tmp/cors-config.json << 'EOF'
 [
     {
         "AllowedHeaders": [
@@ -41,9 +47,8 @@ cat > /tmp/cors-config.json << 'EOF'
             "HEAD"
         ],
         "AllowedOrigins": [
-            "http://localhost:5173",
-            "http://localhost:3000",
-            "http://localhost:5174",
+            "http://localhost:*",
+            "http://127.0.0.1:*",
             "https://*"
         ],
         "ExposeHeaders": [
@@ -56,7 +61,12 @@ cat > /tmp/cors-config.json << 'EOF'
     }
 ]
 EOF
+else
+    echo "Using CORS configuration from: $CORS_CONFIG_FILE"
+    cp "$CORS_CONFIG_FILE" /tmp/cors-config.json
+fi
 
+echo ""
 echo "Applying this CORS configuration:"
 cat /tmp/cors-config.json
 echo ""
@@ -110,7 +120,7 @@ echo "Summary"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "✅ CORS configuration has been updated"
-echo "✅ Allowed origins: localhost:5173, localhost:3000, all HTTPS"
+echo "✅ Allowed origins: localhost:* (any port), 127.0.0.1:* (any port), all HTTPS"
 echo "✅ Allowed methods: GET, PUT, POST, DELETE, HEAD"
 echo "✅ Allowed headers: All (*)"
 echo ""
@@ -118,10 +128,11 @@ echo "Next steps:"
 echo "1. Clear your browser cache (Ctrl+Shift+R or Cmd+Shift+R)"
 echo "2. Try uploading a file again"
 echo "3. Check browser console for errors"
+echo "4. Check CloudWatch logs for detailed debug information"
 echo ""
 echo "If still getting CORS errors, run this test:"
 echo "curl -X OPTIONS https://$BUCKET_NAME.s3.ap-southeast-1.amazonaws.com/ \\"
-echo "  -H 'Origin: http://localhost:5173' \\"
+echo "  -H 'Origin: http://localhost:5174' \\"
 echo "  -H 'Access-Control-Request-Method: PUT' \\"
 echo "  -v"
 echo ""

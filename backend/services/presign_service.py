@@ -10,21 +10,23 @@ logger = logging.getLogger()
 # Initialize S3 client
 s3_client = boto3.client('s3')
 
-def handle_presign_request(body: dict) -> dict:
+def handle_presign_request(body: dict, request_context: dict = None) -> dict:
     """
     Generate presigned URLs for S3 receipt uploads.
     Called from main Lambda function.
 
     Args:
         body: Request body containing fileName and fileType
+        request_context: Optional request context with headers and origin info
 
     Returns:
         dict with statusCode and response data or error
     """
-    logger.info("Presign service started", extra={
+    logger.info("=== PRESIGN SERVICE START ===", extra={
         'request_body': body,
         'file_name': body.get('fileName'),
-        'file_type': body.get('fileType')
+        'file_type': body.get('fileType'),
+        'request_context': request_context
     })
 
     try:
@@ -75,6 +77,14 @@ def handle_presign_request(body: dict) -> dict:
 
         # Generate presigned URL for PUT operation
         try:
+            logger.info("Generating presigned URL with parameters", extra={
+                'operation': 'put_object',
+                'bucket': bucket_name,
+                'key': storage_key,
+                'content_type': file_type,
+                'expires_in': 300
+            })
+
             presigned_url = s3_client.generate_presigned_url(
                 'put_object',
                 Params={
@@ -85,12 +95,14 @@ def handle_presign_request(body: dict) -> dict:
                 ExpiresIn=300  # URL expires in 5 minutes
             )
 
-            logger.info(f"Presigned URL generated successfully for {storage_key}", extra={
+            logger.info(f"✓ Presigned URL generated successfully for {storage_key}", extra={
                 'url_length': len(presigned_url),
-                'url_preview': presigned_url[:100] + '...' if len(presigned_url) > 100 else presigned_url,
+                'url_preview': presigned_url[:150],
+                'full_url': presigned_url,
                 'has_signature': 'Signature=' in presigned_url,
                 'has_expires': 'Expires=' in presigned_url,
-                'bucket_in_url': bucket_name in presigned_url
+                'bucket_in_url': bucket_name in presigned_url,
+                'url_domain': presigned_url.split('/')[2] if len(presigned_url.split('/')) > 2 else 'unknown'
             })
 
         except Exception as e:
@@ -104,20 +116,34 @@ def handle_presign_request(body: dict) -> dict:
         # Test bucket CORS configuration
         try:
             cors_response = s3_client.get_bucket_cors(Bucket=bucket_name)
-            logger.info("Bucket CORS configuration", extra={
-                'cors_rules': cors_response.get('CORSRules', [])
+            cors_rules = cors_response.get('CORSRules', [])
+            logger.info("✓ Bucket CORS configuration retrieved", extra={
+                'cors_rules_count': len(cors_rules),
+                'cors_rules': cors_rules,
+                'allowed_origins': [rule.get('AllowedOrigins', []) for rule in cors_rules],
+                'allowed_methods': [rule.get('AllowedMethods', []) for rule in cors_rules],
+                'allowed_headers': [rule.get('AllowedHeaders', []) for rule in cors_rules]
             })
         except Exception as e:
-            logger.warning(f"Could not retrieve CORS config: {str(e)}", extra={
-                'error_type': type(e).__name__
+            logger.warning(f"⚠ Could not retrieve CORS config: {str(e)}", extra={
+                'error_type': type(e).__name__,
+                'bucket': bucket_name
             })
 
-        return {
+        response = {
             'statusCode': 200,
             'uploadUrl': presigned_url,
             'key': storage_key,
             'bucket': bucket_name
         }
+
+        logger.info("=== PRESIGN SERVICE SUCCESS ===", extra={
+            'response': response,
+            'storage_key': storage_key,
+            'url_length': len(presigned_url)
+        })
+
+        return response
 
     except Exception as e:
         logger.error(f"Unexpected error in presign service: {str(e)}", extra={
