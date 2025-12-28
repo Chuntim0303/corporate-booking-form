@@ -575,7 +575,7 @@ Current value: ${presignEndpoint || '(undefined)'}
                     <optgroup label="All Countries">
                       {countryCodes.map((country) => (
                         <option
-                          key={country.code}
+                          key={`${country.code}-${country.country}`}
                           value={country.code}
                           style={{backgroundColor: 'white', color: 'black'}}
                         >
