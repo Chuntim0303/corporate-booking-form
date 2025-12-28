@@ -21,6 +21,13 @@ except ImportError:
     logger.warning("Could not import presign_service - S3 upload will not work")
     handle_presign_request = None
 
+try:
+    from textract_service import extract_amount_from_receipt
+except ImportError:
+    logger = logging.getLogger()
+    logger.warning("Could not import textract_service - Receipt amount extraction will not work")
+    extract_amount_from_receipt = None
+
 # Configure logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -319,10 +326,12 @@ def handle_application_route(event: Dict[str, Any], headers: Dict[str, str]) -> 
         })
         result = insert_lead_and_partner_application(body)
 
-        logger.info("Contact and partner application submitted successfully", extra={
+        logger.info("Contact, partner application, and payment submitted successfully", extra={
             'email': email_value,
             'contact_id': result['contact_id'],
-            'application_id': result['application_id']
+            'application_id': result['application_id'],
+            'payment_id': result.get('payment_id'),
+            'payment_amount': result.get('payment_amount', 0.0)
         })
 
         return {
@@ -331,7 +340,9 @@ def handle_application_route(event: Dict[str, Any], headers: Dict[str, str]) -> 
             'body': json.dumps({
                 'message': 'Application submitted successfully',
                 'contactId': result['contact_id'],
-                'applicationId': result['application_id']
+                'applicationId': result['application_id'],
+                'paymentId': result.get('payment_id'),
+                'paymentAmount': result.get('payment_amount', 0.0)
             })
         }
 
@@ -416,8 +427,15 @@ def get_db_connection():
 
 def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Insert data into both contacts and partner_applications tables in a single transaction.
-    The contact is created first, then its ID is stored in partner_applications.contact_id.
+    Insert data into contacts, partner_applications, and payments tables in a single transaction.
+
+    Flow:
+    1. Insert into contacts table -> get contact_id
+    2. Insert into partner_applications table -> get application_id
+    3. Extract receipt amount using Textract
+    4. Insert into payments table with extracted amount
+
+    Returns dict with contact_id, application_id, and payment_id
     """
     connection = None
     email = data['email'].lower()
@@ -426,10 +444,16 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
     first_name = data.get('firstName', '').strip()
     last_name = data.get('lastName', '').strip()
 
+    # Get receipt information
+    receipt_key = data.get('receiptStorageKey', '')
+    receipt_file_name = data.get('receiptFileName', '')
+    bucket_name = os.environ.get('S3_BUCKET_NAME', '')
+
     logger.info("Starting database transaction", extra={
         'email': email,
         'first_name': first_name,
-        'last_name': last_name
+        'last_name': last_name,
+        'has_receipt': bool(receipt_key)
     })
 
     try:
@@ -523,20 +547,95 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'email': email
             })
 
-            # Commit both inserts
+            # Extract amount from receipt using Textract if receipt exists
+            payment_amount = 0.0
+            if receipt_key and bucket_name and extract_amount_from_receipt:
+                logger.info("Extracting amount from receipt using Textract", extra={
+                    'bucket': bucket_name,
+                    'key': receipt_key
+                })
+                try:
+                    payment_amount = extract_amount_from_receipt(bucket_name, receipt_key)
+                    logger.info("Amount extracted from receipt", extra={
+                        'amount': payment_amount,
+                        'receipt_key': receipt_key
+                    })
+                except Exception as e:
+                    logger.error("Failed to extract amount from receipt", extra={
+                        'error_type': type(e).__name__,
+                        'error_message': str(e),
+                        'receipt_key': receipt_key
+                    }, exc_info=True)
+                    payment_amount = 0.0
+            else:
+                logger.info("Skipping Textract extraction", extra={
+                    'has_receipt_key': bool(receipt_key),
+                    'has_bucket_name': bool(bucket_name),
+                    'textract_available': bool(extract_amount_from_receipt)
+                })
+
+            # Insert into payments table
+            payment_insert_query = """
+            INSERT INTO payments (
+                contact_id, partner_application_id, amount,
+                payment_method, payment_type, description,
+                official_receipt, status,
+                transaction_datetime, created_at, updated_at
+            ) VALUES (
+                %(contact_id)s, %(partner_application_id)s, %(amount)s,
+                %(payment_method)s, %(payment_type)s, %(description)s,
+                %(official_receipt)s, 'pending',
+                NOW(), NOW(), NOW()
+            )
+            """
+
+            payment_data = {
+                'contact_id': contact_id,
+                'partner_application_id': application_id,
+                'amount': payment_amount,
+                'payment_method': 'bank_transfer',  # Assuming bank transfer since they upload receipt
+                'payment_type': 'partnership_fee',
+                'description': f"Partnership fee payment for {data['partnershipTier']} tier - {data['companyName']}",
+                'official_receipt': receipt_key
+            }
+
+            logger.debug("Executing payment insertion query", extra={
+                'query_params_keys': list(payment_data.keys()),
+                'contact_id': contact_id,
+                'partner_application_id': application_id,
+                'amount': payment_amount,
+                'table': 'payments'
+            })
+
+            cursor.execute(payment_insert_query, payment_data)
+            payment_id = cursor.lastrowid
+
+            logger.info("Payment record inserted successfully", extra={
+                'payment_id': payment_id,
+                'contact_id': contact_id,
+                'partner_application_id': application_id,
+                'amount': payment_amount,
+                'receipt_key': receipt_key
+            })
+
+            # Commit all inserts
             connection.commit()
             logger.info("Database transaction committed successfully", extra={
                 'contact_id': contact_id,
                 'application_id': application_id,
+                'payment_id': payment_id,
                 'email': email,
                 'first_name': first_name,
                 'last_name': last_name,
-                'tables_updated': ['contacts', 'partner_applications']
+                'payment_amount': payment_amount,
+                'tables_updated': ['contacts', 'partner_applications', 'payments']
             })
 
             return {
                 'contact_id': contact_id,
-                'application_id': application_id
+                'application_id': application_id,
+                'payment_id': payment_id,
+                'payment_amount': payment_amount
             }
 
     except pymysql.IntegrityError as e:
