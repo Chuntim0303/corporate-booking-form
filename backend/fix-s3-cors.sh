@@ -47,8 +47,16 @@ if [ ! -f "$CORS_CONFIG_FILE" ]; then
             "HEAD"
         ],
         "AllowedOrigins": [
-            "http://localhost:*",
-            "http://127.0.0.1:*",
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://localhost:5175",
+            "http://localhost:8080",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:5174",
+            "http://127.0.0.1:5175",
+            "http://127.0.0.1:8080",
             "https://*"
         ],
         "ExposeHeaders": [
@@ -120,9 +128,11 @@ echo "Summary"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "✅ CORS configuration has been updated"
-echo "✅ Allowed origins: localhost:* (any port), 127.0.0.1:* (any port), all HTTPS"
+echo "✅ Allowed origins: localhost:3000, 5173, 5174, 5175, 8080 and all HTTPS"
 echo "✅ Allowed methods: GET, PUT, POST, DELETE, HEAD"
 echo "✅ Allowed headers: All (*)"
+echo ""
+echo "NOTE: S3 does not support port wildcards, so each port must be listed explicitly."
 echo ""
 echo "Next steps:"
 echo "1. Clear your browser cache (Ctrl+Shift+R or Cmd+Shift+R)"
