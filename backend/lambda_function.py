@@ -4,6 +4,7 @@ import sys
 import pymysql
 import logging
 import re
+import requests
 from datetime import datetime
 from typing import Dict, Any
 
@@ -432,6 +433,110 @@ def get_db_connection():
         raise
 
 
+def create_pxier_customer(contact_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Create customer in Pxier API
+
+    Args:
+        contact_data: Contact data from database with keys:
+            - first_name, last_name, email_address, phone_number
+            - address_line_1, address_line_2, city, state, postcode
+
+    Returns:
+        API response from Pxier with customerId and contactId
+
+    Raises:
+        Exception: If API call fails
+    """
+    logger.info("Creating Pxier customer", extra={
+        'first_name': contact_data.get('first_name'),
+        'last_name': contact_data.get('last_name'),
+        'email': contact_data.get('email_address')
+    })
+
+    # Validate Pxier configuration
+    pxier_token = os.environ.get('PXIER_ACCESS_TOKEN')
+    pxier_username = os.environ.get('PXIER_USERNAME')
+    pxier_password = os.environ.get('PXIER_PASSWORD')
+    pxier_platform = os.environ.get('PXIER_PLATFORM_ADDRESS')
+
+    if not pxier_token or not pxier_username or not pxier_password or not pxier_platform:
+        logger.error("Pxier API credentials not configured")
+        raise Exception("Pxier API credentials not configured. Please set PXIER_ACCESS_TOKEN, PXIER_USERNAME, PXIER_PASSWORD, and PXIER_PLATFORM_ADDRESS environment variables.")
+
+    # Build customer name
+    customer_name = f"{contact_data.get('first_name', '')} {contact_data.get('last_name', '')}".strip()
+
+    # Build Pxier API URL
+    pxier_url = f"{pxier_platform}/events/updateCustomer"
+
+    # Prepare phone number
+    phone = contact_data.get('phone_number') or ''
+
+    # Prepare payload for Pxier API
+    payload = {
+        "accessToken": pxier_token,
+        "customerId": 0,  # 0 for new customer
+        "customerName": customer_name,
+        "countryCode": "US",
+        "stateCode": contact_data.get('state') or "",
+        "customerTypeCode": 0,
+        "langCode": "en",
+        "address1": contact_data.get('address_line_1') or "",
+        "address2": contact_data.get('address_line_2') or "",
+        "zipCode": contact_data.get('postcode') or "",
+        "city": contact_data.get('city') or "",
+        "contact": [{
+            "contactId": 0,  # 0 for new contact
+            "firstName": contact_data.get('first_name') or "",
+            "lastName": contact_data.get('last_name') or "",
+            "email": contact_data.get('email_address') or "",
+            "phone": phone,
+            "mobile": phone
+        }]
+    }
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    try:
+        logger.info(f"Sending request to Pxier API")
+        logger.debug(f"Pxier API URL: {pxier_url}")
+
+        response = requests.post(
+            pxier_url,
+            data=json.dumps(payload),
+            headers=headers,
+            auth=requests.auth.HTTPBasicAuth(pxier_username, pxier_password),
+            timeout=30
+        )
+
+        response.raise_for_status()
+        result = response.json()
+
+        if result.get("error") == False:
+            logger.info("Pxier customer created successfully", extra={
+                'pxier_customer_id': result.get('data', {}).get('customerId'),
+                'pxier_contact_id': result.get('data', {}).get('contactId')
+            })
+            return result
+        else:
+            error_msg = result.get('message', 'Unknown error')
+            logger.error(f"Pxier API returned error: {result}")
+            raise Exception(f"Pxier API error: {error_msg}")
+
+    except requests.exceptions.Timeout:
+        logger.error(f"Pxier API request timeout")
+        raise Exception("Pxier API request timed out")
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"Pxier API HTTP error: {str(e)}", exc_info=True)
+        raise Exception(f"Pxier API HTTP error: {str(e)}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Pxier API request failed: {str(e)}", exc_info=True)
+        raise Exception(f"Failed to communicate with Pxier API: {str(e)}")
+
+
 def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
     """
     Insert data into contacts, partner_applications, and payments tables in a single transaction.
@@ -457,14 +562,16 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
     bucket_name = os.environ.get('S3_BUCKET_NAME', '')
 
     # Get UTM parameters for tracking
-    utm_source = data.get('utmSource', '')  # Will be stored in sales_rep field
+    utm_source = data.get('utmSource', '')
+    utm_medium = data.get('utmMedium', '')
 
     logger.info("Starting database transaction", extra={
         'email': email,
         'first_name': first_name,
         'last_name': last_name,
         'has_receipt': bool(receipt_key),
-        'utm_source': utm_source
+        'utm_source': utm_source,
+        'utm_medium': utm_medium
     })
 
     try:
@@ -477,11 +584,11 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
             INSERT INTO contacts (
                 first_name, last_name, email_address, gender, phone_number,
                 address_line_1, address_line_2, city, state, postcode,
-                lead_source, created_at, updated_at
+                lead_source, status, created_at, updated_at
             ) VALUES (
                 %(first_name)s, %(last_name)s, %(email_address)s, %(gender)s, %(phone_number)s,
                 %(address_line_1)s, %(address_line_2)s, %(city)s, %(state)s,
-                %(postcode)s, 'ccp', NOW(), NOW()
+                %(postcode)s, 'ccp', 'converted', NOW(), NOW()
             )
             """
 
@@ -522,13 +629,13 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 contact_id, position, company_name, industry, partnership_tier,
                 terms_accepted, total_payable,
                 receipt_storage_key, receipt_file_name,
-                sales_rep,
+                sales_rep, utm_source, utm_medium,
                 submitted_at, status, created_at, updated_at
             ) VALUES (
                 %(contact_id)s, %(position)s, %(company_name)s, %(industry)s,
                 %(partnership_tier)s, %(terms_accepted)s, %(total_payable)s,
                 %(receipt_storage_key)s, %(receipt_file_name)s,
-                %(sales_rep)s,
+                %(sales_rep)s, %(utm_source)s, %(utm_medium)s,
                 NOW(), 'pending', NOW(), NOW()
             )
             """
@@ -543,7 +650,9 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'total_payable': data.get('totalPayable', 0),
                 'receipt_storage_key': data.get('receiptStorageKey', ''),
                 'receipt_file_name': data.get('receiptFileName', ''),
-                'sales_rep': utm_source  # UTM source stored in sales_rep field
+                'sales_rep': utm_source,  # Keep for backwards compatibility
+                'utm_source': utm_source,
+                'utm_medium': utm_medium
             }
 
             logger.debug("Executing partner application insertion query", extra={
@@ -636,7 +745,69 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'receipt_key': receipt_key
             })
 
-            # Commit all inserts
+            # Create customer in Pxier after all database records are inserted
+            pxier_customer_id = None
+            pxier_contact_id = None
+            try:
+                # Prepare contact data for Pxier
+                pxier_contact_data = {
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'email_address': email,
+                    'phone_number': contact_data.get('phone_number'),
+                    'address_line_1': contact_data.get('address_line_1'),
+                    'address_line_2': contact_data.get('address_line_2'),
+                    'city': contact_data.get('city'),
+                    'state': contact_data.get('state'),
+                    'postcode': contact_data.get('postcode')
+                }
+
+                pxier_response = create_pxier_customer(pxier_contact_data)
+                pxier_customer_id = pxier_response.get('data', {}).get('customerId')
+                pxier_contact_id = pxier_response.get('data', {}).get('contactId')
+
+                logger.info("Pxier customer created successfully", extra={
+                    'pxier_customer_id': pxier_customer_id,
+                    'pxier_contact_id': pxier_contact_id,
+                    'contact_id': contact_id
+                })
+
+                # Update contacts table with Pxier IDs
+                cursor.execute("""
+                    UPDATE contacts
+                    SET pxier_customer_id = %s,
+                        pxier_contact_id = %s,
+                        became_customer_at = NOW(),
+                        updated_at = NOW()
+                    WHERE contact_id = %s
+                """, (pxier_customer_id, pxier_contact_id, contact_id))
+
+                # Update partner_applications with customer_id
+                cursor.execute("""
+                    UPDATE partner_applications
+                    SET customer_id = %s,
+                        converted_to_customer_at = NOW(),
+                        updated_at = NOW()
+                    WHERE id = %s
+                """, (pxier_customer_id, application_id))
+
+                logger.info("Updated contacts and partner_applications with Pxier customer IDs", extra={
+                    'contact_id': contact_id,
+                    'application_id': application_id,
+                    'pxier_customer_id': pxier_customer_id
+                })
+
+            except Exception as e:
+                # Log error but don't fail the entire transaction
+                # The application is still submitted even if Pxier creation fails
+                logger.error("Failed to create Pxier customer (application still saved)", extra={
+                    'error_type': type(e).__name__,
+                    'error_message': str(e),
+                    'contact_id': contact_id,
+                    'application_id': application_id
+                }, exc_info=True)
+
+            # Commit all inserts and updates
             connection.commit()
             logger.info("Database transaction committed successfully", extra={
                 'contact_id': contact_id,
