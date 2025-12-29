@@ -89,7 +89,7 @@ const LandingPage = ({ onJoinNetwork }) => {
             <div className="relative overflow-hidden rounded-2xl border" style={{borderColor: 'rgba(218, 171, 45, 0.18)', backgroundColor: 'rgba(255, 255, 255, 0.02)'}}>
               <div className="absolute inset-0 z-10" style={{background: `linear-gradient(135deg, rgba(0, 0, 0, 0.25) 0%, rgba(11, 15, 20, 0.10) 50%, rgba(0, 0, 0, 0.20) 100%)`}}></div>
               <img
-                src="/main03.jpg"
+                src="/main04.jpg"
                 alt="Confetti KL event venue"
                 className="w-full h-[260px] sm:h-[340px] lg:h-[420px] object-cover"
               />
