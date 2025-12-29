@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -9,12 +10,18 @@ class Config:
     DB_USER = os.getenv('DB_USER', 'root')
     DB_PASSWORD = os.getenv('DB_PASSWORD', '')
     DB_NAME = os.getenv('DB_NAME', 'confetti_db')
-    
+
     # Application Configuration
     ENVIRONMENT = os.getenv('ENVIRONMENT', 'dev')
-    
+
     # CORS Configuration
     ALLOWED_ORIGINS = os.getenv('ALLOWED_ORIGINS', '*').split(',')
+
+    # Pxier API Configuration
+    PXIER_ACCESS_TOKEN = os.getenv('PXIER_ACCESS_TOKEN', '')
+    PXIER_USERNAME = os.getenv('PXIER_USERNAME', '')
+    PXIER_PASSWORD = os.getenv('PXIER_PASSWORD', '')
+    PXIER_PLATFORM_ADDRESS = os.getenv('PXIER_PLATFORM_ADDRESS', '')
     
     @staticmethod
     def get_cors_headers(origin=None):
