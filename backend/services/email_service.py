@@ -1,13 +1,14 @@
 """
 Email Service
-Handles sending emails via AWS SES for corporate partnership applications
+Handles sending emails via AWS SES for Incentive Beneficiary Partner Program (IBPP) applications
 """
 import os
 import boto3
 from botocore.exceptions import ClientError
-from typing import Dict, Any, Optional
+from typing import Optional, List
 from datetime import datetime
 import logging
+from zoneinfo import ZoneInfo  # Python 3.9+
 
 # Configure logging
 logger = logging.getLogger()
@@ -24,20 +25,20 @@ def send_partnership_confirmation_email(
     payment_amount: float,
     partnership_tier: str,
     company_name: str,
-    cc_addresses: Optional[list] = None
+    cc_addresses: Optional[List[str]] = None
 ) -> bool:
     """
-    Send partnership application confirmation email to applicant
+    Send IBPP partnership application confirmation email to applicant
 
     Args:
         recipient_email: Applicant's email address
         full_name: Applicant's full name
-        application_id: Partner application ID
-        contact_id: Contact ID
-        payment_amount: Payment amount extracted from receipt
+        application_id: Partner application ID (kept for logging only)
+        contact_id: Contact ID (kept for logging only)
+        payment_amount: Payment amount extracted from receipt (kept for potential future use)
         partnership_tier: Partnership tier selected
-        company_name: Company name
-        cc_addresses: Optional list of CC email addresses from env var
+        company_name: Company name (kept for potential future use)
+        cc_addresses: Optional list of CC email addresses
 
     Returns:
         bool: True if email sent successfully, False otherwise
@@ -49,16 +50,21 @@ def send_partnership_confirmation_email(
     })
 
     try:
-        # Get sender email from environment
+        # Get sender email and sender name from environment
         from_email = os.environ.get('SES_FROM_EMAIL', 'noreply@confetti.com.my')
+        sender_name = os.environ.get('SES_SENDER_NAME', 'Confetti Partnership Team')
 
-        # Email subject
-        subject = "Corporate Partnership Application Received - Confetti"
+        # Use full "Sender Name <email>" format if sender name is provided
+        source = f"{sender_name} <{from_email}>" if sender_name else from_email
 
-        # Format payment amount
-        amount_display = f"RM {float(payment_amount):,.2f}" if payment_amount > 0 else "To be confirmed"
+        # Email subject - updated as requested
+        subject = "Incentive Beneficiary Partner Program (IBPP) Application Received - Confetti"
 
-        # HTML email body
+        # Format submitted time in UTC+8 (Malaysia time)
+        malaysia_tz = ZoneInfo("Asia/Kuala_Lumpur")
+        submitted_time = datetime.now(malaysia_tz).strftime('%d %B %Y, %I:%M %p')
+
+        # HTML email body - removed Application ID, Contact ID, Company Name, Payment Amount
         html_body = f"""
         <!DOCTYPE html>
         <html>
@@ -148,38 +154,22 @@ def send_partnership_confirmation_email(
             <div class="container">
                 <div class="header">
                     <h1 style="margin: 0; font-size: 24px;">Thank You for Your Application!</h1>
-                    <p style="margin: 10px 0 0 0; opacity: 0.9;">Corporate Partnership Program</p>
+                    <p style="margin: 10px 0 0 0; opacity: 0.9;">Incentive Beneficiary Partner Program (IBPP)</p>
                 </div>
 
                 <div class="content">
                     <p>Dear <strong>{full_name}</strong>,</p>
 
-                    <p>Thank you for applying to become a corporate partner with Confetti. We have successfully received your application and payment.</p>
+                    <p>Thank you for applying to the <strong>Incentive Beneficiary Partner Program (IBPP)</strong> with Confetti. We have successfully received your application and payment.</p>
 
                     <div class="application-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Application ID:</span>
-                            <span class="detail-value">#{application_id}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Contact ID:</span>
-                            <span class="detail-value">#{contact_id}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Company Name:</span>
-                            <span class="detail-value">{company_name}</span>
-                        </div>
                         <div class="detail-row">
                             <span class="detail-label">Partnership Tier:</span>
                             <span class="detail-value">{partnership_tier.replace('_', ' ').title()}</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Payment Amount:</span>
-                            <span class="detail-value"><strong>{amount_display}</strong></span>
-                        </div>
-                        <div class="detail-row">
                             <span class="detail-label">Submitted:</span>
-                            <span class="detail-value">{datetime.now().strftime('%d %B %Y, %I:%M %p')}</span>
+                            <span class="detail-value">{submitted_time}</span>
                         </div>
                     </div>
 
@@ -205,13 +195,13 @@ def send_partnership_confirmation_email(
 
                 <div class="footer">
                     <p style="margin: 5px 0;">
-                        <strong>Confetti Corporate Partnership Program</strong>
+                        <strong>Confetti Incentive Beneficiary Partner Program (IBPP)</strong>
                     </p>
                     <p style="margin: 5px 0;">
                         This is an automated message. Please do not reply to this email.
                     </p>
                     <p style="margin: 5px 0;">
-                        © {datetime.now().year} Confetti. All rights reserved.
+                        © {datetime.now(malaysia_tz).year} Confetti. All rights reserved.
                     </p>
                 </div>
             </div>
@@ -219,37 +209,32 @@ def send_partnership_confirmation_email(
         </html>
         """
 
-        # Plain text version
+        # Plain text version - updated accordingly
         text_body = f"""
-Corporate Partnership Application Received
+Incentive Beneficiary Partner Program (IBPP) Application Received
 
 Dear {full_name},
 
-Thank you for applying to become a corporate partner with Confetti. We have successfully received your application and payment.
+Thank you for applying to the Incentive Beneficiary Partner Program (IBPP) with Confetti. We have successfully received your application and payment.
 
 APPLICATION DETAILS:
-Application ID: #{application_id}
-Contact ID: #{contact_id}
-Company Name: {company_name}
 Partnership Tier: {partnership_tier.replace('_', ' ').title()}
-Payment Amount: {amount_display}
-Submitted: {datetime.now().strftime('%d %B %Y, %I:%M %p')}
+Submitted: {submitted_time}
 
 WHAT HAPPENS NEXT?
 1. Our team will review your application and payment receipt
-2. We will verify your payment details
-3. You will receive a confirmation email within 2-3 business days
-4. Once approved, you'll receive your partnership benefits and access details
+2. Kindly allow 2-3 business days processing time
+3. Once full payment is made, you'll receive your partnership benefits and access details
 
 If you have any questions or need assistance, please don't hesitate to contact our partnership team.
 
 Best regards,
-The Confetti Partnership Team
+Confetti KL Sdn Bhd
 
 ---
-Confetti Corporate Partnership Program
+Confetti Incentive Beneficiary Partner Program (IBPP)
 This is an automated message. Please do not reply to this email.
-© {datetime.now().year} Confetti. All rights reserved.
+© {datetime.now(malaysia_tz).year} Confetti. All rights reserved.
         """
 
         # Prepare destination
@@ -257,7 +242,6 @@ This is an automated message. Please do not reply to this email.
 
         # Add CC addresses if provided
         if cc_addresses and isinstance(cc_addresses, list):
-            # Filter out empty strings and validate emails
             valid_cc_addresses = [cc.strip() for cc in cc_addresses if cc and cc.strip()]
             if valid_cc_addresses:
                 destination['CcAddresses'] = valid_cc_addresses
@@ -268,13 +252,13 @@ This is an automated message. Please do not reply to this email.
 
         # Send email via SES
         logger.info("Sending email via SES", extra={
-            'from_email': from_email,
+            'source': source,
             'to_email': recipient_email,
             'has_cc': 'CcAddresses' in destination
         })
 
         response = ses_client.send_email(
-            Source=from_email,
+            Source=source,
             Destination=destination,
             Message={
                 'Subject': {
@@ -313,14 +297,6 @@ This is an automated message. Please do not reply to this email.
             'recipient_email': recipient_email,
             'application_id': application_id
         }, exc_info=True)
-
-        # Common SES errors
-        if error_code == 'MessageRejected':
-            logger.error("Email rejected - check recipient email address")
-        elif error_code == 'MailFromDomainNotVerified':
-            logger.error("SES sender email not verified")
-        elif error_code == 'ConfigurationSetDoesNotExist':
-            logger.error("SES configuration set does not exist")
 
         return False
 
