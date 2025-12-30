@@ -579,19 +579,6 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
         current_time = datetime.utcnow()
 
         with connection.cursor() as cursor:
-            # Insert into contacts table FIRST
-            contact_insert_query = """
-            INSERT INTO contacts (
-                first_name, last_name, email_address, gender, phone_number,
-                address_line_1, address_line_2, city, state, postcode,
-                lead_source, status, created_at, updated_at
-            ) VALUES (
-                %(first_name)s, %(last_name)s, %(email_address)s, %(gender)s, %(phone_number)s,
-                %(address_line_1)s, %(address_line_2)s, %(city)s, %(state)s,
-                %(postcode)s, 'ccp', 'converted', NOW(), NOW()
-            )
-            """
-
             contact_data = {
                 'first_name': first_name,
                 'last_name': last_name,
@@ -605,23 +592,56 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'postcode': data.get('postalCode', '00000')
             }
 
-            logger.debug("Executing contact insertion query", extra={
-                'query_params_keys': list(contact_data.keys()),
-                'email': email,
-                'first_name': first_name,
-                'last_name': last_name
-            })
+            # Resolve contact_id by email first (do not always insert a new contact)
+            cursor.execute(
+                """
+                SELECT contact_id
+                FROM contacts
+                WHERE LOWER(email_address) = %s
+                LIMIT 1
+                """,
+                (email,)
+            )
+            existing_contact = cursor.fetchone()
 
-            cursor.execute(contact_insert_query, contact_data)
-            contact_id = cursor.lastrowid
+            if existing_contact and existing_contact.get('contact_id'):
+                contact_id = existing_contact['contact_id']
+                logger.info("Reusing existing contact_id for email", extra={
+                    'contact_id': contact_id,
+                    'email': email,
+                    'table': 'contacts'
+                })
+            else:
+                # Insert into contacts table FIRST
+                contact_insert_query = """
+                INSERT INTO contacts (
+                    first_name, last_name, email_address, gender, phone_number,
+                    address_line_1, address_line_2, city, state, postcode,
+                    lead_source, status, created_at, updated_at
+                ) VALUES (
+                    %(first_name)s, %(last_name)s, %(email_address)s, %(gender)s, %(phone_number)s,
+                    %(address_line_1)s, %(address_line_2)s, %(city)s, %(state)s,
+                    %(postcode)s, 'ccp', 'converted', NOW(), NOW()
+                )
+                """
 
-            logger.info("Contact record inserted successfully", extra={
-                'contact_id': contact_id,
-                'email': email,
-                'first_name': first_name,
-                'last_name': last_name,
-                'table': 'contacts'
-            })
+                logger.debug("Executing contact insertion query", extra={
+                    'query_params_keys': list(contact_data.keys()),
+                    'email': email,
+                    'first_name': first_name,
+                    'last_name': last_name
+                })
+
+                cursor.execute(contact_insert_query, contact_data)
+                contact_id = cursor.lastrowid
+
+                logger.info("Contact record inserted successfully", extra={
+                    'contact_id': contact_id,
+                    'email': email,
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'table': 'contacts'
+                })
 
             # Now insert into partner_applications table with the contact_id
             partner_insert_query = """
