@@ -187,6 +187,7 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
     nric: '',
 
     // Step 2: Company Information
+    notBusinessOwner: false,
     companyName: '',
     industry: '',
     industryOther: '',
@@ -368,7 +369,6 @@ Current value: ${presignEndpoint || '(undefined)'}
       case 1:
         if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
         if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-        if (!formData.position.trim()) newErrors.position = 'Position is required';
         if (!formData.email.trim()) newErrors.email = 'Email is required';
         if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
         if (!formData.nric.trim()) newErrors.nric = 'NRIC is required';
@@ -394,10 +394,13 @@ Current value: ${presignEndpoint || '(undefined)'}
         }
         break;
       case 2:
-        if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
-        if (!formData.industry) newErrors.industry = 'Industry selection is required';
-        if (formData.industry === 'other' && !formData.industryOther.trim()) {
-          newErrors.industryOther = 'Please specify your industry';
+        if (!formData.notBusinessOwner) {
+          if (!formData.position.trim()) newErrors.position = 'Position is required';
+          if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
+          if (!formData.industry) newErrors.industry = 'Industry selection is required';
+          if (formData.industry === 'other' && !formData.industryOther.trim()) {
+            newErrors.industryOther = 'Please specify your industry';
+          }
         }
         break;
       case 3:
@@ -513,17 +516,6 @@ Current value: ${presignEndpoint || '(undefined)'}
               />
             </div>
 
-            <EnhancedInput
-              label="Position/Title"
-              name="position"
-              placeholder="Job title"
-              value={formData.position}
-              onChange={handleChange}
-              error={errors.position}
-              icon={Award}
-              required
-            />
-            
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <EnhancedInput
                 label="Email Address"
@@ -663,6 +655,18 @@ Current value: ${presignEndpoint || '(undefined)'}
             </div>
 
             <EnhancedInput
+              label="Position/Title"
+              name="position"
+              placeholder="Job title"
+              value={formData.position}
+              onChange={handleChange}
+              error={errors.position}
+              icon={Award}
+              required={!formData.notBusinessOwner}
+              disabled={formData.notBusinessOwner}
+            />
+
+            <EnhancedInput
               label="Company Name"
               name="companyName"
               placeholder="Your company name"
@@ -670,7 +674,8 @@ Current value: ${presignEndpoint || '(undefined)'}
               onChange={handleChange}
               error={errors.companyName}
               icon={Building}
-              required
+              required={!formData.notBusinessOwner}
+              disabled={formData.notBusinessOwner}
             />
 
             <EnhancedSelect
@@ -681,7 +686,8 @@ Current value: ${presignEndpoint || '(undefined)'}
               onChange={handleChange}
               error={errors.industry}
               icon={Trophy}
-              required
+              required={!formData.notBusinessOwner}
+              disabled={formData.notBusinessOwner}
               options={[
                 { value: 'technology', label: 'Technology' },
                 { value: 'finance', label: 'Finance & Banking' },
@@ -694,8 +700,49 @@ Current value: ${presignEndpoint || '(undefined)'}
                 { value: 'other', label: 'Other' }
               ]}
             />
+
+            <div className="px-1">
+              <label className="flex items-start space-x-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  name="notBusinessOwner"
+                  checked={formData.notBusinessOwner}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setFormData((prev) => ({
+                      ...prev,
+                      notBusinessOwner: checked,
+                      ...(checked
+                        ? {
+                            position: '',
+                            companyName: '',
+                            industry: '',
+                            industryOther: ''
+                          }
+                        : {})
+                    }));
+                    if (checked) {
+                      setErrors((prev) => ({
+                        ...prev,
+                        position: '',
+                        companyName: '',
+                        industry: '',
+                        industryOther: ''
+                      }));
+                    }
+                  }}
+                  className="w-5 h-5 mt-0.5 border-gray-600 rounded focus:ring-2 cursor-pointer"
+                  style={{ accentColor: '#DAAB2D' }}
+                  onFocus={(ev) => ev.target.style.boxShadow = '0 0 0 2px rgba(218, 171, 45, 0.3)'}
+                  onBlur={(ev) => ev.target.style.boxShadow = ''}
+                />
+                <span className="text-xs sm:text-sm text-gray-800 leading-relaxed">
+                  Tick here if you are not a business owner
+                </span>
+              </label>
+            </div>
             
-            {formData.industry === 'other' && (
+            {formData.industry === 'other' && !formData.notBusinessOwner && (
               <EnhancedInput
                 label="Please specify your industry"
                 name="industryOther"
@@ -712,7 +759,7 @@ Current value: ${presignEndpoint || '(undefined)'}
 
       case 3:
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+          <div className="space-y-4 sm:space-y-6">
             <div className="space-y-4 sm:space-y-6">
               <div className="rounded-lg p-4 sm:p-5 border" style={{
                 backgroundColor: 'rgba(218, 171, 45, 0.05)',
@@ -723,15 +770,15 @@ Current value: ${presignEndpoint || '(undefined)'}
                 <div className="mt-3 space-y-2.5 text-sm text-gray-900">
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-gray-600 font-medium">Bank</span>
-                    <span className="font-semibold text-black">Maybank</span>
+                    <span className="font-semibold text-black">CIMB BANK</span>
                   </div>
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-gray-600 font-medium">Account Name</span>
-                    <span className="font-semibold text-black">Confetti KL Sdn Bhd</span>
+                    <span className="font-semibold text-black">CONFETTI GLITZ SDN BHD</span>
                   </div>
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-gray-600 font-medium">Account No.</span>
-                    <span className="font-semibold text-black tracking-wide">1234567890</span>
+                    <span className="font-semibold text-black tracking-wide">8011406875</span>
                   </div>
                   <div className="flex items-start justify-between gap-4">
                     <span className="text-gray-600 font-medium">Reference</span>
@@ -787,46 +834,6 @@ Current value: ${presignEndpoint || '(undefined)'}
                 )}
               </div>
             </div>
-
-            <div className="rounded-lg p-5 sm:p-6 border" style={{
-              backgroundColor: 'rgba(218, 171, 45, 0.08)',
-              borderColor: 'rgba(218, 171, 45, 0.25)'
-            }}>
-              <div className="text-sm sm:text-base font-semibold uppercase tracking-wide" style={{color: '#A57A03'}}>Payment Summary</div>
-
-              <div className="mt-4 p-4 rounded-lg" style={{backgroundColor: 'rgba(255, 255, 255, 0.5)'}}>
-                <div className="flex items-center justify-between gap-4 mb-2">
-                  <div className="text-xs sm:text-sm text-gray-700 font-medium">Partnership Tier</div>
-                  <div className="text-base sm:text-lg font-bold text-black capitalize">{tierPricing[formData.partnershipTier]?.label || formData.partnershipTier || '-'}</div>
-                </div>
-                <div className="flex items-center justify-between gap-4">
-                  <div className="text-xs sm:text-sm text-gray-700 font-medium">Amount Due</div>
-                  <div className="text-2xl sm:text-3xl font-bold text-black">{formatRM(totalPayable)}</div>
-                </div>
-              </div>
-
-              <div className="mt-5 pt-5 space-y-3 border-t" style={{borderColor: 'rgba(218, 171, 45, 0.2)'}}>
-                <div className="flex items-center justify-between text-sm text-gray-900">
-                  <span className="text-gray-700 font-medium">Subtotal</span>
-                  <span className="font-semibold text-black">{formatRM(totalPayable)}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-gray-900">
-                  <span className="text-gray-700 font-medium">Tax (SST)</span>
-                  <span className="font-semibold text-black">RM 0</span>
-                </div>
-                <div className="flex items-center justify-between text-base pt-3 border-t" style={{borderColor: 'rgba(218, 171, 45, 0.2)'}}>
-                  <span className="font-semibold" style={{color: '#A57A03'}}>Total Amount</span>
-                  <span className="text-xl font-bold text-black">{formatRM(totalPayable)}</span>
-                </div>
-              </div>
-
-              {errors.partnershipTier && (
-                <div className="flex items-center gap-2 text-xs text-red-400 mt-4">
-                  <AlertCircle className="w-3 h-3 flex-shrink-0" />
-                  <span>{errors.partnershipTier}</span>
-                </div>
-              )}
-            </div>
           </div>
         );
 
@@ -862,7 +869,6 @@ Current value: ${presignEndpoint || '(undefined)'}
                 </h4>
                 <div className="text-gray-900 space-y-2.5 pl-0 sm:pl-2">
                   <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Full Name</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.firstName} {formData.lastName}</span></p>
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Position/Title</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.position}</span></p>
                   <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Email Address</span> <span className="font-semibold text-black text-sm sm:text-base break-all">{formData.email}</span></p>
                   <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Phone Number</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.countryCode} {formData.phone}</span></p>
                   <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">NRIC</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.nric}</span></p>
@@ -875,12 +881,19 @@ Current value: ${presignEndpoint || '(undefined)'}
                   Company Information
                 </h4>
                 <div className="text-gray-900 space-y-2.5 pl-0 sm:pl-2">
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Company Name</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.companyName}</span></p>
-                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Industry</span> <span className="font-semibold text-black text-sm sm:text-base capitalize">{
-                    formData.industry === 'other' && formData.industryOther
-                      ? formData.industryOther
-                      : formData.industry
-                  }</span></p>
+                  {formData.notBusinessOwner ? (
+                    <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Business Owner</span> <span className="font-semibold text-black text-sm sm:text-base">No</span></p>
+                  ) : (
+                    <>
+                      <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Position/Title</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.position}</span></p>
+                      <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Company Name</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.companyName}</span></p>
+                      <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Industry</span> <span className="font-semibold text-black text-sm sm:text-base capitalize">{
+                        formData.industry === 'other' && formData.industryOther
+                          ? formData.industryOther
+                          : formData.industry
+                      }</span></p>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -944,7 +957,7 @@ Current value: ${presignEndpoint || '(undefined)'}
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl lg:max-w-2xl mx-auto">
       {/* Redesigned Header - Step Title Left, Circle Right */}
       <div className="mb-8 sm:mb-12">
         <div className="flex items-center justify-between">
@@ -997,8 +1010,8 @@ Current value: ${presignEndpoint || '(undefined)'}
       {/* Form Content */}
       <div className="rounded-xl p-4 sm:p-6 lg:p-8 border"
         style={{
-          backgroundColor: '#FFFFFF',
-          borderColor: 'rgba(218, 171, 45, 0.2)'
+          backgroundColor: '#ffffffff',
+          borderColor: 'rgba(83, 83, 83, 0.2)'
         }}
       >
         {renderStep()}
