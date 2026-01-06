@@ -13,6 +13,7 @@ import LandingPage from './LandingPage';
 // Main App Component
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [successModalOpen, setSuccessModalOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -23,7 +24,12 @@ function App() {
   };
 
   const handleFormComplete = () => {
-    alert('We have received your application! Our team will get back to you shortly.');
+    setSuccessModalOpen(true);
+  };
+
+  const handleCloseSuccessModal = () => {
+    setSuccessModalOpen(false);
+    navigate('/');
   };
 
   return (
@@ -127,14 +133,14 @@ function App() {
             </main>
 
             {/* Footer */}
-            <footer className="border-t mt-16 sm:mt-24"
+            <footer className="border-t"
               style={{
                 backgroundColor: '#1E1E21',
                 borderTopColor: 'rgba(218, 171, 45, 0.1)'
               }}
             >
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
                   <div className="sm:col-span-2">
                     <div className="flex items-center space-x-3 mb-6">
                       <span className="text-xl font-medium text-white tracking-tight">
@@ -147,29 +153,19 @@ function App() {
                   </div>
                   
                   <div>
-                    <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wide">Partnership Tiers</h3>
-                    <ul className="space-y-3">
-                      <li><a href="#" className="text-gray-400 text-sm transition-colors duration-300" style={{'--hover-color': '#DAAB2D'}} onMouseEnter={(e) => e.target.style.color = '#DAAB2D'} onMouseLeave={(e) => e.target.style.color = ''}>Gold Partner</a></li>
-                      <li><a href="#" className="text-gray-400 text-sm transition-colors duration-300" style={{'--hover-color': '#DAAB2D'}} onMouseEnter={(e) => e.target.style.color = '#DAAB2D'} onMouseLeave={(e) => e.target.style.color = ''}>Platinum Partner</a></li>
-                      <li><a href="#" className="text-gray-400 text-sm transition-colors duration-300" style={{'--hover-color': '#DAAB2D'}} onMouseEnter={(e) => e.target.style.color = '#DAAB2D'} onMouseLeave={(e) => e.target.style.color = ''}>Diamond Partner</a></li>
-                      <li><a href="#" className="text-gray-400 text-sm transition-colors duration-300" style={{'--hover-color': '#DAAB2D'}} onMouseEnter={(e) => e.target.style.color = '#DAAB2D'} onMouseLeave={(e) => e.target.style.color = ''}>Event Packages</a></li>
-                    </ul>
-                  </div>
-                  
-                  <div>
                     <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wide">Contact</h3>
                     <ul className="space-y-3 text-gray-400 text-sm">
                       <li className="flex items-center gap-2">
                         <MapPin className="w-4 h-4 flex-shrink-0" style={{color: '#DAAB2D'}} />
-                        <span>Kuala Lumpur, Malaysia</span>
+                        <span>Ground floor Retail Block, Pusat Perdagangan Mines, 2, Jalan Mines 2, Mines Wellness City, 43300 Seri Kembangan, Selangor</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <Phone className="w-4 h-4 flex-shrink-0" style={{color: '#DAAB2D'}} />
-                        <span>+60 3-1234-5678</span>
+                        <span>+60 11-3513 4195</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <Mail className="w-4 h-4 flex-shrink-0" style={{color: '#DAAB2D'}} />
-                        <span>partners@confettikl.com</span>
+                        <span>sales@confetti.com.my</span>
                       </li>
                     </ul>
                   </div>
@@ -226,11 +222,39 @@ function App() {
                   initialTier={location?.state?.partnershipTier}
                   onComplete={() => {
                     handleFormComplete();
-                    navigate('/');
                   }}
                 />
               </div>
             </main>
+
+            {successModalOpen && (
+              <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full relative overflow-hidden">
+                  <button
+                    onClick={handleCloseSuccessModal}
+                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10"
+                    aria-label="Close"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+
+                  <div className="flex justify-center mb-6 pt-4">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{backgroundColor: '#DAAB2D'}}>
+                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div className="text-center pb-2">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted</h2>
+                    <p className="text-gray-600 text-sm">We have received your application. Our team will get back to you shortly.</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         }
       />
