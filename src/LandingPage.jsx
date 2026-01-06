@@ -55,15 +55,17 @@ const LandingPage = ({ onJoinNetwork }) => {
                 Incentive Beneficiary Partner Program (IBPP)
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-4xl font-light text-white mb-4 sm:mb-6 leading-tight tracking-tight">
-                ELEVATE YOUR
+              <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-4xl font-light text-white mb-6 sm:mb-6 leading-tight tracking-tight">
+                THE ENTREPRENEUR'S
                 <span className="block mt-2 font-medium" style={{color: '#DAAB2D'}}>
-                  CORPORATE EVENTS
+                  3RD SPACE
                 </span>
               </h1>
 
-              <p className="text-base sm:text-base lg:text-lg text-gray-200 mb-6 sm:mb-8 max-w-3xl lg:max-w-none leading-relaxed">
-                Join Confetti KL's exclusive Class Partner program and unlock premium benefits for your corporate events. From product launches to team building - create memorable experiences.
+              <p className="text-sm sm:text-base lg:text-base text-gray-200 mb-6 sm:mb-8 max-w-3xl lg:max-w-none leading-relaxed">
+                Confetti builds a 3rd Space for entrepreneurs — a commercial environment that drives client, team, and market conversions.
+                <br />
+                Through design and brand-led operations, we transform spaces into sustainable, refined venues for better business success.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center lg:justify-start items-center">
@@ -86,7 +88,7 @@ const LandingPage = ({ onJoinNetwork }) => {
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-2xl border" style={{borderColor: 'rgba(218, 171, 45, 0.18)', backgroundColor: 'rgba(255, 255, 255, 0.02)'}}>
+            <div className="hidden md:block relative overflow-hidden rounded-2xl border" style={{borderColor: 'rgba(218, 171, 45, 0.18)', backgroundColor: 'rgba(255, 255, 255, 0.02)'}}>
               <div className="absolute inset-0 z-10" style={{background: `linear-gradient(135deg, rgba(0, 0, 0, 0.25) 0%, rgba(11, 15, 20, 0.10) 50%, rgba(0, 0, 0, 0.20) 100%)`}}></div>
               <img
                 src="/main04.jpg"
@@ -109,7 +111,7 @@ const LandingPage = ({ onJoinNetwork }) => {
             {plans.map((plan) => (
               <div
                 key={plan.key}
-                className={`relative rounded-2xl border bg-white overflow-hidden ${plan.popular ? 'shadow-xl' : 'shadow-sm'}`}
+                className={`relative rounded-2xl border bg-white overflow-hidden transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl ${plan.popular ? 'shadow-xl' : 'shadow-sm'}`}
                 style={{
                   borderColor: plan.popular ? 'rgba(99, 102, 241, 0.6)' : 'rgba(209, 213, 219, 1)'
                 }}

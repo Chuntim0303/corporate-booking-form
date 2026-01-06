@@ -13,7 +13,7 @@ import LandingPage from './LandingPage';
 // Main App Component
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [successModalOpen, setSuccessModalOpen] = useState(true);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
