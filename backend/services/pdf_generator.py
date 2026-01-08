@@ -44,15 +44,18 @@ def generate_pdf_filename(customer_name, phone_number):
 def generate_application_pdf(application_data):
     """
     Generate PDF from corporate partnership application data.
-    
+
     Args:
         application_data: Dictionary containing application fields
-        
+
     Returns:
         bytes: PDF file content as bytes
     """
     try:
-        logger.info("Generating partnership application PDF")
+        logger.info("=" * 60)
+        logger.info("Generating ReportLab-based PDF (Fallback Method)")
+        logger.info("=" * 60)
+        logger.info(f"Application data fields: {list(application_data.keys())}")
         
         # Create PDF in memory
         buffer = io.BytesIO()
@@ -224,15 +227,24 @@ def generate_application_pdf(application_data):
         elements.append(footer_text)
         
         # Build PDF
+        logger.info("Building PDF document...")
         doc.build(elements)
-        
+
         # Get PDF bytes
         buffer.seek(0)
         pdf_bytes = buffer.read()
-        
-        logger.info("Partnership application PDF generated successfully")
+
+        logger.info("✓ ReportLab PDF generated successfully")
+        logger.info(f"  - PDF size: {len(pdf_bytes)} bytes ({len(pdf_bytes) / 1024:.2f} KB)")
+        logger.info("=" * 60)
+
         return pdf_bytes
-        
+
     except Exception as e:
-        logger.error(f"Error generating partnership application PDF: {str(e)}", exc_info=True)
+        logger.error("=" * 60)
+        logger.error("✗ ERROR generating ReportLab PDF")
+        logger.error(f"  - Error Type: {type(e).__name__}")
+        logger.error(f"  - Error Message: {str(e)}")
+        logger.error("=" * 60)
+        logger.error(f"Full error:", exc_info=True)
         raise

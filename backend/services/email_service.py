@@ -51,10 +51,21 @@ def send_partnership_confirmation_email(
         bool: True if email sent successfully, False otherwise
     """
     operation = "send_partnership_confirmation_email"
-    logger.info(f"=== {operation.upper()} START ===", extra={
-        'recipient_email': recipient_email,
-        'application_id': application_id
-    })
+    logger.info("=" * 60)
+    logger.info(f"=== {operation.upper()} START ===")
+    logger.info("=" * 60)
+    logger.info(f"Recipient: {recipient_email}")
+    logger.info(f"Application ID: {application_id}")
+    logger.info(f"Contact ID: {contact_id}")
+    logger.info(f"Full Name: {full_name}")
+    logger.info(f"Partnership Tier: {partnership_tier}")
+    logger.info(f"PDF Attachment Status:")
+    logger.info(f"  - pdf_bytes provided: {pdf_bytes is not None}")
+    logger.info(f"  - pdf_filename provided: {pdf_filename is not None}")
+    if pdf_bytes:
+        logger.info(f"  - PDF size: {len(pdf_bytes)} bytes ({len(pdf_bytes) / 1024:.2f} KB)")
+        logger.info(f"  - PDF filename: {pdf_filename}")
+    logger.info("=" * 60)
 
     try:
         # Get sender email and sender name from environment
@@ -245,7 +256,15 @@ This is an automated message. Please do not reply to this email.
         """
 
         # If PDF attachment is provided, use raw email with MIME multipart
+        logger.info("=" * 60)
+        logger.info("Email Sending Decision Point")
+        logger.info("=" * 60)
+        logger.info(f"pdf_bytes is not None: {pdf_bytes is not None}")
+        logger.info(f"pdf_filename is not None: {pdf_filename is not None}")
+
         if pdf_bytes and pdf_filename:
+            logger.info("✓ PDF attachment available - Using send_raw_email with MIME multipart")
+            logger.info("=" * 60)
             logger.info("Sending email with PDF attachment via SES", extra={
                 'source': source,
                 'to_email': recipient_email,
@@ -299,6 +318,14 @@ This is an automated message. Please do not reply to this email.
                 'pdf_filename': pdf_filename
             })
         else:
+            logger.error("✗ PDF attachment NOT available - Using send_email WITHOUT attachment")
+            logger.error("  WARNING: Email will be sent without the PDF attachment!")
+            if not pdf_bytes:
+                logger.error("  Reason: pdf_bytes is None")
+            if not pdf_filename:
+                logger.error("  Reason: pdf_filename is None")
+            logger.info("=" * 60)
+
             # Send regular email without attachment
             # Prepare destination
             destination = {'ToAddresses': [recipient_email]}
