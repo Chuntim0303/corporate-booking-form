@@ -1,0 +1,122 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Event Venue Booking Form Backend
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.11
+    Environment:
+      Variables:
+        BOOKINGS_TABLE: !Ref BookingsTable
+        S3_BUCKET_NAME: !Ref BookingsBucket
+        OUTPUT_BUCKET: !Ref BookingsBucket
+
+Resources:
+  # API Gateway
+  BookingApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
+  # Lambda Function
+  BookingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: lambda_function.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BookingsTable
+        - S3CrudPolicy:
+            BucketName: !Ref BookingsBucket
+      Events:
+        CreateBooking:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BookingApi
+            Path: /api/bookings
+            Method: POST
+        GetBookings:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BookingApi
+            Path: /api/bookings
+            Method: GET
+        GetBooking:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BookingApi
+            Path: /api/bookings/{bookingId}
+            Method: GET
+        GetUploadUrl:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BookingApi
+            Path: /api/upload-url
+            Method: POST
+        Options:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BookingApi
+            Path: /{proxy+}
+            Method: OPTIONS
+
+  # DynamoDB Table
+  BookingsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: event-bookings
+      AttributeDefinitions:
+        - AttributeName: bookingId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: bookingId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  # S3 Bucket for file uploads (payment proofs) and generated PDFs
+  BookingsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: event-venue-bookings
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+              - DELETE
+              - HEAD
+            AllowedOrigins:
+              - '*'
+            ExposeHeaders:
+              - ETag
+              - x-amz-server-side-encryption
+              - x-amz-request-id
+              - x-amz-id-2
+            MaxAge: 3000
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+Outputs:
+  BookingApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${BookingApi}.execute-api.${AWS::Region}.amazonaws.com/prod/'
+
+  BookingsTableName:
+    Description: DynamoDB table name
+    Value: !Ref BookingsTable
+
+  BookingsBucketName:
+    Description: S3 bucket name
+    Value: !Ref BookingsBucket
