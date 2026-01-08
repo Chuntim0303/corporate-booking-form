@@ -8,10 +8,31 @@ import logging
 import boto3
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from reportlab.pdfgen import canvas
-from pdfrw import PdfReader, PdfWriter, PageMerge
 
 logger = logging.getLogger()
+
+# Lazy imports to avoid PIL dependency issues at module load time
+# reportlab and pdfrw will be imported when needed
+_reportlab_canvas = None
+_pdfrw_modules = None
+
+
+def _get_reportlab_canvas():
+    """Lazy import of reportlab.pdfgen.canvas"""
+    global _reportlab_canvas
+    if _reportlab_canvas is None:
+        from reportlab.pdfgen import canvas
+        _reportlab_canvas = canvas
+    return _reportlab_canvas
+
+
+def _get_pdfrw_modules():
+    """Lazy import of pdfrw modules"""
+    global _pdfrw_modules
+    if _pdfrw_modules is None:
+        from pdfrw import PdfReader, PdfWriter, PageMerge
+        _pdfrw_modules = {'PdfReader': PdfReader, 'PdfWriter': PdfWriter, 'PageMerge': PageMerge}
+    return _pdfrw_modules
 
 
 def get_malaysia_time():
@@ -41,6 +62,11 @@ def format_field_value(key, value):
 def create_overlay(application_data, placeholder_positions):
     """Create PDF overlay with text fields at specified positions"""
     logger.info("Creating PDF overlay with application data")
+
+    # Lazy import
+    canvas = _get_reportlab_canvas()
+    pdfrw = _get_pdfrw_modules()
+
     packet = io.BytesIO()
     can = canvas.Canvas(packet)
     can.setFont("Helvetica", 10)
@@ -92,7 +118,7 @@ def create_overlay(application_data, placeholder_positions):
 
     can.save()
     packet.seek(0)
-    overlay_pdf = PdfReader(packet)
+    overlay_pdf = pdfrw['PdfReader'](packet)
     logger.info(f"Overlay PDF pages count: {len(overlay_pdf.pages)}")
     return overlay_pdf
 
@@ -111,6 +137,12 @@ def generate_pdf(template_bytes, application_data, placeholder_positions):
         bytes: Generated PDF file content
     """
     try:
+        # Lazy import
+        pdfrw = _get_pdfrw_modules()
+        PdfReader = pdfrw['PdfReader']
+        PdfWriter = pdfrw['PdfWriter']
+        PageMerge = pdfrw['PageMerge']
+
         logger.info("=" * 60)
         logger.info("Generating PDF from template")
         logger.info("=" * 60)

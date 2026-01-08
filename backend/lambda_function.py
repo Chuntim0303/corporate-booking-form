@@ -32,25 +32,12 @@ logger.info("=" * 60)
 logger.info("✓ presign_service: Available")
 logger.info("✓ textract_service: Available")
 logger.info("✓ email_service: Available")
-logger.info("✓ pdf_generator: Available")
+logger.info("✓ pdf_generator: Available (lazy imports)")
 logger.info("✓ config module: Available")
-
-# Check if PDF dependencies are importable
-try:
-    import reportlab
-    logger.info(f"✓ reportlab library: Available (version {reportlab.Version})")
-except ImportError as e:
-    logger.error(f"✗ reportlab library: NOT AVAILABLE - {str(e)}")
-
-try:
-    import pdfrw
-    logger.info(f"✓ pdfrw library: Available")
-except ImportError as e:
-    logger.error(f"✗ pdfrw library: NOT AVAILABLE - {str(e)}")
-
 logger.info(f"Template Config - TEMPLATE_BUCKET: {config.TEMPLATE_BUCKET or 'NOT SET'}")
 logger.info(f"Template Config - TEMPLATE_KEY: {config.TEMPLATE_KEY or 'NOT SET'}")
 logger.info("=" * 60)
+logger.info("Note: reportlab/pdfrw loaded lazily when PDF generation is called")
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
