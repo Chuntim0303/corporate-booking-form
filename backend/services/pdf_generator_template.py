@@ -127,68 +127,114 @@ def create_overlay(texts, placeholder_positions, signature_position=None, signat
     return overlay_pdf
 
 
-def generate_pdf_from_template(template_bytes, form_data, placeholder_positions, 
+def generate_pdf_from_template(template_bytes, form_data, placeholder_positions,
                                 signature_position=None, signature_size=None):
     """
     Generate filled PDF by overlaying text on a template PDF
-    
+
     Args:
         template_bytes: PDF template file as bytes
         form_data: Dictionary containing form field values
         placeholder_positions: Dictionary mapping field names to (x, y) coordinates
         signature_position: Optional (x, y) tuple for signature placement
         signature_size: Optional (width, height) tuple for signature size
-        
+
     Returns:
         bytes: Generated PDF file content
     """
     try:
-        logger.info("Generating PDF from template with overlay")
+        logger.info("=" * 60)
+        logger.info("Generating PDF from Template with Overlay")
+        logger.info("=" * 60)
+        logger.info(f"Template size: {len(template_bytes)} bytes")
+        logger.info(f"Form data fields: {list(form_data.keys())}")
+        logger.info(f"Placeholder positions count: {len(placeholder_positions)}")
+        logger.info(f"Signature position: {signature_position}")
+        logger.info(f"Signature size: {signature_size}")
+
+        logger.info("Reading template PDF...")
         template_pdf = PdfReader(io.BytesIO(template_bytes))
-        overlay_pdf = create_overlay(form_data, placeholder_positions, 
+        logger.info(f"✓ Template PDF read successfully - {len(template_pdf.pages)} page(s)")
+
+        logger.info("Creating overlay with form data...")
+        overlay_pdf = create_overlay(form_data, placeholder_positions,
                                      signature_position, signature_size)
-        
+        logger.info(f"✓ Overlay created - {len(overlay_pdf.pages)} page(s)")
+
         # Merge overlay with template
+        logger.info("Merging overlay with template...")
+        page_count = 0
         for page, overlay_page in zip(template_pdf.pages, overlay_pdf.pages):
             merger = PageMerge(page)
             merger.add(overlay_page).render()
-        
-        logger.info("Overlay merged with template PDF")
-        
+            page_count += 1
+
+        logger.info(f"✓ Overlay merged with template PDF ({page_count} page(s))")
+
         # Write to output
+        logger.info("Writing final PDF to output stream...")
         output_stream = io.BytesIO()
         PdfWriter().write(output_stream, template_pdf)
         output_stream.seek(0)
         pdf_bytes = output_stream.read()
-        
-        logger.info("Template-based PDF generation completed successfully")
+
+        logger.info(f"✓ Template-based PDF generation completed successfully")
+        logger.info(f"  - Final PDF size: {len(pdf_bytes)} bytes ({len(pdf_bytes) / 1024:.2f} KB)")
+        logger.info("=" * 60)
+
         return pdf_bytes
-        
+
     except Exception as e:
-        logger.error(f"Error generating PDF from template: {str(e)}", exc_info=True)
+        logger.error("=" * 60)
+        logger.error(f"✗ ERROR generating PDF from template")
+        logger.error(f"  - Error Type: {type(e).__name__}")
+        logger.error(f"  - Error Message: {str(e)}")
+        logger.error("=" * 60)
+        logger.error(f"Full error:", exc_info=True)
         raise
 
 
 def load_template_from_s3(bucket_name, template_key):
     """
     Load PDF template from S3 bucket
-    
+
     Args:
         bucket_name: S3 bucket name
         template_key: S3 object key for the template
-        
+
     Returns:
         bytes: PDF template file content
     """
     try:
-        logger.info(f"Loading PDF template from S3: s3://{bucket_name}/{template_key}")
+        logger.info("=" * 60)
+        logger.info("Loading PDF Template from S3")
+        logger.info("=" * 60)
+        logger.info(f"S3 URI: s3://{bucket_name}/{template_key}")
+        logger.info(f"Bucket: {bucket_name}")
+        logger.info(f"Key: {template_key}")
+
         s3_client = boto3.client('s3')
+        logger.info("S3 client created successfully")
+
+        logger.info("Fetching object from S3...")
         response = s3_client.get_object(Bucket=bucket_name, Key=template_key)
+
         template_bytes = response['Body'].read()
-        logger.info(f"Template loaded successfully, size: {len(template_bytes)} bytes")
+        logger.info(f"✓ Template loaded successfully")
+        logger.info(f"  - Size: {len(template_bytes)} bytes ({len(template_bytes) / 1024:.2f} KB)")
+        logger.info(f"  - Content-Type: {response.get('ContentType', 'unknown')}")
+        logger.info("=" * 60)
+
         return template_bytes
     except Exception as e:
-        logger.error(f"Error loading template from S3: {str(e)}", exc_info=True)
+        logger.error("=" * 60)
+        logger.error(f"✗ ERROR loading template from S3")
+        logger.error(f"  - Bucket: {bucket_name}")
+        logger.error(f"  - Key: {template_key}")
+        logger.error(f"  - Error Type: {type(e).__name__}")
+        logger.error(f"  - Error Message: {str(e)}")
+        logger.error("=" * 60)
+        logger.error(f"Full error:", exc_info=True)
         raise
 
 

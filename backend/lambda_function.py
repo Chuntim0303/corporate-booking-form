@@ -75,6 +75,45 @@ except Exception as e:
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+# Log import status for debugging
+logger.info("=" * 60)
+logger.info("Lambda Function Initialization - Import Status")
+logger.info("=" * 60)
+logger.info(f"✓ presign_service: {'Available' if handle_presign_request else 'NOT AVAILABLE'}")
+logger.info(f"✓ textract_service: {'Available' if extract_amount_from_receipt else 'NOT AVAILABLE'}")
+logger.info(f"✓ email_service: {'Available' if send_partnership_confirmation_email else 'NOT AVAILABLE'}")
+logger.info(f"✓ pdf_generator (ReportLab): {'Available' if generate_application_pdf else 'NOT AVAILABLE'}")
+logger.info(f"✓ pdf_generator_template: {'Available' if generate_pdf_from_template else 'NOT AVAILABLE'}")
+logger.info(f"✓ Config: {'Available' if Config else 'NOT AVAILABLE'}")
+
+# Check if PDF dependencies are importable
+try:
+    import reportlab
+    logger.info(f"✓ reportlab library: Available (version {reportlab.Version})")
+except ImportError as e:
+    logger.error(f"✗ reportlab library: NOT AVAILABLE - {str(e)}")
+
+try:
+    import pdfrw
+    logger.info(f"✓ pdfrw library: Available")
+except ImportError as e:
+    logger.error(f"✗ pdfrw library: NOT AVAILABLE - {str(e)}")
+
+try:
+    import PIL
+    from PIL import Image
+    logger.info(f"✓ Pillow (PIL) library: Available (version {PIL.__version__})")
+except ImportError as e:
+    logger.error(f"✗ Pillow (PIL) library: NOT AVAILABLE - {str(e)}")
+
+if Config:
+    logger.info(f"Template Config - TEMPLATE_BUCKET: {Config.TEMPLATE_BUCKET or 'NOT SET'}")
+    logger.info(f"Template Config - TEMPLATE_KEY: {Config.TEMPLATE_KEY or 'NOT SET'}")
+else:
+    logger.warning("Config not available - template configuration cannot be checked")
+
+logger.info("=" * 60)
+
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     """
@@ -894,14 +933,29 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                     # Generate PDF attachment
                     pdf_bytes = None
                     pdf_filename = None
-                    
+
+                    logger.info("=" * 60)
+                    logger.info("PDF Generation - Checking Prerequisites")
+                    logger.info("=" * 60)
+                    logger.info(f"Config available: {Config is not None}")
+                    logger.info(f"generate_pdf_from_template available: {generate_pdf_from_template is not None}")
+                    logger.info(f"load_template_from_s3 available: {load_template_from_s3 is not None}")
+                    if Config:
+                        logger.info(f"TEMPLATE_BUCKET set: {bool(Config.TEMPLATE_BUCKET)} (value: '{Config.TEMPLATE_BUCKET}')")
+                        logger.info(f"TEMPLATE_KEY set: {bool(Config.TEMPLATE_KEY)} (value: '{Config.TEMPLATE_KEY}')")
+                    logger.info(f"generate_application_pdf (ReportLab fallback) available: {generate_application_pdf is not None}")
+                    logger.info(f"generate_pdf_filename (ReportLab fallback) available: {generate_pdf_filename is not None}")
+
                     # Try template-based PDF generation first (if configured)
-                    use_template = (Config and 
-                                  generate_pdf_from_template and 
+                    use_template = (Config and
+                                  generate_pdf_from_template and
                                   load_template_from_s3 and
-                                  Config.TEMPLATE_BUCKET and 
+                                  Config.TEMPLATE_BUCKET and
                                   Config.TEMPLATE_KEY)
-                    
+
+                    logger.info(f"Will use template-based PDF: {use_template}")
+                    logger.info("=" * 60)
+
                     if use_template:
                         try:
                             logger.info("Generating template-based PDF attachment", extra={
@@ -945,8 +999,13 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                             pdf_filename = None
                     
                     # Fallback to reportlab-based PDF generation
+                    logger.info(f"Checking reportlab fallback - pdf_bytes is None: {pdf_bytes is None}, generate_application_pdf available: {generate_application_pdf is not None}, generate_pdf_filename available: {generate_pdf_filename is not None}")
+
                     if not pdf_bytes and generate_application_pdf and generate_pdf_filename:
                         try:
+                            logger.info("=" * 60)
+                            logger.info("Attempting ReportLab-based PDF generation (fallback)")
+                            logger.info("=" * 60)
                             logger.info("Generating reportlab-based PDF attachment", extra={
                                 'application_id': application_id,
                                 'email': email
@@ -968,9 +1027,29 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                             }, exc_info=True)
                             pdf_bytes = None
                             pdf_filename = None
-                    
-                    if not pdf_bytes:
+                    else:
+                        if not pdf_bytes:
+                            logger.warning("Skipping reportlab fallback - One or more conditions not met:")
+                            logger.warning(f"  - pdf_bytes is None: {pdf_bytes is None}")
+                            logger.warning(f"  - generate_application_pdf available: {generate_application_pdf is not None}")
+                            logger.warning(f"  - generate_pdf_filename available: {generate_pdf_filename is not None}")
+
+                    logger.info("=" * 60)
+                    logger.info("PDF Generation - Final Status")
+                    logger.info("=" * 60)
+                    if pdf_bytes:
+                        logger.info(f"✓ PDF GENERATED SUCCESSFULLY")
+                        logger.info(f"  - Filename: {pdf_filename}")
+                        logger.info(f"  - Size: {len(pdf_bytes)} bytes")
+                    else:
+                        logger.error("✗ PDF GENERATION FAILED - No PDF will be attached to email")
+                        logger.error("  This means the email will be sent WITHOUT the PDF attachment!")
+                        logger.error("  Possible reasons:")
+                        logger.error("    1. PDF dependencies (reportlab, pdfrw, Pillow) not installed in Lambda")
+                        logger.error("    2. Lambda Layer not attached to function")
+                        logger.error("    3. Import errors during function initialization")
                         logger.warning("PDF generator not available - sending email without attachment")
+                    logger.info("=" * 60)
 
                     # Send email
                     full_name = f"{first_name} {last_name}"
