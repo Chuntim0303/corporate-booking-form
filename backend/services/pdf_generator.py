@@ -18,9 +18,21 @@ _pdfrw_modules = None
 
 
 def _get_reportlab_canvas():
-    """Lazy import of reportlab.pdfgen.canvas"""
+    """Lazy import of reportlab.pdfgen.canvas with PIL workaround"""
     global _reportlab_canvas
     if _reportlab_canvas is None:
+        # Mock PIL before reportlab tries to import it
+        # This prevents the broken PIL in Lambda layer from breaking reportlab
+        import sys
+        if 'PIL' not in sys.modules:
+            # Create a minimal mock PIL module
+            from types import ModuleType
+            pil_mock = ModuleType('PIL')
+            pil_mock.Image = ModuleType('PIL.Image')
+            sys.modules['PIL'] = pil_mock
+            sys.modules['PIL.Image'] = pil_mock.Image
+            logger.info("PIL mocked to work around Lambda layer issues")
+
         from reportlab.pdfgen import canvas
         _reportlab_canvas = canvas
     return _reportlab_canvas
