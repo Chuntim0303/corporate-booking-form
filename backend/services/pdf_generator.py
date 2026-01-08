@@ -1,18 +1,15 @@
 """
-PDF generation service for corporate partnership applications.
-Generates PDF from application data for email attachments.
+PDF generation for corporate partnership applications.
+Uses template overlay approach - adapted from reference backend.
 """
 import io
 import re
 import logging
+import boto3
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from reportlab.lib.pagesizes import letter, A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
+from reportlab.pdfgen import canvas
+from pdfrw import PdfReader, PdfWriter, PageMerge
 
 logger = logging.getLogger()
 
@@ -23,12 +20,202 @@ def get_malaysia_time():
     return datetime.now(malaysia_tz)
 
 
+def format_field_value(key, value):
+    """Format field values for display in PDF"""
+    if not value:
+        return ""
+
+    if key == 'termsAccepted':
+        return "Accepted" if value else "Not Accepted"
+    elif key in ['partnershipTier', 'partnership_tier', 'industry', 'state', 'gender']:
+        return str(value).replace('_', ' ').title()
+    elif key in ['totalPayable', 'total_payable']:
+        try:
+            return f"RM {float(value):.2f}"
+        except (ValueError, TypeError):
+            return str(value)
+    else:
+        return str(value)
+
+
+def create_overlay(application_data, placeholder_positions):
+    """Create PDF overlay with text fields at specified positions"""
+    logger.info("Creating PDF overlay with application data")
+    packet = io.BytesIO()
+    can = canvas.Canvas(packet)
+    can.setFont("Helvetica", 10)
+
+    # Prepare data - combine first and last name if needed
+    data = application_data.copy()
+    if 'firstName' in data and 'lastName' in data:
+        data['full_name'] = f"{data.get('firstName', '')} {data.get('lastName', '')}".strip()
+
+    # Map frontend field names to backend field names for consistency
+    field_mapping = {
+        'firstName': 'first_name',
+        'lastName': 'last_name',
+        'email': 'email_address',
+        'phone': 'phone_number',
+        'addressLine1': 'address_line_1',
+        'addressLine2': 'address_line_2',
+        'postalCode': 'postal_code',
+        'companyName': 'company_name',
+        'partnershipTier': 'partnership_tier',
+        'totalPayable': 'total_payable',
+    }
+
+    for frontend_key, backend_key in field_mapping.items():
+        if frontend_key in data and backend_key not in data:
+            data[backend_key] = data[frontend_key]
+
+    # Add submitted date (current Malaysia time)
+    malaysia_now = get_malaysia_time()
+    data['submitted_date'] = malaysia_now.strftime("%d/%m/%Y")
+
+    # Draw text at specified positions
+    for key, value in data.items():
+        if key in placeholder_positions and value:
+            x, y = placeholder_positions[key]
+            formatted_value = format_field_value(key, value)
+            logger.debug(f"Adding text for key '{key}' at position ({x}, {y}): {formatted_value}")
+
+            # Handle multi-line fields if any
+            if key in ['special_requests', 'notes', 'additionalRequests']:
+                lines = str(formatted_value).split('\n')
+                line_height = 12
+                for i, line in enumerate(lines):
+                    if i < 5:  # Limit to 5 lines
+                        can.drawString(x, y - i * line_height, line[:80])
+            else:
+                text_to_draw = formatted_value[:60]  # Limit to 60 characters
+                can.drawString(x, y, text_to_draw)
+
+    can.save()
+    packet.seek(0)
+    overlay_pdf = PdfReader(packet)
+    logger.info(f"Overlay PDF pages count: {len(overlay_pdf.pages)}")
+    return overlay_pdf
+
+
+def generate_pdf(template_bytes, application_data, placeholder_positions):
+    """
+    Generate filled PDF from template and application data.
+    Returns PDF bytes.
+
+    Args:
+        template_bytes: PDF template file as bytes
+        application_data: Dictionary containing application field values
+        placeholder_positions: Dictionary mapping field names to (x, y) coordinates
+
+    Returns:
+        bytes: Generated PDF file content
+    """
+    try:
+        logger.info("=" * 60)
+        logger.info("Generating PDF from template")
+        logger.info("=" * 60)
+        logger.info(f"Template size: {len(template_bytes)} bytes")
+        logger.info(f"Application data fields: {list(application_data.keys())}")
+
+        template_pdf = PdfReader(io.BytesIO(template_bytes))
+        if not template_pdf.pages:
+            raise ValueError("Template PDF contains no pages")
+
+        logger.info(f"Template PDF loaded - {len(template_pdf.pages)} page(s)")
+
+        # Get page dimensions from template
+        page0 = template_pdf.pages[0]
+        media_box = getattr(page0, 'MediaBox', None)
+        if media_box and len(media_box) >= 4:
+            overlay_width = float(media_box[2])
+            overlay_height = float(media_box[3])
+        else:
+            overlay_width = float(page0.inheritable.MediaBox[2])
+            overlay_height = float(page0.inheritable.MediaBox[3])
+
+        logger.info(f"Using template MediaBox for overlay pagesize: ({overlay_width}, {overlay_height})")
+
+        # Create overlay with application data
+        overlay_pdf = create_overlay(application_data, placeholder_positions)
+
+        # Set overlay page size to match template
+        for overlay_page in overlay_pdf.pages:
+            overlay_page.MediaBox = [0, 0, overlay_width, overlay_height]
+
+        # Merge overlay with template
+        for page, overlay_page in zip(template_pdf.pages, overlay_pdf.pages):
+            merger = PageMerge(page)
+            merger.add(overlay_page).render()
+        logger.info("Overlay merged with template PDF")
+
+        # Write output
+        output_stream = io.BytesIO()
+        PdfWriter().write(output_stream, template_pdf)
+        output_stream.seek(0)
+        pdf_bytes = output_stream.read()
+
+        logger.info(f"✓ PDF generation completed successfully - {len(pdf_bytes)} bytes ({len(pdf_bytes) / 1024:.2f} KB)")
+        logger.info("=" * 60)
+        return pdf_bytes
+
+    except Exception as e:
+        logger.error("=" * 60)
+        logger.error(f"✗ ERROR generating PDF")
+        logger.error(f"  - Error Type: {type(e).__name__}")
+        logger.error(f"  - Error Message: {str(e)}")
+        logger.error("=" * 60)
+        logger.error(f"Full error:", exc_info=True)
+        raise
+
+
+def load_template_from_s3(bucket_name, template_key):
+    """
+    Load PDF template from S3 bucket
+
+    Args:
+        bucket_name: S3 bucket name
+        template_key: S3 object key for the template
+
+    Returns:
+        bytes: PDF template file content
+    """
+    try:
+        logger.info("=" * 60)
+        logger.info("Loading PDF Template from S3")
+        logger.info("=" * 60)
+        logger.info(f"S3 URI: s3://{bucket_name}/{template_key}")
+
+        s3_client = boto3.client('s3')
+        logger.info("S3 client created successfully")
+
+        logger.info("Fetching object from S3...")
+        response = s3_client.get_object(Bucket=bucket_name, Key=template_key)
+
+        template_bytes = response['Body'].read()
+        logger.info(f"✓ Template loaded successfully")
+        logger.info(f"  - Size: {len(template_bytes)} bytes ({len(template_bytes) / 1024:.2f} KB)")
+        logger.info(f"  - Content-Type: {response.get('ContentType', 'unknown')}")
+        logger.info("=" * 60)
+
+        return template_bytes
+    except Exception as e:
+        logger.error("=" * 60)
+        logger.error(f"✗ ERROR loading template from S3")
+        logger.error(f"  - Bucket: {bucket_name}")
+        logger.error(f"  - Key: {template_key}")
+        logger.error(f"  - Error Type: {type(e).__name__}")
+        logger.error(f"  - Error Message: {str(e)}")
+        logger.error("=" * 60)
+        logger.error(f"Full error:", exc_info=True)
+        raise
+
+
 def generate_pdf_filename(customer_name, phone_number):
     """Generate PDF filename with customer name and last 4 digits of phone number and timestamp"""
     try:
         clean_name = re.sub(r'[^a-zA-Z0-9\s]', '', customer_name)
         clean_name = clean_name.replace(' ', '_')[:20]
-        phone_digits = re.sub(r'[^\d]', '', phone_number)
+        phone_digits = re.sub(r'[^\d]', '', str(phone_number))
         last_4_digits = phone_digits[-4:] if len(phone_digits) >= 4 else phone_digits
         malaysia_now = get_malaysia_time()
         timestamp = malaysia_now.strftime("%Y%m%d_%H%M%S")
@@ -39,212 +226,3 @@ def generate_pdf_filename(customer_name, phone_number):
         malaysia_now = get_malaysia_time()
         timestamp = malaysia_now.strftime("%Y%m%d_%H%M%S")
         return f"IBPP_Application_{timestamp}.pdf"
-
-
-def generate_application_pdf(application_data):
-    """
-    Generate PDF from corporate partnership application data.
-
-    Args:
-        application_data: Dictionary containing application fields
-
-    Returns:
-        bytes: PDF file content as bytes
-    """
-    try:
-        logger.info("=" * 60)
-        logger.info("Generating ReportLab-based PDF (Fallback Method)")
-        logger.info("=" * 60)
-        logger.info(f"Application data fields: {list(application_data.keys())}")
-        
-        # Create PDF in memory
-        buffer = io.BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=A4, 
-                              rightMargin=72, leftMargin=72,
-                              topMargin=72, bottomMargin=18)
-        
-        # Container for PDF elements
-        elements = []
-        
-        # Define styles
-        styles = getSampleStyleSheet()
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontSize=18,
-            textColor=colors.HexColor('#2c3e50'),
-            spaceAfter=30,
-            alignment=TA_CENTER,
-            fontName='Helvetica-Bold'
-        )
-        
-        heading_style = ParagraphStyle(
-            'CustomHeading',
-            parent=styles['Heading2'],
-            fontSize=14,
-            textColor=colors.HexColor('#2c3e50'),
-            spaceAfter=12,
-            spaceBefore=12,
-            fontName='Helvetica-Bold'
-        )
-        
-        normal_style = styles['Normal']
-        
-        # Title
-        title = Paragraph("Incentive Beneficiary Partner Program (IBPP)<br/>Application Summary", title_style)
-        elements.append(title)
-        elements.append(Spacer(1, 0.2*inch))
-        
-        # Submission timestamp
-        malaysia_now = get_malaysia_time()
-        submitted_time = malaysia_now.strftime('%d %B %Y, %I:%M %p')
-        timestamp_text = Paragraph(f"<b>Submitted:</b> {submitted_time}", normal_style)
-        elements.append(timestamp_text)
-        elements.append(Spacer(1, 0.3*inch))
-        
-        # Personal Information Section
-        elements.append(Paragraph("Personal Information", heading_style))
-        personal_data = [
-            ['First Name:', application_data.get('firstName', 'N/A')],
-            ['Last Name:', application_data.get('lastName', 'N/A')],
-            ['Position:', application_data.get('position', 'N/A')],
-            ['Email:', application_data.get('email', 'N/A')],
-            ['Phone:', f"+{application_data.get('countryCode', '')} {application_data.get('phone', 'N/A')}"],
-            ['NRIC:', application_data.get('nric', 'N/A')],
-        ]
-        
-        personal_table = Table(personal_data, colWidths=[2*inch, 4*inch])
-        personal_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
-            ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#495057')),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e9ecef')),
-        ]))
-        elements.append(personal_table)
-        elements.append(Spacer(1, 0.3*inch))
-        
-        # Address Information Section
-        elements.append(Paragraph("Address Information", heading_style))
-        address_data = [
-            ['Address Line 1:', application_data.get('addressLine1', 'N/A')],
-            ['Address Line 2:', application_data.get('addressLine2', '-')],
-            ['City:', application_data.get('city', 'N/A')],
-            ['State:', application_data.get('state', 'N/A')],
-            ['Postal Code:', application_data.get('postalCode', 'N/A')],
-            ['Gender:', application_data.get('gender', 'N/A').replace('_', ' ').title()],
-        ]
-        
-        address_table = Table(address_data, colWidths=[2*inch, 4*inch])
-        address_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
-            ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#495057')),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e9ecef')),
-        ]))
-        elements.append(address_table)
-        elements.append(Spacer(1, 0.3*inch))
-        
-        # Company Information Section
-        elements.append(Paragraph("Company Information", heading_style))
-        company_data = [
-            ['Company Name:', application_data.get('companyName', 'N/A')],
-            ['Industry:', application_data.get('industry', 'N/A')],
-            ['Partnership Tier:', application_data.get('partnershipTier', 'N/A').replace('_', ' ').title()],
-            ['Total Payable:', f"RM {application_data.get('totalPayable', 0):.2f}"],
-        ]
-        
-        company_table = Table(company_data, colWidths=[2*inch, 4*inch])
-        company_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
-            ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#495057')),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e9ecef')),
-        ]))
-        elements.append(company_table)
-        elements.append(Spacer(1, 0.3*inch))
-        
-        # Terms and Conditions
-        elements.append(Paragraph("Terms and Conditions", heading_style))
-        terms_status = "Accepted" if application_data.get('termsAccepted') else "Not Accepted"
-        terms_text = Paragraph(f"<b>Status:</b> {terms_status}", normal_style)
-        elements.append(terms_text)
-        elements.append(Spacer(1, 0.3*inch))
-        
-        # UTM Tracking (if available)
-        if application_data.get('utmSource') or application_data.get('utmMedium'):
-            elements.append(Paragraph("Tracking Information", heading_style))
-            utm_data = []
-            if application_data.get('utmSource'):
-                utm_data.append(['UTM Source:', application_data.get('utmSource')])
-            if application_data.get('utmMedium'):
-                utm_data.append(['UTM Medium:', application_data.get('utmMedium')])
-            
-            if utm_data:
-                utm_table = Table(utm_data, colWidths=[2*inch, 4*inch])
-                utm_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
-                    ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#495057')),
-                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                    ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-                    ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
-                    ('FONTSIZE', (0, 0), (-1, -1), 10),
-                    ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-                    ('TOPPADDING', (0, 0), (-1, -1), 8),
-                    ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e9ecef')),
-                ]))
-                elements.append(utm_table)
-                elements.append(Spacer(1, 0.3*inch))
-        
-        # Footer
-        elements.append(Spacer(1, 0.5*inch))
-        footer_style = ParagraphStyle(
-            'Footer',
-            parent=styles['Normal'],
-            fontSize=8,
-            textColor=colors.HexColor('#6c757d'),
-            alignment=TA_CENTER
-        )
-        footer_text = Paragraph(
-            f"© {malaysia_now.year} Confetti. All rights reserved.<br/>"
-            "This is an automated document generated from your application submission.",
-            footer_style
-        )
-        elements.append(footer_text)
-        
-        # Build PDF
-        logger.info("Building PDF document...")
-        doc.build(elements)
-
-        # Get PDF bytes
-        buffer.seek(0)
-        pdf_bytes = buffer.read()
-
-        logger.info("✓ ReportLab PDF generated successfully")
-        logger.info(f"  - PDF size: {len(pdf_bytes)} bytes ({len(pdf_bytes) / 1024:.2f} KB)")
-        logger.info("=" * 60)
-
-        return pdf_bytes
-
-    except Exception as e:
-        logger.error("=" * 60)
-        logger.error("✗ ERROR generating ReportLab PDF")
-        logger.error(f"  - Error Type: {type(e).__name__}")
-        logger.error(f"  - Error Message: {str(e)}")
-        logger.error("=" * 60)
-        logger.error(f"Full error:", exc_info=True)
-        raise
