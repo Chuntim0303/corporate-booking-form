@@ -16,25 +16,60 @@ if services_dir not in sys.path:
 
 # Import services
 try:
-    from presign_service import handle_presign_request
+    from services.presign_service import handle_presign_request
 except ImportError:
     logger = logging.getLogger()
     logger.warning("Could not import presign_service - S3 upload will not work")
     handle_presign_request = None
 
 try:
-    from textract_service import extract_amount_from_receipt
+    from services.textract_service import extract_amount_from_receipt
 except ImportError:
     logger = logging.getLogger()
     logger.warning("Could not import textract_service - Receipt amount extraction will not work")
     extract_amount_from_receipt = None
 
 try:
-    from email_service import send_partnership_confirmation_email
+    from services.email_service import send_partnership_confirmation_email
 except ImportError:
     logger = logging.getLogger()
     logger.warning("Could not import email_service - Confirmation emails will not work")
     send_partnership_confirmation_email = None
+
+try:
+    from services.pdf_generator import generate_application_pdf, generate_pdf_filename
+except ImportError as e:
+    logger = logging.getLogger()
+    logger.warning(f"Could not import pdf_generator - PDF generation will not work: {str(e)}")
+    generate_application_pdf = None
+    generate_pdf_filename = None
+except Exception as e:
+    logger = logging.getLogger()
+    logger.error(f"Unexpected error importing pdf_generator: {str(e)}", exc_info=True)
+    generate_application_pdf = None
+    generate_pdf_filename = None
+
+try:
+    from services.pdf_generator_template import (
+        generate_pdf_from_template, 
+        load_template_from_s3,
+        generate_pdf_filename as generate_pdf_filename_template
+    )
+    from config import Config
+except ImportError as e:
+    logger = logging.getLogger()
+    logger.warning(f"Could not import template-based PDF generator: {str(e)}")
+    generate_pdf_from_template = None
+    load_template_from_s3 = None
+    generate_pdf_filename_template = None
+    Config = None
+except Exception as e:
+    logger = logging.getLogger()
+    logger.error(f"Unexpected error importing template-based PDF generator: {str(e)}", exc_info=True)
+    generate_pdf_from_template = None
+    load_template_from_s3 = None
+    generate_pdf_filename_template = None
+    Config = None
 
 # Configure logging
 logger = logging.getLogger()
@@ -856,6 +891,87 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                         'cc_count': len(cc_addresses) if cc_addresses else 0
                     })
 
+                    # Generate PDF attachment
+                    pdf_bytes = None
+                    pdf_filename = None
+                    
+                    # Try template-based PDF generation first (if configured)
+                    use_template = (Config and 
+                                  generate_pdf_from_template and 
+                                  load_template_from_s3 and
+                                  Config.TEMPLATE_BUCKET and 
+                                  Config.TEMPLATE_KEY)
+                    
+                    if use_template:
+                        try:
+                            logger.info("Generating template-based PDF attachment", extra={
+                                'application_id': application_id,
+                                'email': email,
+                                'template_bucket': Config.TEMPLATE_BUCKET,
+                                'template_key': Config.TEMPLATE_KEY
+                            })
+                            
+                            # Load template from S3
+                            template_bytes = load_template_from_s3(
+                                Config.TEMPLATE_BUCKET, 
+                                Config.TEMPLATE_KEY
+                            )
+                            
+                            # Generate PDF with overlay
+                            pdf_bytes = generate_pdf_from_template(
+                                template_bytes=template_bytes,
+                                form_data=data,
+                                placeholder_positions=Config.PLACEHOLDER_POSITIONS,
+                                signature_position=Config.SIGNATURE_POSITION,
+                                signature_size=Config.SIGNATURE_SIZE
+                            )
+                            
+                            pdf_filename = generate_pdf_filename_template(
+                                f"{first_name} {last_name}",
+                                data.get('phone', '0000')
+                            )
+                            
+                            logger.info("Template-based PDF generated successfully", extra={
+                                'pdf_filename': pdf_filename,
+                                'pdf_size': len(pdf_bytes)
+                            })
+                        except Exception as pdf_error:
+                            logger.error("Failed to generate template-based PDF, falling back to reportlab", extra={
+                                'error_type': type(pdf_error).__name__,
+                                'error_message': str(pdf_error),
+                                'application_id': application_id
+                            }, exc_info=True)
+                            pdf_bytes = None
+                            pdf_filename = None
+                    
+                    # Fallback to reportlab-based PDF generation
+                    if not pdf_bytes and generate_application_pdf and generate_pdf_filename:
+                        try:
+                            logger.info("Generating reportlab-based PDF attachment", extra={
+                                'application_id': application_id,
+                                'email': email
+                            })
+                            pdf_bytes = generate_application_pdf(data)
+                            pdf_filename = generate_pdf_filename(
+                                f"{first_name} {last_name}",
+                                data.get('phone', '0000')
+                            )
+                            logger.info("Reportlab PDF generated successfully", extra={
+                                'pdf_filename': pdf_filename,
+                                'pdf_size': len(pdf_bytes)
+                            })
+                        except Exception as pdf_error:
+                            logger.error("Failed to generate reportlab PDF attachment", extra={
+                                'error_type': type(pdf_error).__name__,
+                                'error_message': str(pdf_error),
+                                'application_id': application_id
+                            }, exc_info=True)
+                            pdf_bytes = None
+                            pdf_filename = None
+                    
+                    if not pdf_bytes:
+                        logger.warning("PDF generator not available - sending email without attachment")
+
                     # Send email
                     full_name = f"{first_name} {last_name}"
                     email_sent = send_partnership_confirmation_email(
@@ -866,7 +982,9 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                         payment_amount=payment_amount,
                         partnership_tier=data['partnershipTier'],
                         company_name=data['companyName'],
-                        cc_addresses=cc_addresses if cc_addresses else None
+                        cc_addresses=cc_addresses if cc_addresses else None,
+                        pdf_bytes=pdf_bytes,
+                        pdf_filename=pdf_filename
                     )
 
                     if email_sent:

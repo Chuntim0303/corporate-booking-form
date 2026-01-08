@@ -9,6 +9,9 @@ from typing import Optional, List
 from datetime import datetime
 import logging
 from zoneinfo import ZoneInfo  # Python 3.9+
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+from email.mime.text import MIMEText
 
 # Configure logging
 logger = logging.getLogger()
@@ -25,7 +28,9 @@ def send_partnership_confirmation_email(
     payment_amount: float,
     partnership_tier: str,
     company_name: str,
-    cc_addresses: Optional[List[str]] = None
+    cc_addresses: Optional[List[str]] = None,
+    pdf_bytes: Optional[bytes] = None,
+    pdf_filename: Optional[str] = None
 ) -> bool:
     """
     Send IBPP partnership application confirmation email to applicant
@@ -39,6 +44,8 @@ def send_partnership_confirmation_email(
         partnership_tier: Partnership tier selected
         company_name: Company name (kept for potential future use)
         cc_addresses: Optional list of CC email addresses
+        pdf_bytes: Optional PDF file content as bytes to attach
+        pdf_filename: Optional PDF filename for attachment
 
     Returns:
         bool: True if email sent successfully, False otherwise
@@ -201,7 +208,7 @@ def send_partnership_confirmation_email(
                         This is an automated message. Please do not reply to this email.
                     </p>
                     <p style="margin: 5px 0;">
-                        © {datetime.now(malaysia_tz).year} Confetti. All rights reserved.
+                        &copy; {datetime.now(malaysia_tz).year} Confetti. All rights reserved.
                     </p>
                 </div>
             </div>
@@ -234,56 +241,112 @@ Confetti KL Sdn Bhd
 ---
 Confetti Incentive Beneficiary Partner Program (IBPP)
 This is an automated message. Please do not reply to this email.
-© {datetime.now(malaysia_tz).year} Confetti. All rights reserved.
+&copy; {datetime.now(malaysia_tz).year} Confetti. All rights reserved.
         """
 
-        # Prepare destination
-        destination = {'ToAddresses': [recipient_email]}
+        # If PDF attachment is provided, use raw email with MIME multipart
+        if pdf_bytes and pdf_filename:
+            logger.info("Sending email with PDF attachment via SES", extra={
+                'source': source,
+                'to_email': recipient_email,
+                'pdf_filename': pdf_filename,
+                'pdf_size': len(pdf_bytes)
+            })
 
-        # Add CC addresses if provided
-        if cc_addresses and isinstance(cc_addresses, list):
-            valid_cc_addresses = [cc.strip() for cc in cc_addresses if cc and cc.strip()]
-            if valid_cc_addresses:
-                destination['CcAddresses'] = valid_cc_addresses
-                logger.info("Adding CC addresses", extra={
-                    'cc_count': len(valid_cc_addresses),
-                    'cc_addresses': valid_cc_addresses
-                })
+            # Create multipart message
+            msg = MIMEMultipart()
+            msg['Subject'] = subject
+            msg['From'] = source
+            msg['To'] = recipient_email
 
-        # Send email via SES
-        logger.info("Sending email via SES", extra={
-            'source': source,
-            'to_email': recipient_email,
-            'has_cc': 'CcAddresses' in destination
-        })
+            # Add CC addresses if provided
+            cc_addresses_list = []
+            if cc_addresses and isinstance(cc_addresses, list):
+                valid_cc_addresses = [cc.strip() for cc in cc_addresses if cc and cc.strip()]
+                if valid_cc_addresses:
+                    msg['Cc'] = ', '.join(valid_cc_addresses)
+                    cc_addresses_list = valid_cc_addresses
+                    logger.info("Adding CC addresses", extra={
+                        'cc_count': len(valid_cc_addresses),
+                        'cc_addresses': valid_cc_addresses
+                    })
 
-        response = ses_client.send_email(
-            Source=source,
-            Destination=destination,
-            Message={
-                'Subject': {
-                    'Data': subject,
-                    'Charset': 'UTF-8'
-                },
-                'Body': {
-                    'Text': {
-                        'Data': text_body,
+            # Attach HTML body
+            msg.attach(MIMEText(html_body, 'html', 'utf-8'))
+
+            # Attach PDF
+            pdf_attachment = MIMEApplication(pdf_bytes)
+            pdf_attachment.add_header('Content-Disposition', 'attachment', filename=pdf_filename)
+            msg.attach(pdf_attachment)
+
+            # Prepare destinations list
+            destinations = [recipient_email]
+            if cc_addresses_list:
+                destinations.extend(cc_addresses_list)
+
+            # Send raw email
+            response = ses_client.send_raw_email(
+                Source=source,
+                Destinations=destinations,
+                RawMessage={'Data': msg.as_string()}
+            )
+
+            message_id = response.get('MessageId')
+            logger.info(f"&check; Email with PDF attachment sent successfully", extra={
+                'recipient_email': recipient_email,
+                'message_id': message_id,
+                'application_id': application_id,
+                'pdf_filename': pdf_filename
+            })
+        else:
+            # Send regular email without attachment
+            # Prepare destination
+            destination = {'ToAddresses': [recipient_email]}
+
+            # Add CC addresses if provided
+            if cc_addresses and isinstance(cc_addresses, list):
+                valid_cc_addresses = [cc.strip() for cc in cc_addresses if cc and cc.strip()]
+                if valid_cc_addresses:
+                    destination['CcAddresses'] = valid_cc_addresses
+                    logger.info("Adding CC addresses", extra={
+                        'cc_count': len(valid_cc_addresses),
+                        'cc_addresses': valid_cc_addresses
+                    })
+
+            # Send email via SES
+            logger.info("Sending email via SES", extra={
+                'source': source,
+                'to_email': recipient_email,
+                'has_cc': 'CcAddresses' in destination
+            })
+
+            response = ses_client.send_email(
+                Source=source,
+                Destination=destination,
+                Message={
+                    'Subject': {
+                        'Data': subject,
                         'Charset': 'UTF-8'
                     },
-                    'Html': {
-                        'Data': html_body,
-                        'Charset': 'UTF-8'
+                    'Body': {
+                        'Text': {
+                            'Data': text_body,
+                            'Charset': 'UTF-8'
+                        },
+                        'Html': {
+                            'Data': html_body,
+                            'Charset': 'UTF-8'
+                        }
                     }
                 }
-            }
-        )
+            )
 
-        message_id = response.get('MessageId')
-        logger.info(f"✓ Email sent successfully", extra={
-            'recipient_email': recipient_email,
-            'message_id': message_id,
-            'application_id': application_id
-        })
+            message_id = response.get('MessageId')
+            logger.info(f"&check; Email sent successfully", extra={
+                'recipient_email': recipient_email,
+                'message_id': message_id,
+                'application_id': application_id
+            })
 
         return True
 
