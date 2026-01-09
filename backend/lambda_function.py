@@ -921,11 +921,13 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                                 config.TEMPLATE_KEY
                             )
 
-                            # Generate PDF with overlay
+                            # Generate PDF with overlay and signature
                             pdf_bytes = generate_pdf(
                                 template_bytes=template_bytes,
                                 application_data=data,
-                                placeholder_positions=config.PLACEHOLDER_POSITIONS
+                                placeholder_positions=config.PLACEHOLDER_POSITIONS,
+                                signature_position=config.SIGNATURE_POSITION,
+                                signature_size=config.SIGNATURE_SIZE
                             )
 
                             pdf_filename = generate_pdf_filename(

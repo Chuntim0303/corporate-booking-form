@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useId } from 'react';
+import React, { useEffect, useState, useId, useRef } from 'react';
 import {
   User,
   Mail,
@@ -16,9 +16,12 @@ import {
   Check,
   Loader2,
   Award,
-  ChevronDown
+  ChevronDown,
+  PenTool,
+  RotateCcw
 } from 'lucide-react';
 import { popularCountryCodes, countryCodes } from '../data/countryCodes';
+import SignatureCanvas from './SignatureCanvas';
 
 // Enhanced Input Component
 const EnhancedInput = ({ 
@@ -177,6 +180,7 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
   const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const signatureRef = useRef(null);
   const [formData, setFormData] = useState({
     // Step 1: Contact Person
     firstName: '',
@@ -204,8 +208,9 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
     receiptFileName: '',
     receiptStorageKey: '',
 
-    // Step 4: Terms
-    termsAccepted: false
+    // Step 4: Terms & Signature
+    termsAccepted: false,
+    signatureData: ''
   });
 
   const tierPricing = {
@@ -430,6 +435,9 @@ Current value: ${presignEndpoint || '(undefined)'}
         break;
       case 4:
         if (!formData.termsAccepted) newErrors.termsAccepted = 'You must accept terms and conditions';
+        if (signatureRef.current && signatureRef.current.isEmpty()) {
+          newErrors.signature = 'Please sign in the box above';
+        }
         break;
     }
     
@@ -464,6 +472,9 @@ Current value: ${presignEndpoint || '(undefined)'}
         await uploadReceiptIfNeeded();
       }
 
+      // Capture signature data
+      const signatureData = signatureRef.current ? signatureRef.current.toDataURL() : '';
+
       const response = await fetch('https://s8uentbcpd.execute-api.ap-southeast-1.amazonaws.com/dev/applications', {
         method: 'POST',
         headers: {
@@ -488,7 +499,8 @@ Current value: ${presignEndpoint || '(undefined)'}
           totalPayable: totalPayable,
           receiptStorageKey: formData.receiptStorageKey,
           receiptFileName: formData.receiptFileName,
-          termsAccepted: formData.termsAccepted
+          termsAccepted: formData.termsAccepted,
+          signatureData: signatureData
         })
       });
 
@@ -1011,6 +1023,46 @@ Current value: ${presignEndpoint || '(undefined)'}
                   )}
                 </div>
               </div>
+            </div>
+
+            {/* Signature Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="block text-sm sm:text-base font-medium text-black">
+                  <div className="flex items-center gap-2">
+                    <PenTool className="w-4 h-4" />
+                    <span>Your Signature <span style={{color: '#6b7280'}}>*</span></span>
+                  </div>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (signatureRef.current) {
+                      signatureRef.current.clear();
+                      if (errors.signature) {
+                        setErrors(prev => ({ ...prev, signature: '' }));
+                      }
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-all"
+                  style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  Clear
+                </button>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-700">
+                Please sign using your mouse or touchscreen in the box below
+              </p>
+              <div className={`border-2 rounded-lg overflow-hidden ${errors.signature ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'}`} style={{ height: '200px' }}>
+                <SignatureCanvas ref={signatureRef} />
+              </div>
+              {errors.signature && (
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-red-600">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <span style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>{errors.signature}</span>
+                </div>
+              )}
             </div>
 
             <div className="border rounded-lg p-4 sm:p-5" style={{

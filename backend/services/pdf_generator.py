@@ -4,10 +4,12 @@ Uses template overlay approach - adapted from reference backend.
 """
 import io
 import re
+import base64
 import logging
 import boto3
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from PIL import Image
 
 logger = logging.getLogger()
 
@@ -71,8 +73,8 @@ def format_field_value(key, value):
         return str(value)
 
 
-def create_overlay(application_data, placeholder_positions):
-    """Create PDF overlay with text fields at specified positions"""
+def create_overlay(application_data, placeholder_positions, signature_position=None, signature_size=None):
+    """Create PDF overlay with text fields and signature image at specified positions"""
     logger.info("Creating PDF overlay with application data")
 
     # Lazy import
@@ -128,6 +130,47 @@ def create_overlay(application_data, placeholder_positions):
                 text_to_draw = formatted_value[:60]  # Limit to 60 characters
                 can.drawString(x, y, text_to_draw)
 
+    # Handle signature image if provided
+    signature_data = data.get('signatureData') or data.get('signature_data')
+    if signature_data and signature_position and signature_size:
+        try:
+            logger.info("Processing signature image for PDF overlay")
+
+            # Extract base64 data from data URL (format: data:image/png;base64,...)
+            if signature_data.startswith('data:image'):
+                signature_data = signature_data.split(',', 1)[1]
+
+            # Decode base64 image
+            image_bytes = base64.b64decode(signature_data)
+            image_stream = io.BytesIO(image_bytes)
+
+            # Load image with PIL
+            img = Image.open(image_stream)
+
+            # Convert RGBA to RGB if needed (PDF doesn't support transparency)
+            if img.mode == 'RGBA':
+                # Create white background
+                background = Image.new('RGB', img.size, (255, 255, 255))
+                background.paste(img, mask=img.split()[3])  # Use alpha channel as mask
+                img = background
+            elif img.mode != 'RGB':
+                img = img.convert('RGB')
+
+            # Create a new BytesIO for the processed image
+            img_buffer = io.BytesIO()
+            img.save(img_buffer, format='PNG')
+            img_buffer.seek(0)
+
+            # Draw signature on canvas
+            x, y = signature_position
+            width, height = signature_size
+            can.drawImage(img_buffer, x, y, width=width, height=height, preserveAspectRatio=True, mask='auto')
+            logger.info(f"Signature image added to PDF at position ({x}, {y}) with size ({width}, {height})")
+
+        except Exception as e:
+            logger.error(f"Error processing signature image: {str(e)}", exc_info=True)
+            logger.warning("Continuing PDF generation without signature")
+
     can.save()
     packet.seek(0)
     overlay_pdf = pdfrw['PdfReader'](packet)
@@ -135,7 +178,7 @@ def create_overlay(application_data, placeholder_positions):
     return overlay_pdf
 
 
-def generate_pdf(template_bytes, application_data, placeholder_positions):
+def generate_pdf(template_bytes, application_data, placeholder_positions, signature_position=None, signature_size=None):
     """
     Generate filled PDF from template and application data.
     Returns PDF bytes.
@@ -144,6 +187,8 @@ def generate_pdf(template_bytes, application_data, placeholder_positions):
         template_bytes: PDF template file as bytes
         application_data: Dictionary containing application field values
         placeholder_positions: Dictionary mapping field names to (x, y) coordinates
+        signature_position: Optional tuple (x, y) for signature placement
+        signature_size: Optional tuple (width, height) for signature dimensions
 
     Returns:
         bytes: Generated PDF file content
@@ -179,8 +224,8 @@ def generate_pdf(template_bytes, application_data, placeholder_positions):
 
         logger.info(f"Using template MediaBox for overlay pagesize: ({overlay_width}, {overlay_height})")
 
-        # Create overlay with application data
-        overlay_pdf = create_overlay(application_data, placeholder_positions)
+        # Create overlay with application data and signature
+        overlay_pdf = create_overlay(application_data, placeholder_positions, signature_position, signature_size)
 
         # Set overlay page size to match template
         for overlay_page in overlay_pdf.pages:
