@@ -9,12 +9,12 @@ import logging
 import boto3
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from PIL import Image
 
 logger = logging.getLogger()
 
-# Lazy imports to avoid PIL dependency issues at module load time
-# reportlab and pdfrw will be imported when needed
+# Lazy imports to avoid dependency issues at module load time
+# reportlab, pdfrw, and PIL will be imported when needed
+# This prevents module load failures if PIL is broken in Lambda layer
 _reportlab_canvas = None
 _pdfrw_modules = None
 
@@ -143,6 +143,10 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
             # Decode base64 image
             image_bytes = base64.b64decode(signature_data)
             image_stream = io.BytesIO(image_bytes)
+
+            # Lazy import PIL only when processing signatures
+            # This prevents module load failures if PIL is broken in Lambda layer
+            from PIL import Image
 
             # Load image with PIL
             img = Image.open(image_stream)
