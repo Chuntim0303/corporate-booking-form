@@ -108,6 +108,29 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
         if frontend_key in data and backend_key not in data:
             data[backend_key] = data[frontend_key]
 
+    # Combine address fields into single 'address' field for PDF template
+    address_parts = []
+    if data.get('addressLine1') or data.get('address_line_1'):
+        address_parts.append(data.get('addressLine1') or data.get('address_line_1'))
+    if data.get('addressLine2') or data.get('address_line_2'):
+        address_parts.append(data.get('addressLine2') or data.get('address_line_2'))
+
+    # Add city, state, postcode on one line
+    city_state_postal = []
+    if data.get('city'):
+        city_state_postal.append(data.get('city'))
+    if data.get('state'):
+        city_state_postal.append(data.get('state'))
+    if data.get('postcode') or data.get('postal_code'):
+        city_state_postal.append(data.get('postcode') or data.get('postal_code'))
+
+    if city_state_postal:
+        address_parts.append(', '.join(city_state_postal))
+
+    if address_parts:
+        data['address'] = ', '.join(address_parts)
+        logger.info(f"Combined address field created: {data['address']}")
+
     # Add submitted date (current Malaysia time)
     malaysia_now = get_malaysia_time()
     data['submitted_date'] = malaysia_now.strftime("%d/%m/%Y")
@@ -120,8 +143,12 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
             logger.debug(f"Adding text for key '{key}' at position ({x}, {y}): {formatted_value}")
 
             # Handle multi-line fields if any
-            if key in ['special_requests', 'notes', 'additionalRequests']:
-                lines = str(formatted_value).split('\n')
+            if key in ['special_requests', 'notes', 'additionalRequests', 'address']:
+                # For address field, split by comma for better formatting
+                if key == 'address':
+                    lines = str(formatted_value).split(', ')
+                else:
+                    lines = str(formatted_value).split('\n')
                 line_height = 12
                 for i, line in enumerate(lines):
                     if i < 5:  # Limit to 5 lines
@@ -134,7 +161,7 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
     signature_data = data.get('signatureData') or data.get('signature_data')
     if signature_data and signature_position and signature_size:
         try:
-            logger.info("Processing signature image for PDF overlay")
+            logger.info(f"Processing signature image for PDF overlay - data length: {len(signature_data) if signature_data else 0}, position: {signature_position}, size: {signature_size}")
 
             # Extract base64 data from data URL (format: data:image/png;base64,...)
             if signature_data.startswith('data:image'):
@@ -160,20 +187,23 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
             elif img.mode != 'RGB':
                 img = img.convert('RGB')
 
-            # Create a new BytesIO for the processed image
-            img_buffer = io.BytesIO()
-            img.save(img_buffer, format='PNG')
-            img_buffer.seek(0)
-
             # Draw signature on canvas
+            # reportlab can handle PIL Image objects directly
             x, y = signature_position
             width, height = signature_size
-            can.drawImage(img_buffer, x, y, width=width, height=height, preserveAspectRatio=True, mask='auto')
+            can.drawImage(img, x, y, width=width, height=height, preserveAspectRatio=True, mask='auto')
             logger.info(f"Signature image added to PDF at position ({x}, {y}) with size ({width}, {height})")
 
         except Exception as e:
             logger.error(f"Error processing signature image: {str(e)}", exc_info=True)
             logger.warning("Continuing PDF generation without signature")
+    else:
+        if not signature_data:
+            logger.info("No signature data provided in application data")
+        elif not signature_position:
+            logger.warning("Signature data provided but signature_position is not configured")
+        elif not signature_size:
+            logger.warning("Signature data provided but signature_size is not configured")
 
     can.save()
     packet.seek(0)
