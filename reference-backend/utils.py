@@ -1,5 +1,5 @@
 """
-Utility functions for the event booking form backend.
+Utility functions for the wedding form backend.
 """
 import logging
 from datetime import datetime, timedelta
@@ -13,6 +13,35 @@ def get_malaysia_time():
     utc_time = datetime.utcnow()
     malaysia_time = utc_time + timedelta(hours=8)
     return malaysia_time
+
+
+def map_frontend_to_backend_fields(frontend_data):
+    """
+    Convert frontend camelCase field names to backend snake_case field names.
+    Also handles splitting fullName into first_name and last_name.
+    """
+    from config import FRONTEND_TO_BACKEND_MAPPING
+
+    backend_data = {}
+
+    for frontend_key, value in frontend_data.items():
+        # Check if we have a mapping for this field
+        if frontend_key in FRONTEND_TO_BACKEND_MAPPING:
+            backend_key = FRONTEND_TO_BACKEND_MAPPING[frontend_key]
+
+            # Special handling for fullName - split into first_name and last_name
+            if frontend_key == 'fullName' and value:
+                name_parts = str(value).strip().split(None, 1)  # Split on first whitespace
+                backend_data['first_name'] = name_parts[0] if len(name_parts) > 0 else ''
+                backend_data['last_name'] = name_parts[1] if len(name_parts) > 1 else ''
+                logger.info(f"Split fullName '{value}' into first_name='{backend_data['first_name']}' and last_name='{backend_data['last_name']}'")
+            else:
+                backend_data[backend_key] = value
+        else:
+            # If no mapping exists, keep the original key
+            backend_data[frontend_key] = value
+
+    return backend_data
 
 
 def process_phone_number(phone_number):

@@ -1,7 +1,3 @@
-"""
-Email service for event booking form backend.
-Sends confirmation emails with PDF attachments.
-"""
 import os
 import logging
 import boto3
@@ -9,43 +5,36 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 from datetime import datetime
-from services.config import SES_SENDER, SES_SENDER_NAME, ALERT_EMAIL, SES_CC_ADDRESSES
-from services.utils import get_malaysia_time
+from zoneinfo import ZoneInfo
+from config import SES_SENDER, SES_SENDER_NAME, ALERT_EMAIL, SES_CC_ADDRESSES
+from utils import get_malaysia_time
+from pdf_generator import generate_pdf_filename
 
 logger = logging.getLogger()
 
-
-def send_booking_confirmation_email(
+def send_wedding_confirmation_email(
     pdf_bytes,
     recipient_email,
     customer_name=None,
     phone_number=None,
-    booking_id=None,
-    booking_data=None
+    wedding_form_id=None,
+    contact_id=None
 ):
-    """Send event booking confirmation email with PDF attachment"""
-    operation = "send_booking_confirmation_email"
+    """Send wedding form confirmation email with PDF attachment"""
+    operation = "send_wedding_confirmation_email"
     logger.info(f"=== {operation.upper()} START ===")
-    logger.info(f"Sending to: {recipient_email}, Booking ID: {booking_id}")
-    
+    logger.info(f"Sending to: {recipient_email}, Wedding Form ID: {wedding_form_id}, Contact ID: {contact_id}")
     try:
         ses = boto3.client('ses')
-        malaysia_time = get_malaysia_time()
-        submitted_time = malaysia_time.strftime('%d %B %Y, %I:%M %p')
+        # Format submitted time in UTC+8 (Malaysia time)
+        malaysia_tz = ZoneInfo("Asia/Kuala_Lumpur")
+        submitted_time = datetime.now(malaysia_tz).strftime('%d %B %Y, %I:%M %p')
 
-        subject = "Event Booking Confirmation - Confetti KL"
+        # Prepare email subject and sender
+        subject = "Wedding Form Submission Received - Confetti KL"
         source = f"{SES_SENDER_NAME} <{SES_SENDER}>"
 
-        # Extract booking details
-        if booking_data:
-            event_date = booking_data.get('event_date') or booking_data.get('eventDate') or 'N/A'
-            event_time = booking_data.get('event_time') or booking_data.get('eventTime') or 'N/A'
-            hall = booking_data.get('hall') or 'N/A'
-        else:
-            event_date = 'N/A'
-            event_time = 'N/A'
-            hall = 'N/A'
-
+        # HTML email body (with "What happens next?" section removed)
         html_body = f"""
 <!DOCTYPE html>
 <html>
@@ -77,7 +66,7 @@ def send_booking_confirmation_email(
         .content {{
             padding: 30px;
         }}
-        .booking-details {{
+        .application-details {{
             background-color: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 6px;
@@ -95,7 +84,7 @@ def send_booking_confirmation_email(
             font-weight: bold;
             color: #495057;
             display: inline-block;
-            width: 150px;
+            width: 180px;
         }}
         .detail-value {{
             color: #212529;
@@ -113,27 +102,19 @@ def send_booking_confirmation_email(
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="margin: 0; font-size: 24px;">Thank You for Your Booking!</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.9;">Event Venue Booking Confirmed</p>
+            <h1 style="margin: 0; font-size: 24px;">Thank You for Your Submission!</h1>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Wedding Form Received</p>
         </div>
         <div class="content">
             <p>Dear <strong>{customer_name or 'Valued Customer'}</strong>,</p>
-            <p>Thank you for booking with <strong>Confetti KL</strong>. We have successfully received your event venue booking.</p>
-            <div class="booking-details">
+            <p>Thank you for submitting your wedding form with <strong>Confetti KL</strong>. We have successfully received your submission and payment.</p>
+            <div class="application-details">
                 <div class="detail-row">
-                    <span class="detail-label">Event Date:</span>
-                    <span class="detail-value">{event_date}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Event Time:</span>
-                    <span class="detail-value">{event_time}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Hall:</span>
-                    <span class="detail-value">{hall}</span>
+                    <span class="detail-label">Submitted:</span>
+                    <span class="detail-value">{submitted_time}</span>
                 </div>
             </div>
-            <p>Please find the attached PDF copy of your booking for your records.</p>
+            <p>Please find the attached PDF copy for your records.</p>
             <p style="margin-top: 30px; font-size: 14px; color: #6c757d;">
                 If you have any questions or need assistance, please don't hesitate to contact us.
             </p>
@@ -144,13 +125,13 @@ def send_booking_confirmation_email(
         </div>
         <div class="footer">
             <p style="margin: 5px 0;">
-                <strong>Confetti KL Event Services</strong>
+                <strong>Confetti KL Wedding Services</strong>
             </p>
             <p style="margin: 5px 0;">
                 This is an automated message. Please do not reply to this email.
             </p>
             <p style="margin: 5px 0;">
-                © {malaysia_time.year} Confetti KL. All rights reserved.
+                © {datetime.now(malaysia_tz).year} Confetti KL. All rights reserved.
             </p>
         </div>
     </div>
@@ -158,6 +139,7 @@ def send_booking_confirmation_email(
 </html>
         """
 
+        # Prepare multipart message
         msg = MIMEMultipart()
         msg['Subject'] = subject
         msg['From'] = source
@@ -171,11 +153,12 @@ def send_booking_confirmation_email(
                 msg['Cc'] = ', '.join(cc_addresses)
                 logger.info(f"Adding CC addresses: {cc_addresses}")
 
+        # Attach only the HTML body
         msg.attach(MIMEText(html_body, 'html', 'utf-8'))
 
         # Attach PDF
         pdf_attachment = MIMEApplication(pdf_bytes)
-        pdf_filename = f"EventBooking_{booking_id}.pdf"
+        pdf_filename = generate_pdf_filename(customer_name or "Customer", phone_number or "0000")
         pdf_attachment.add_header('Content-Disposition', 'attachment', filename=pdf_filename)
         msg.attach(pdf_attachment)
 
@@ -191,17 +174,26 @@ def send_booking_confirmation_email(
             RawMessage={'Data': msg.as_string()}
         )
 
-        logger.info(f"✓ Booking confirmation email sent successfully to {recipient_email}")
+        logger.info(f"✓ Wedding confirmation email sent successfully to {recipient_email}")
         if cc_addresses:
             logger.info(f"✓ CC sent to: {', '.join(cc_addresses)}")
 
         return True
 
     except Exception as e:
-        logger.error(f"Failed to send booking confirmation email: {str(e)}", exc_info=True)
+        logger.error(f"Failed to send wedding confirmation email: {str(e)}", exc_info=True)
         raise
     finally:
         logger.info(f"=== {operation.upper()} END ===")
+
+
+def send_email_with_attachment(pdf_bytes, recipient, customer_name=None, phone_number=None):
+    """
+    Deprecated: Use send_wedding_confirmation_email instead.
+    This function is kept for backwards compatibility.
+    """
+    logger.warning("send_email_with_attachment is deprecated, use send_wedding_confirmation_email instead")
+    return send_wedding_confirmation_email(pdf_bytes, recipient, customer_name, phone_number)
 
 
 def send_alert_email(error_type, error_message, customer_data=None, traceback_info=None):
@@ -216,20 +208,23 @@ def send_alert_email(error_type, error_message, customer_data=None, traceback_in
         malaysia_time = get_malaysia_time()
         timestamp = malaysia_time.strftime("%Y-%m-%d %H:%M:%S MYT")
 
-        subject = f"🚨 Event Booking Error Alert: {error_type}"
+        subject = f"🚨 Wedding Form Error Alert: {error_type}"
         msg['Subject'] = subject
         msg['From'] = f"{SES_SENDER_NAME} <{SES_SENDER}>"
         msg['To'] = ALERT_EMAIL
 
+        # Build customer info section
         customer_info = "N/A"
         if customer_data:
             customer_info = f"""
-- Name: {customer_data.get('firstName', 'N/A')} {customer_data.get('lastName', 'N/A')}
-- Phone: {customer_data.get('phoneNumber', 'N/A')}
-- Event Date: {customer_data.get('eventDate', 'N/A')}
-- Hall: {customer_data.get('hall', 'N/A')}
+- Name: {customer_data.get('first_name', 'N/A')} {customer_data.get('last_name', 'N/A')}
+- Email: {customer_data.get('email_address', 'N/A')}
+- Phone: {customer_data.get('phone_number', 'N/A')}
+- Event Date: {customer_data.get('event_date', 'N/A')}
+- Venue: {customer_data.get('venue_selection', 'N/A')}
 """
 
+        # Build traceback section
         traceback_section = ""
         if traceback_info:
             traceback_section = f"""
@@ -237,20 +232,16 @@ Technical Details:
 {traceback_info}
 """
 
-        body_text = f"""EVENT BOOKING SUBMISSION FAILURE ALERT
-
+        body_text = f"""WEDDING FORM SUBMISSION FAILURE ALERT
 Time: {timestamp}
 Error Type: {error_type}
-
 Error Message:
 {error_message}
-
 Customer Information:
 {customer_info}
 {traceback_section}
-This is an automated alert from the Event Booking Lambda function.
+This is an automated alert from the Wedding Form Lambda function.
 Please investigate and take appropriate action.
-
 ---
 Environment: {os.environ.get('AWS_LAMBDA_FUNCTION_NAME', 'Unknown')}
 Region: {os.environ.get('AWS_REGION', 'Unknown')}
