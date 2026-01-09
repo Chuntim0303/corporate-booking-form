@@ -41,21 +41,16 @@ ALLOWED_FILE_TYPES = os.environ.get('ALLOWED_FILE_TYPES', 'image/jpeg,image/png,
 # Placeholder positions for PDF template overlay (x, y coordinates)
 # Adjust these positions to match your PDF template layout
 PLACEHOLDER_POSITIONS = {
-    'full_name': (138, 563),
-    'email_address': (446, 543.8),
-    'phone_number': (446, 574),
+    'full_name': (138, 562),
+    'email_address': (416, 543.8),
+    'phone_number': (280, 543.8),
     'position': (446, 523.5),
     'company_name': (138, 523.5),
-    'industry': (164, 489.6),
-    'nric': (138, 543.8),
-    'address_line_1': (138, 435),
-    'address_line_2': (164, 408),
-    'city': (164, 381),
-    'state': (164, 354),
-    'postal_code': (164, 327),
+    'nric': (138, 543),
+    'address': (138, 503.5),
     'partnership_tier': (138, 400),
     'total_payable': (138, 410),
-    'submitted_date': (124, 150),
+    'submitted_date': (124, 145),
 }
 
 # Signature positioning for PDF (if signature field exists)

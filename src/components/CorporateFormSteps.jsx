@@ -1,4 +1,4 @@
-import React, { useState, useId } from 'react';
+import React, { useEffect, useState, useId } from 'react';
 import {
   User,
   Mail,
@@ -176,6 +176,7 @@ const EnhancedSelect = ({
 const CorporateFormSteps = ({ onComplete, initialTier }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     // Step 1: Contact Person
     firstName: '',
@@ -311,6 +312,17 @@ Current value: ${presignEndpoint || '(undefined)'}
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!termsModalOpen) return;
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setTermsModalOpen(false);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [termsModalOpen]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -1011,7 +1023,11 @@ Current value: ${presignEndpoint || '(undefined)'}
                   onBlur={(e) => e.target.style.boxShadow = ''}
                 />
                 <span className="text-sm sm:text-base text-gray-900 leading-relaxed">
-                  I agree to the <button type="button" style={{color: '#A57A03'}} className="font-semibold hover:underline transition-all">Terms & Conditions</button> and authorize Confetti KL to contact me regarding this partnership application.
+                  I agree to the <button type="button" style={{color: '#A57A03'}} className="font-semibold hover:underline transition-all" onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setTermsModalOpen(true);
+                  }}>Terms & Conditions</button> and authorize Confetti KL to contact me regarding this partnership application.
                 </span>
               </label>
               {errors.termsAccepted && (
@@ -1173,6 +1189,45 @@ Current value: ${presignEndpoint || '(undefined)'}
           )}
         </div>
       </div>
+
+      {termsModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+          onMouseDown={() => setTermsModalOpen(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="w-full max-w-2xl rounded-xl shadow-xl border"
+            style={{ backgroundColor: '#ffffff', borderColor: 'rgba(83, 83, 83, 0.2)' }}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: 'rgba(83, 83, 83, 0.2)' }}>
+              <h3 className="text-base sm:text-lg font-semibold text-black">Terms & Conditions</h3>
+              <button
+                type="button"
+                className="px-3 py-1 text-sm font-semibold rounded-md border"
+                style={{ borderColor: 'rgba(83, 83, 83, 0.2)', color: '#111827' }}
+                onClick={() => setTermsModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="px-5 py-4 max-h-[70vh] overflow-y-auto">
+              <ol className="list-decimal pl-5 space-y-3 text-sm sm:text-base text-gray-900 leading-relaxed">
+                <li>The initial payment made towards this program is strictly non-refundable under any circumstances.</li>
+                <li>The balance of the total fees must be fully paid within five (5) days from the date of the initial payment.</li>
+                <li>Failure to settle the balance within the stipulated time frame will result in the forfeiture of the initial payment, and the participant shall no longer be entitled to any benefits, points, or privileges associated with the program.</li>
+                <li>The participant shall execute any subsequent agreement / documentation as provided by Confetti Glitz Sdn Bhd which shall contain the regulation and terms & conditions of this programme. The non-execution of said agreement / documentation shall not nullify the validity of this Booking Form.</li>
+                <li>The IBPP acknowledges and accepts that the payment hereto shall be deemed as a deposit whereby no invoice nor receipt will be issued to the IBPP Partner.</li>
+                <li>Confetti Glitz Sdn Bhd reserves the right to alter, change, amend, add to, or abrogate any provision of the Terms and Conditions of the programme at any time. This includes, but is not limited to, modifications or termination of all or any of this programme, changes to the fees, points, pricing, and related provisions, which will all immediately take effect upon the posting of the latest amended Terms and Conditions. Confetti Glitz Sdn Bhd will notify the IBPP of such amendments and ensure access to the latest version of the Terms and Conditions through the designated partner portal or other accessible means.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

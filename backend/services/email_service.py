@@ -147,14 +147,6 @@ def send_partnership_confirmation_email(
                 .detail-value {{
                     color: #212529;
                 }}
-                .next-steps {{
-                    background-color: #e7f3ff;
-                    border: 1px solid #b3d7ff;
-                    border-left: 4px solid #0066cc;
-                    padding: 15px;
-                    margin: 20px 0;
-                    border-radius: 4px;
-                }}
                 .footer {{
                     background-color: #f8f9fa;
                     padding: 20px;
@@ -189,16 +181,6 @@ def send_partnership_confirmation_email(
                             <span class="detail-label">Submitted:</span>
                             <span class="detail-value">{submitted_time}</span>
                         </div>
-                    </div>
-
-                    <div class="next-steps">
-                        <strong>What happens next?</strong>
-                        <ol style="margin: 10px 0; padding-left: 20px;">
-                            <li>Our team will review your application and payment receipt</li>
-                            <li>We will verify your payment details</li>
-                            <li>You will receive a confirmation email within 2-3 business days</li>
-                            <li>Once approved, you'll receive your partnership benefits and access details</li>
-                        </ol>
                     </div>
 
                     <p style="margin-top: 30px; font-size: 14px; color: #6c757d;">
@@ -238,11 +220,6 @@ Thank you for applying to the Incentive Beneficiary Partner Program (IBPP) with 
 APPLICATION DETAILS:
 Partnership Tier: {partnership_tier.replace('_', ' ').title()}
 Submitted: {submitted_time}
-
-WHAT HAPPENS NEXT?
-1. Our team will review your application and payment receipt
-2. Kindly allow 2-3 business days processing time
-3. Once full payment is made, you'll receive your partnership benefits and access details
 
 If you have any questions or need assistance, please don't hesitate to contact our partnership team.
 
