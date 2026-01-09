@@ -110,10 +110,15 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
 
     # Combine address fields into single 'address' field for PDF template
     address_parts = []
-    if data.get('addressLine1') or data.get('address_line_1'):
-        address_parts.append(data.get('addressLine1') or data.get('address_line_1'))
-    if data.get('addressLine2') or data.get('address_line_2'):
-        address_parts.append(data.get('addressLine2') or data.get('address_line_2'))
+    # Get addressLine1 - check both camelCase and snake_case, but avoid duplicates
+    address_line_1 = data.get('addressLine1') or data.get('address_line_1')
+    if address_line_1:
+        address_parts.append(address_line_1)
+
+    # Get addressLine2 - check both camelCase and snake_case, but avoid duplicates
+    address_line_2 = data.get('addressLine2') or data.get('address_line_2')
+    if address_line_2:
+        address_parts.append(address_line_2)
 
     # Add city, state, postcode on one line
     city_state_postal = []
@@ -173,6 +178,19 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
 
             # Lazy import PIL only when processing signatures
             # This prevents module load failures if PIL is broken in Lambda layer
+            # IMPORTANT: Remove mock PIL from sys.modules if present (created by reportlab workaround)
+            import sys
+            if 'PIL' in sys.modules:
+                # Check if it's our mock (it won't have __file__ attribute)
+                if not hasattr(sys.modules['PIL'], '__file__'):
+                    logger.info("Removing mocked PIL modules to import real PIL for signature processing")
+                    # Remove mock modules so we can import real PIL
+                    if 'PIL' in sys.modules:
+                        del sys.modules['PIL']
+                    if 'PIL.Image' in sys.modules:
+                        del sys.modules['PIL.Image']
+
+            # Now import real PIL
             from PIL import Image
 
             # Load image with PIL
