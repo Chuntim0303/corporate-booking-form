@@ -165,8 +165,28 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
     # Handle signature image if provided
     signature_data = data.get('signatureData') or data.get('signature_data')
     if signature_data and signature_position and signature_size:
+        import sys
+        import tempfile
+        import os
+
+        # Save mock state and unmock PIL for signature processing
+        pil_was_mocked = False
+        saved_pil_modules = {}
+
         try:
             logger.info(f"Processing signature image for PDF overlay - data length: {len(signature_data) if signature_data else 0}, position: {signature_position}, size: {signature_size}")
+
+            # Check if PIL is mocked (has no __file__ attribute)
+            if 'PIL' in sys.modules and not hasattr(sys.modules['PIL'], '__file__'):
+                pil_was_mocked = True
+                logger.info("Temporarily removing mocked PIL to allow real PIL for signature processing")
+                # Save mocked modules
+                if 'PIL' in sys.modules:
+                    saved_pil_modules['PIL'] = sys.modules['PIL']
+                    del sys.modules['PIL']
+                if 'PIL.Image' in sys.modules:
+                    saved_pil_modules['PIL.Image'] = sys.modules['PIL.Image']
+                    del sys.modules['PIL.Image']
 
             # Extract base64 data from data URL (format: data:image/png;base64,...)
             if signature_data.startswith('data:image'):
@@ -175,10 +195,7 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
             # Decode base64 image
             image_bytes = base64.b64decode(signature_data)
 
-            # Save to temporary file - reportlab can read files without PIL
-            # This avoids the broken PIL in Lambda layer completely
-            import tempfile
-            import os
+            # Save to temporary file
             temp_fd, temp_file_path = tempfile.mkstemp(suffix='.png', dir='/tmp')
             try:
                 os.write(temp_fd, image_bytes)
@@ -187,7 +204,7 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
 
             logger.info(f"Signature saved to temp file: {temp_file_path}")
 
-            # Draw signature from file - reportlab handles this without PIL
+            # Draw signature - reportlab will use real PIL now
             x, y = signature_position
             width, height = signature_size
             can.drawImage(temp_file_path, x, y, width=width, height=height, preserveAspectRatio=True, mask='auto')
@@ -203,6 +220,12 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
         except Exception as e:
             logger.error(f"Error processing signature image: {str(e)}", exc_info=True)
             logger.warning("Continuing PDF generation without signature")
+        finally:
+            # Restore mocked PIL if it was mocked
+            if pil_was_mocked:
+                logger.info("Restoring mocked PIL modules")
+                for module_name, module_obj in saved_pil_modules.items():
+                    sys.modules[module_name] = module_obj
     else:
         if not signature_data:
             logger.info("No signature data provided in application data")
