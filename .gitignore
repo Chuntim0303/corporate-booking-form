@@ -16,6 +16,16 @@ dist-ssr
 .env.local
 .env.production
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
