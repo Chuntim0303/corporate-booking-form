@@ -174,18 +174,31 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
 
             # Decode base64 image
             image_bytes = base64.b64decode(signature_data)
-            image_stream = io.BytesIO(image_bytes)
 
-            # Use ImageReader from reportlab - doesn't require PIL!
-            # This is more reliable than using PIL, especially in Lambda where PIL may be broken
-            from reportlab.lib.utils import ImageReader
-            img = ImageReader(image_stream)
+            # Save to temporary file - reportlab can read files without PIL
+            # This avoids the broken PIL in Lambda layer completely
+            import tempfile
+            import os
+            temp_fd, temp_file_path = tempfile.mkstemp(suffix='.png', dir='/tmp')
+            try:
+                os.write(temp_fd, image_bytes)
+            finally:
+                os.close(temp_fd)
 
-            # Draw signature on canvas
+            logger.info(f"Signature saved to temp file: {temp_file_path}")
+
+            # Draw signature from file - reportlab handles this without PIL
             x, y = signature_position
             width, height = signature_size
-            can.drawImage(img, x, y, width=width, height=height, preserveAspectRatio=True, mask='auto')
+            can.drawImage(temp_file_path, x, y, width=width, height=height, preserveAspectRatio=True, mask='auto')
             logger.info(f"Signature image added to PDF at position ({x}, {y}) with size ({width}, {height})")
+
+            # Clean up temp file
+            try:
+                os.remove(temp_file_path)
+                logger.debug(f"Cleaned up temp signature file: {temp_file_path}")
+            except Exception as cleanup_error:
+                logger.warning(f"Failed to clean up temp file {temp_file_path}: {cleanup_error}")
 
         except Exception as e:
             logger.error(f"Error processing signature image: {str(e)}", exc_info=True)
