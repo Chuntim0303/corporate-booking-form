@@ -176,37 +176,12 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
             image_bytes = base64.b64decode(signature_data)
             image_stream = io.BytesIO(image_bytes)
 
-            # Lazy import PIL only when processing signatures
-            # This prevents module load failures if PIL is broken in Lambda layer
-            # IMPORTANT: Remove mock PIL from sys.modules if present (created by reportlab workaround)
-            import sys
-            if 'PIL' in sys.modules:
-                # Check if it's our mock (it won't have __file__ attribute)
-                if not hasattr(sys.modules['PIL'], '__file__'):
-                    logger.info("Removing mocked PIL modules to import real PIL for signature processing")
-                    # Remove mock modules so we can import real PIL
-                    if 'PIL' in sys.modules:
-                        del sys.modules['PIL']
-                    if 'PIL.Image' in sys.modules:
-                        del sys.modules['PIL.Image']
-
-            # Now import real PIL
-            from PIL import Image
-
-            # Load image with PIL
-            img = Image.open(image_stream)
-
-            # Convert RGBA to RGB if needed (PDF doesn't support transparency)
-            if img.mode == 'RGBA':
-                # Create white background
-                background = Image.new('RGB', img.size, (255, 255, 255))
-                background.paste(img, mask=img.split()[3])  # Use alpha channel as mask
-                img = background
-            elif img.mode != 'RGB':
-                img = img.convert('RGB')
+            # Use ImageReader from reportlab - doesn't require PIL!
+            # This is more reliable than using PIL, especially in Lambda where PIL may be broken
+            from reportlab.lib.utils import ImageReader
+            img = ImageReader(image_stream)
 
             # Draw signature on canvas
-            # reportlab can handle PIL Image objects directly
             x, y = signature_position
             width, height = signature_size
             can.drawImage(img, x, y, width=width, height=height, preserveAspectRatio=True, mask='auto')
