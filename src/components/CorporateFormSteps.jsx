@@ -191,6 +191,11 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
     companyName: '',
     industry: '',
     industryOther: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    state: '',
+    postcode: '',
 
     // Step 3: Payment
     partnershipTier: initialTier || '',
@@ -372,6 +377,14 @@ Current value: ${presignEndpoint || '(undefined)'}
         if (!formData.email.trim()) newErrors.email = 'Email is required';
         if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
         if (!formData.nric.trim()) newErrors.nric = 'NRIC is required';
+        if (!formData.notBusinessOwner) {
+          if (!formData.position.trim()) newErrors.position = 'Position is required';
+          if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
+          if (!formData.industry) newErrors.industry = 'Industry selection is required';
+          if (formData.industry === 'other' && !formData.industryOther.trim()) {
+            newErrors.industryOther = 'Please specify your industry';
+          }
+        }
 
         if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
           newErrors.email = 'Please enter a valid email address';
@@ -394,14 +407,10 @@ Current value: ${presignEndpoint || '(undefined)'}
         }
         break;
       case 2:
-        if (!formData.notBusinessOwner) {
-          if (!formData.position.trim()) newErrors.position = 'Position is required';
-          if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
-          if (!formData.industry) newErrors.industry = 'Industry selection is required';
-          if (formData.industry === 'other' && !formData.industryOther.trim()) {
-            newErrors.industryOther = 'Please specify your industry';
-          }
-        }
+        if (!formData.addressLine1.trim()) newErrors.addressLine1 = 'Address line 1 is required';
+        if (!formData.city.trim()) newErrors.city = 'City is required';
+        if (!formData.state.trim()) newErrors.state = 'State is required';
+        if (!formData.postcode.trim()) newErrors.postcode = 'Postcode is required';
         break;
       case 3:
         if (!formData.partnershipTier) newErrors.partnershipTier = 'Partnership tier is missing. Please go back and select a plan.';
@@ -458,6 +467,11 @@ Current value: ${presignEndpoint || '(undefined)'}
           nric: formData.nric,
           companyName: formData.companyName,
           industry: formData.industry === 'other' ? formData.industryOther : formData.industry,
+          addressLine1: formData.addressLine1,
+          addressLine2: formData.addressLine2,
+          city: formData.city,
+          state: formData.state,
+          postcode: formData.postcode,
           partnershipTier: formData.partnershipTier,
           totalPayable: totalPayable,
           receiptStorageKey: formData.receiptStorageKey,
@@ -483,7 +497,7 @@ Current value: ${presignEndpoint || '(undefined)'}
 
   const stepTitles = [
     'Your Contact Details',
-    'Company Information',
+    'Delivery Address',
     'Payment & Receipt',
     'Review & Submit'
   ];
@@ -493,6 +507,9 @@ Current value: ${presignEndpoint || '(undefined)'}
       case 1:
         return (
           <div className="space-y-4 sm:space-y-6">
+
+            <h3 className="text-lg sm:text-xl font-semibold text-black">Personal Information</h3>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <EnhancedInput
                 label="First Name"
@@ -632,74 +649,6 @@ Current value: ${presignEndpoint || '(undefined)'}
               required
               maxLength={14}
             />
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="space-y-4 sm:space-y-6">
-            {/* Info Card */}
-            <div className="rounded-lg p-4 sm:p-5 border" style={{
-              backgroundColor: 'rgba(218, 171, 45, 0.05)',
-              borderColor: 'rgba(218, 171, 45, 0.2)'
-            }}>
-              <div className="flex items-start gap-3">
-                <Building className="w-5 h-5 mt-0.5 flex-shrink-0" style={{color: '#6b7280'}} />
-                <div>
-                  <h4 className="text-sm sm:text-base font-semibold text-black mb-1.5">About Your Company</h4>
-                  <p className="text-xs sm:text-sm text-gray-800 leading-relaxed">
-                    Tell us about your business so we can customize partnership opportunities to match your industry and goals.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <EnhancedInput
-              label="Position/Title"
-              name="position"
-              placeholder="Job title"
-              value={formData.position}
-              onChange={handleChange}
-              error={errors.position}
-              icon={Award}
-              required={!formData.notBusinessOwner}
-              disabled={formData.notBusinessOwner}
-            />
-
-            <EnhancedInput
-              label="Company Name"
-              name="companyName"
-              placeholder="Your company name"
-              value={formData.companyName}
-              onChange={handleChange}
-              error={errors.companyName}
-              icon={Building}
-              required={!formData.notBusinessOwner}
-              disabled={formData.notBusinessOwner}
-            />
-
-            <EnhancedSelect
-              label="Industry"
-              name="industry"
-              placeholder="Select your industry"
-              value={formData.industry}
-              onChange={handleChange}
-              error={errors.industry}
-              icon={Trophy}
-              required={!formData.notBusinessOwner}
-              disabled={formData.notBusinessOwner}
-              options={[
-                { value: 'technology', label: 'Technology' },
-                { value: 'finance', label: 'Finance & Banking' },
-                { value: 'healthcare', label: 'Healthcare' },
-                { value: 'manufacturing', label: 'Manufacturing' },
-                { value: 'retail', label: 'Retail & E-commerce' },
-                { value: 'consulting', label: 'Consulting' },
-                { value: 'education', label: 'Education' },
-                { value: 'government', label: 'Government' },
-                { value: 'other', label: 'Other' }
-              ]}
-            />
 
             <div className="px-1">
               <label className="flex items-start space-x-3 cursor-pointer group">
@@ -741,19 +690,149 @@ Current value: ${presignEndpoint || '(undefined)'}
                 </span>
               </label>
             </div>
-            
-            {formData.industry === 'other' && !formData.notBusinessOwner && (
+
+            {!formData.notBusinessOwner && (
+              <>
+                <h3 className="text-lg sm:text-xl font-semibold text-black pt-6">Business Information</h3>
+
+                <EnhancedInput
+                  label="Company Name"
+                  name="companyName"
+                  placeholder="Your company name"
+                  value={formData.companyName}
+                  onChange={handleChange}
+                  error={errors.companyName}
+                  icon={Building}
+                  required
+                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <EnhancedInput
+                    label="Position/Title"
+                    name="position"
+                    placeholder="Job title"
+                    value={formData.position}
+                    onChange={handleChange}
+                    error={errors.position}
+                    icon={Award}
+                    required
+                  />
+                  <EnhancedSelect
+                    label="Business Nature"
+                    name="industry"
+                    placeholder="Select your industry"
+                    value={formData.industry}
+                    onChange={handleChange}
+                    error={errors.industry}
+                    icon={Trophy}
+                    required
+                    options={[
+                      { value: 'technology', label: 'Technology' },
+                      { value: 'finance', label: 'Finance & Banking' },
+                      { value: 'healthcare', label: 'Healthcare' },
+                      { value: 'manufacturing', label: 'Manufacturing' },
+                      { value: 'retail', label: 'Retail & E-commerce' },
+                      { value: 'consulting', label: 'Consulting' },
+                      { value: 'education', label: 'Education' },
+                      { value: 'government', label: 'Government' },
+                      { value: 'other', label: 'Other' }
+                    ]}
+                  />
+                </div>
+
+                {formData.industry === 'other' && (
+                  <EnhancedInput
+                    label="Please specify your industry"
+                    name="industryOther"
+                    placeholder="Enter your industry"
+                    value={formData.industryOther}
+                    onChange={handleChange}
+                    error={errors.industryOther}
+                    icon={Building}
+                    required
+                  />
+                )}
+              </>
+            )}
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-4 sm:space-y-6">
+            <EnhancedInput
+              label="Address Line 1"
+              name="addressLine1"
+              placeholder="Street address"
+              value={formData.addressLine1}
+              onChange={handleChange}
+              error={errors.addressLine1}
+              icon={Building}
+              required
+            />
+
+            <EnhancedInput
+              label="Address Line 2"
+              name="addressLine2"
+              placeholder="Unit / Building / Floor (optional)"
+              value={formData.addressLine2}
+              onChange={handleChange}
+              error={errors.addressLine2}
+              icon={Building}
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <EnhancedInput
-                label="Please specify your industry"
-                name="industryOther"
-                placeholder="Enter your industry"
-                value={formData.industryOther}
+                label="City"
+                name="city"
+                placeholder="City"
+                value={formData.city}
                 onChange={handleChange}
-                error={errors.industryOther}
+                error={errors.city}
                 icon={Building}
                 required
               />
-            )}
+              <EnhancedSelect
+                label="State"
+                name="state"
+                placeholder="Select state"
+                value={formData.state}
+                onChange={handleChange}
+                error={errors.state}
+                icon={Building}
+                required
+                options={[
+                  { value: 'Johor', label: 'Johor' },
+                  { value: 'Kedah', label: 'Kedah' },
+                  { value: 'Kelantan', label: 'Kelantan' },
+                  { value: 'Kuala Lumpur', label: 'Kuala Lumpur' },
+                  { value: 'Labuan', label: 'Labuan' },
+                  { value: 'Melaka', label: 'Melaka' },
+                  { value: 'Negeri Sembilan', label: 'Negeri Sembilan' },
+                  { value: 'Pahang', label: 'Pahang' },
+                  { value: 'Penang', label: 'Penang' },
+                  { value: 'Perak', label: 'Perak' },
+                  { value: 'Perlis', label: 'Perlis' },
+                  { value: 'Putrajaya', label: 'Putrajaya' },
+                  { value: 'Sabah', label: 'Sabah' },
+                  { value: 'Sarawak', label: 'Sarawak' },
+                  { value: 'Selangor', label: 'Selangor' },
+                  { value: 'Terengganu', label: 'Terengganu' }
+                ]}
+              />
+            </div>
+
+            <EnhancedInput
+              label="Postcode"
+              name="postcode"
+              placeholder="Postcode"
+              value={formData.postcode}
+              onChange={handleChange}
+              error={errors.postcode}
+              icon={Building}
+              required
+              maxLength={10}
+            />
           </div>
         );
 
@@ -878,22 +957,16 @@ Current value: ${presignEndpoint || '(undefined)'}
               <div className="border-t pt-5" style={{borderColor: 'rgba(218, 171, 45, 0.2)'}}>
                 <h4 className="text-sm sm:text-base font-semibold mb-4 uppercase tracking-wide flex items-center gap-2" style={{color: '#A57A03'}}>
                   <Building className="w-4 h-4" />
-                  Company Information
+                  Delivery Address
                 </h4>
                 <div className="text-gray-900 space-y-2.5 pl-0 sm:pl-2">
-                  {formData.notBusinessOwner ? (
-                    <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Business Owner</span> <span className="font-semibold text-black text-sm sm:text-base">No</span></p>
-                  ) : (
-                    <>
-                      <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Position/Title</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.position}</span></p>
-                      <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Company Name</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.companyName}</span></p>
-                      <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Industry</span> <span className="font-semibold text-black text-sm sm:text-base capitalize">{
-                        formData.industry === 'other' && formData.industryOther
-                          ? formData.industryOther
-                          : formData.industry
-                      }</span></p>
-                    </>
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Address Line 1</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.addressLine1}</span></p>
+                  {formData.addressLine2 && (
+                    <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Address Line 2</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.addressLine2}</span></p>
                   )}
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">City</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.city}</span></p>
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">State</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.state}</span></p>
+                  <p className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"><span className="text-gray-600 text-xs sm:text-sm font-medium">Postcode</span> <span className="font-semibold text-black text-sm sm:text-base">{formData.postcode}</span></p>
                 </div>
               </div>
 
