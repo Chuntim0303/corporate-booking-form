@@ -377,6 +377,45 @@ def handle_application_route(event: Dict[str, Any], headers: Dict[str, str]) -> 
         }
 
 
+def extract_gender_from_nric(nric: str) -> str:
+    """
+    Extract gender from Malaysian NRIC.
+    Format: YYMMDD-PB-###G where G (last digit) indicates gender
+    - Odd number = Male (M)
+    - Even number = Female (F)
+
+    Args:
+        nric: NRIC string in format XXXXXX-XX-XXXX
+
+    Returns:
+        'M' for male, 'F' for female, or 'prefer_not_to_say' if cannot determine
+    """
+    try:
+        # Extract only digits from NRIC
+        nric_digits = re.sub(r'[^0-9]', '', nric)
+
+        if len(nric_digits) >= 1:
+            # Get the last digit
+            last_digit = int(nric_digits[-1])
+
+            # Odd = Male, Even = Female
+            if last_digit % 2 == 0:
+                return 'F'
+            else:
+                return 'M'
+        else:
+            logger.warning("Cannot extract gender from NRIC - no digits found", extra={
+                'nric': nric
+            })
+            return 'prefer_not_to_say'
+    except Exception as e:
+        logger.error("Error extracting gender from NRIC", extra={
+            'error': str(e),
+            'nric': nric
+        })
+        return 'prefer_not_to_say'
+
+
 def get_db_connection():
     """
     Create and return a MySQL database connection using environment variables.
@@ -578,17 +617,23 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
         current_time = datetime.utcnow()
 
         with connection.cursor() as cursor:
+            # Extract gender from NRIC
+            nric = data.get('nric', '')
+            gender = extract_gender_from_nric(nric) if nric else 'prefer_not_to_say'
+
             contact_data = {
                 'first_name': first_name,
                 'last_name': last_name,
                 'email_address': email,
-                'gender': data.get('gender', 'prefer_not_to_say'),
+                'gender': gender,
                 'phone_number': data['phone'],
+                'country_code': data.get('countryCode', ''),
+                'identification_card': nric,
                 'address_line_1': data.get('addressLine1', 'Not provided'),
                 'address_line_2': data.get('addressLine2', ''),
                 'city': data.get('city', 'Not provided'),
                 'state': data.get('state', 'Not provided'),
-                'postcode': data.get('postalCode', '00000')
+                'postcode': data.get('postcode', '00000')
             }
 
             # Resolve contact_id by email first (do not always insert a new contact)
@@ -615,10 +660,12 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 contact_insert_query = """
                 INSERT INTO contacts (
                     first_name, last_name, email_address, gender, phone_number,
+                    country_code, identification_card,
                     address_line_1, address_line_2, city, state, postcode,
                     lead_source, status, created_at, updated_at
                 ) VALUES (
                     %(first_name)s, %(last_name)s, %(email_address)s, %(gender)s, %(phone_number)s,
+                    %(country_code)s, %(identification_card)s,
                     %(address_line_1)s, %(address_line_2)s, %(city)s, %(state)s,
                     %(postcode)s, 'ccp', 'converted', NOW(), NOW()
                 )
