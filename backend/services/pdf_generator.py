@@ -170,6 +170,16 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
         if frontend_key in data and backend_key not in data:
             data[backend_key] = data[frontend_key]
 
+    # For non-business owners, explicitly remove company_name, position, and industry
+    # to ensure these fields are blank in the PDF (not rendered at all)
+    if data.get('notBusinessOwner', False):
+        logger.info("Non-business owner detected - removing company_name, position, and industry from PDF data")
+        # Remove fields if they exist
+        data.pop('company_name', None)
+        data.pop('companyName', None)
+        data.pop('position', None)
+        data.pop('industry', None)
+
     # Combine address fields into single 'address' field for PDF template (single line)
     address_parts = []
 
