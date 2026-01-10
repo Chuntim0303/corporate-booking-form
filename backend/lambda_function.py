@@ -977,7 +977,7 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                         contact_id=contact_id,
                         payment_amount=payment_amount,
                         partnership_tier=data['partnershipTier'],
-                        company_name=data['companyName'],
+                        company_name=data.get('companyName', 'Individual'),
                         cc_addresses=cc_addresses if cc_addresses else None,
                         pdf_bytes=pdf_bytes,
                         pdf_filename=pdf_filename
