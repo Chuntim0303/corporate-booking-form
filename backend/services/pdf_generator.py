@@ -158,50 +158,37 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
         if frontend_key in data and backend_key not in data:
             data[backend_key] = data[frontend_key]
 
-    # Combine address fields into single 'address' field for PDF template
+    # Combine address fields into single 'address' field for PDF template (single line)
     address_parts = []
 
-    # Get addressLine1 - check both camelCase and snake_case, but avoid duplicates
+    # Get addressLine1 - check both camelCase and snake_case
     address_line_1 = data.get('addressLine1') or data.get('address_line_1')
     if address_line_1:
         address_parts.append(address_line_1)
 
-    # Get addressLine2 - check both camelCase and snake_case, but avoid duplicates
+    # Get addressLine2 - check both camelCase and snake_case
     address_line_2 = data.get('addressLine2') or data.get('address_line_2')
     if address_line_2:
         address_parts.append(address_line_2)
 
-    # Build city, state, postcode line (format: "City, State Postcode")
-    city_state_postal_parts = []
+    # Get city
     city = data.get('city')
+    if city:
+        address_parts.append(city)
+
+    # Get state
     state = data.get('state')
+    if state:
+        address_parts.append(state)
+
+    # Get postcode
     postcode = data.get('postcode') or data.get('postal_code')
-
-    # Add city and state with comma separator
-    if city and state:
-        city_state_postal_parts.append(f"{city}, {state}")
-    elif city:
-        city_state_postal_parts.append(city)
-    elif state:
-        city_state_postal_parts.append(state)
-
-    # Add postcode with space separator
     if postcode:
-        if city_state_postal_parts:
-            city_state_postal_parts.append(postcode)
-        else:
-            city_state_postal_parts.append(postcode)
+        address_parts.append(postcode)
 
-    # Join city/state and postcode with space
-    if city_state_postal_parts:
-        if len(city_state_postal_parts) > 1:
-            address_parts.append(' '.join(city_state_postal_parts))
-        else:
-            address_parts.append(city_state_postal_parts[0])
-
-    # Combine all address parts with newlines for proper multi-line display
+    # Combine all address parts into single line with comma separators
     if address_parts:
-        data['address'] = '\n'.join(address_parts)
+        data['address'] = ', '.join(address_parts)
         logger.info(f"Combined address field created: {data['address']}")
 
     # Add submitted date (current Malaysia time)
@@ -216,7 +203,7 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
             logger.debug(f"Adding text for key '{key}' at position ({x}, {y}): {formatted_value}")
 
             # Handle multi-line fields if any
-            if key in ['special_requests', 'notes', 'additionalRequests', 'address']:
+            if key in ['special_requests', 'notes', 'additionalRequests']:
                 # Split by newlines for multi-line display
                 lines = str(formatted_value).split('\n')
                 line_height = 12
@@ -224,7 +211,8 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
                     if i < 5:  # Limit to 5 lines
                         can.drawString(x, y - i * line_height, line[:80])
             else:
-                text_to_draw = formatted_value[:60]  # Limit to 60 characters
+                # Single line fields (including address)
+                text_to_draw = formatted_value[:100]  # Allow longer text for address
                 can.drawString(x, y, text_to_draw)
 
     signature_data_url = data.get('signatureData') or data.get('signature_data')
