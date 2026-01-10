@@ -207,6 +207,7 @@ const CorporateFormSteps = ({ onComplete, initialTier }) => {
     receiptFile: null,
     receiptFileName: '',
     receiptStorageKey: '',
+    referrer: '',
 
     // Step 4: Terms & Signature
     termsAccepted: false,
@@ -502,6 +503,7 @@ Current value: ${presignEndpoint || '(undefined)'}
           totalPayable: totalPayable,
           receiptStorageKey: formData.receiptStorageKey,
           receiptFileName: formData.receiptFileName,
+          referrer: formData.referrer,
           termsAccepted: formData.termsAccepted,
           signatureData: signatureData
         })
@@ -945,6 +947,18 @@ Current value: ${presignEndpoint || '(undefined)'}
                   </div>
                 )}
               </div>
+
+              <EnhancedInput
+                label="Referral Code"
+                name="referrer"
+                placeholder="Enter referral code (optional)"
+                value={formData.referrer}
+                onChange={handleChange}
+                error={errors.referrer}
+                icon={Users}
+                required={false}
+                helpText="If you were referred by an existing partner, enter their referral code here"
+              />
             </div>
           </div>
         );
