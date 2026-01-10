@@ -42,29 +42,27 @@ ALLOWED_FILE_TYPES = os.environ.get('ALLOWED_FILE_TYPES', 'image/jpeg,image/png,
 # Adjust these positions to match your PDF template layout
 PLACEHOLDER_POSITIONS = {
     'full_name': (138, 562),
-    'full_name_2': (138, 300),  # Second full_name position - adjust coordinates as needed
+    'full_name_2': (124, 165.5),  # Second full_name position - adjust coordinates as needed
     'email_address': (416, 543.8),
-    'phone_number': (280, 543.8),
+    'phone_number': (286, 543.8),
     'position': (416, 523.5),
-    'company_name': (138, 523.5),
+    'company_name': (138, 524),
     'nric': (138, 543),
-    'nric_2': (138, 280),  # Second NRIC position - adjust coordinates as needed
-    'address': (138, 513.5),
-    'partnership_tier': (138, 400),
-    'total_payable': (138, 410),
-    'submitted_date': (124, 145),
+    'nric_2': (124, 146.5),  # Second NRIC position - adjust coordinates as needed
+    'address': (138, 507.2),
+    'partnership_tier': (138, 455),
+    'total_payable': (138, 437),
+    'submitted_date': (124, 127),
 }
 
 # Signature positioning for PDF (if signature field exists)
-SIGNATURE_POSITION = (45, 210)
+SIGNATURE_POSITION = (50, 195)
 SIGNATURE_SIZE = (120, 60)
 
 # Field width limits for PDF text (in characters)
 # Adjust these to control how much text fits in each field
-ADDRESS_MAX_WIDTH = 80  # Maximum characters for address field per line
+ADDRESS_MAX_WIDTH = 70  # Maximum characters for address field per line
 
 # Second row position for long addresses (x, y coordinates)
 # If address exceeds ADDRESS_MAX_WIDTH, remainder continues on this position
 ADDRESS_ROW2_POSITION = (138, 490.5)  # 12 points below the first row (503.5 - 12)
-
-
