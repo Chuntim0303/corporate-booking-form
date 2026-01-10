@@ -1,6 +1,6 @@
 """
 PDF generation for corporate partnership applications.
-Uses template overlay approach - adapted from reference backend.
+Uses template overlay approach - matches reference backend structure.
 """
 import io
 import re
@@ -9,33 +9,11 @@ import logging
 import boto3
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+from pdfrw import PdfReader, PdfWriter, PageMerge
 
 logger = logging.getLogger()
-
-# Lazy imports to avoid dependency issues at module load time
-# reportlab, pdfrw, and PIL will be imported when needed
-# This prevents module load failures if PIL is broken in Lambda layer
-_reportlab_canvas = None
-_pdfrw_modules = None
-
-
-def _get_reportlab_canvas():
-    """Lazy import of reportlab.pdfgen.canvas"""
-    global _reportlab_canvas
-    if _reportlab_canvas is None:
-        from reportlab.pdfgen import canvas
-        _reportlab_canvas = canvas
-        logger.info("Reportlab canvas loaded successfully")
-    return _reportlab_canvas
-
-
-def _get_pdfrw_modules():
-    """Lazy import of pdfrw modules"""
-    global _pdfrw_modules
-    if _pdfrw_modules is None:
-        from pdfrw import PdfReader, PdfWriter, PageMerge
-        _pdfrw_modules = {'PdfReader': PdfReader, 'PdfWriter': PdfWriter, 'PageMerge': PageMerge}
-    return _pdfrw_modules
 
 
 def get_malaysia_time():
@@ -65,10 +43,6 @@ def format_field_value(key, value):
 def create_overlay(application_data, placeholder_positions, signature_position=None, signature_size=None):
     """Create PDF overlay with text fields and signature image at specified positions"""
     logger.info("Creating PDF overlay with application data")
-
-    # Lazy import
-    canvas = _get_reportlab_canvas()
-    pdfrw = _get_pdfrw_modules()
 
     packet = io.BytesIO()
     can = canvas.Canvas(packet)
@@ -151,60 +125,27 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
                 text_to_draw = formatted_value[:60]  # Limit to 60 characters
                 can.drawString(x, y, text_to_draw)
 
-    # Handle signature image if provided
-    signature_data = data.get('signatureData') or data.get('signature_data')
-    if signature_data and signature_position and signature_size:
-        import tempfile
-        import os
-
-        temp_file_path = None
+    # Handle signature image if provided - using reference backend approach
+    signature_data_url = data.get('signatureData') or data.get('signature_data')
+    if signature_data_url and signature_position and signature_size:
         try:
-            logger.info(f"Processing signature image for PDF overlay - data length: {len(signature_data) if signature_data else 0}, position: {signature_position}, size: {signature_size}")
-
-            # Extract base64 data from data URL (format: data:image/png;base64,...)
-            if signature_data.startswith('data:image'):
-                signature_data = signature_data.split(',', 1)[1]
-
-            # Decode base64 image
-            image_bytes = base64.b64decode(signature_data)
-
-            # Save to temporary file - reportlab will use PIL to read it
-            temp_fd, temp_file_path = tempfile.mkstemp(suffix='.png', dir='/tmp')
-            try:
-                os.write(temp_fd, image_bytes)
-            finally:
-                os.close(temp_fd)
-
-            logger.info(f"Signature saved to temp file: {temp_file_path}")
-
-            # Draw signature - reportlab will use PIL internally to read the image
+            logger.info("Processing signature data")
+            # Extract base64 data from data URL
+            base64_data = re.sub('^data:image/.+;base64,', '', signature_data_url)
+            image_data = base64.b64decode(base64_data)
+            image_stream = io.BytesIO(image_data)
+            img = ImageReader(image_stream)
             x, y = signature_position
             width, height = signature_size
-            can.drawImage(temp_file_path, x, y, width=width, height=height, preserveAspectRatio=True, mask='auto')
-            logger.info(f"Signature image added to PDF at position ({x}, {y}) with size ({width}, {height})")
-
+            can.drawImage(img, x, y, width=width, height=height)
+            logger.info(f"Signature image drawn on canvas at position ({x}, {y}) with size ({width}, {height})")
         except Exception as e:
             logger.error(f"Error processing signature image: {str(e)}", exc_info=True)
             logger.warning("Continuing PDF generation without signature")
-        finally:
-            # Clean up temp file
-            if temp_file_path:
-                try:
-                    os.remove(temp_file_path)
-                    logger.debug(f"Cleaned up temp signature file: {temp_file_path}")
-                except Exception as cleanup_error:
-                    logger.warning(f"Failed to clean up temp file {temp_file_path}: {cleanup_error}")
-    else:
-        if not signature_data:
-            logger.info("No signature data provided in application data")
-        elif not signature_position:
-            logger.warning("Signature data provided but signature_position is not configured")
-        elif not signature_size:
-            logger.warning("Signature data provided but signature_size is not configured")
 
     can.save()
     packet.seek(0)
-    overlay_pdf = pdfrw['PdfReader'](packet)
+    overlay_pdf = PdfReader(packet)
     logger.info(f"Overlay PDF pages count: {len(overlay_pdf.pages)}")
     return overlay_pdf
 
@@ -225,12 +166,6 @@ def generate_pdf(template_bytes, application_data, placeholder_positions, signat
         bytes: Generated PDF file content
     """
     try:
-        # Lazy import
-        pdfrw = _get_pdfrw_modules()
-        PdfReader = pdfrw['PdfReader']
-        PdfWriter = pdfrw['PdfWriter']
-        PageMerge = pdfrw['PageMerge']
-
         logger.info("=" * 60)
         logger.info("Generating PDF from template")
         logger.info("=" * 60)
