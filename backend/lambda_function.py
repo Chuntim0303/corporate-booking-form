@@ -274,18 +274,24 @@ def handle_application_route(event: Dict[str, Any], headers: Dict[str, str]) -> 
         })
 
         # Validate required fields
+        # Base required fields for all users
         required_fields = [
-            'firstName', 'lastName', 'position', 'email', 'phone',
-            'countryCode', 'nric', 'companyName', 'industry',
-            'partnershipTier', 'termsAccepted'
+            'firstName', 'lastName', 'email', 'phone',
+            'countryCode', 'nric', 'partnershipTier', 'termsAccepted'
         ]
+
+        # Add business-specific fields only if user is a business owner
+        is_not_business_owner = body.get('notBusinessOwner', False)
+        if not is_not_business_owner:
+            required_fields.extend(['position', 'companyName', 'industry'])
 
         missing_fields = [field for field in required_fields if not body.get(field)]
         if missing_fields:
             logger.warning("Missing required fields in request", extra={
                 'missing_fields': missing_fields,
                 'provided_fields': [f for f in required_fields if f not in missing_fields],
-                'email': body.get('email', 'NOT_PROVIDED')
+                'email': body.get('email', 'NOT_PROVIDED'),
+                'is_not_business_owner': is_not_business_owner
             })
             return {
                 'statusCode': 400,
@@ -700,22 +706,25 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 contact_id, position, company_name, industry, partnership_tier,
                 terms_accepted, total_payable,
                 receipt_storage_key, receipt_file_name,
-                sales_rep, utm_source, utm_medium,
+                sales_rep, utm_source, utm_medium, referrer,
                 submitted_at, status, created_at, updated_at
             ) VALUES (
                 %(contact_id)s, %(position)s, %(company_name)s, %(industry)s,
                 %(partnership_tier)s, %(terms_accepted)s, %(total_payable)s,
                 %(receipt_storage_key)s, %(receipt_file_name)s,
-                %(sales_rep)s, %(utm_source)s, %(utm_medium)s,
+                %(sales_rep)s, %(utm_source)s, %(utm_medium)s, %(referrer)s,
                 NOW(), 'pending', NOW(), NOW()
             )
             """
 
+            # Handle business fields - use defaults if user is not a business owner
+            is_not_business_owner = data.get('notBusinessOwner', False)
+
             partner_data = {
                 'contact_id': contact_id,
-                'position': data['position'],
-                'company_name': data['companyName'],
-                'industry': data['industry'],
+                'position': data.get('position', 'N/A') if not is_not_business_owner else 'N/A',
+                'company_name': data.get('companyName', 'Individual') if not is_not_business_owner else 'Individual',
+                'industry': data.get('industry', 'N/A') if not is_not_business_owner else 'N/A',
                 'partnership_tier': data['partnershipTier'],
                 'terms_accepted': data['termsAccepted'],
                 'total_payable': data.get('totalPayable', 0),
@@ -723,7 +732,8 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'receipt_file_name': data.get('receiptFileName', ''),
                 'sales_rep': utm_source,  # Keep for backwards compatibility
                 'utm_source': utm_source,
-                'utm_medium': utm_medium
+                'utm_medium': utm_medium,
+                'referrer': data.get('referrer', '')
             }
 
             logger.debug("Executing partner application insertion query", extra={
