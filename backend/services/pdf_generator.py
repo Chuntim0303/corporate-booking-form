@@ -1,6 +1,6 @@
 """
 PDF generation for corporate partnership applications.
-Uses template overlay approach - matches reference backend structure.
+Uses template overlay approach with PIL mock for broken Lambda layer.
 """
 import io
 import re
@@ -9,11 +9,41 @@ import logging
 import boto3
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
-from pdfrw import PdfReader, PdfWriter, PageMerge
 
 logger = logging.getLogger()
+
+# Lazy imports to work around broken PIL in Lambda layer
+_reportlab_canvas = None
+_pdfrw_modules = None
+
+
+def _get_reportlab_canvas():
+    """Lazy import of reportlab with PIL mock to work around broken Lambda layer"""
+    global _reportlab_canvas
+    if _reportlab_canvas is None:
+        # Mock PIL to prevent broken PIL from breaking reportlab
+        # The Lambda layer has PIL installed but it's missing C extensions (_imaging)
+        import sys
+        if 'PIL' not in sys.modules:
+            from types import ModuleType
+            pil_mock = ModuleType('PIL')
+            pil_mock.Image = ModuleType('PIL.Image')
+            sys.modules['PIL'] = pil_mock
+            sys.modules['PIL.Image'] = pil_mock.Image
+            logger.info("PIL mocked to work around broken Lambda layer (missing _imaging C extension)")
+
+        from reportlab.pdfgen import canvas
+        _reportlab_canvas = canvas
+    return _reportlab_canvas
+
+
+def _get_pdfrw_modules():
+    """Lazy import of pdfrw modules"""
+    global _pdfrw_modules
+    if _pdfrw_modules is None:
+        from pdfrw import PdfReader, PdfWriter, PageMerge
+        _pdfrw_modules = {'PdfReader': PdfReader, 'PdfWriter': PdfWriter, 'PageMerge': PageMerge}
+    return _pdfrw_modules
 
 
 def get_malaysia_time():
@@ -43,6 +73,10 @@ def format_field_value(key, value):
 def create_overlay(application_data, placeholder_positions, signature_position=None, signature_size=None):
     """Create PDF overlay with text fields and signature image at specified positions"""
     logger.info("Creating PDF overlay with application data")
+
+    # Lazy import
+    canvas = _get_reportlab_canvas()
+    pdfrw = _get_pdfrw_modules()
 
     packet = io.BytesIO()
     can = canvas.Canvas(packet)
@@ -125,27 +159,19 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
                 text_to_draw = formatted_value[:60]  # Limit to 60 characters
                 can.drawString(x, y, text_to_draw)
 
-    # Handle signature image if provided - using reference backend approach
+    # Signature processing disabled due to broken PIL in Lambda layer
+    # The Lambda layer has PIL but missing C extensions (_imaging)
+    # Cannot use ImageReader which requires working PIL
     signature_data_url = data.get('signatureData') or data.get('signature_data')
     if signature_data_url and signature_position and signature_size:
-        try:
-            logger.info("Processing signature data")
-            # Extract base64 data from data URL
-            base64_data = re.sub('^data:image/.+;base64,', '', signature_data_url)
-            image_data = base64.b64decode(base64_data)
-            image_stream = io.BytesIO(image_data)
-            img = ImageReader(image_stream)
-            x, y = signature_position
-            width, height = signature_size
-            can.drawImage(img, x, y, width=width, height=height)
-            logger.info(f"Signature image drawn on canvas at position ({x}, {y}) with size ({width}, {height})")
-        except Exception as e:
-            logger.error(f"Error processing signature image: {str(e)}", exc_info=True)
-            logger.warning("Continuing PDF generation without signature")
+        logger.warning("⚠️ Signature data provided but cannot be processed")
+        logger.warning("⚠️ Lambda layer PIL is broken (missing _imaging C extension)")
+        logger.warning("⚠️ To enable signatures: Rebuild Lambda layer with proper Pillow for Amazon Linux")
+        logger.warning("⚠️ PDF will be generated WITHOUT signature")
 
     can.save()
     packet.seek(0)
-    overlay_pdf = PdfReader(packet)
+    overlay_pdf = pdfrw['PdfReader'](packet)
     logger.info(f"Overlay PDF pages count: {len(overlay_pdf.pages)}")
     return overlay_pdf
 
@@ -166,6 +192,12 @@ def generate_pdf(template_bytes, application_data, placeholder_positions, signat
         bytes: Generated PDF file content
     """
     try:
+        # Lazy import
+        pdfrw = _get_pdfrw_modules()
+        PdfReader = pdfrw['PdfReader']
+        PdfWriter = pdfrw['PdfWriter']
+        PageMerge = pdfrw['PageMerge']
+
         logger.info("=" * 60)
         logger.info("Generating PDF from template")
         logger.info("=" * 60)
