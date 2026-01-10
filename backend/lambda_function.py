@@ -7,6 +7,7 @@ import re
 import requests
 from datetime import datetime
 from typing import Dict, Any
+import platform
 
 # Add services directory to path for imports
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -29,6 +30,10 @@ logger.setLevel(logging.INFO)
 logger.info("=" * 60)
 logger.info("Lambda Function Initialization - Import Status")
 logger.info("=" * 60)
+logger.info(f"Python Version: {sys.version}")
+logger.info(f"Platform: {platform.platform()}")
+logger.info(f"Machine: {platform.machine()}")
+logger.info(f"Processor: {platform.processor()}")
 logger.info("✓ presign_service: Available")
 logger.info("✓ textract_service: Available")
 logger.info("✓ email_service: Available")

@@ -6,44 +6,17 @@ import io
 import re
 import base64
 import logging
-import boto3
+try:
+    import boto3
+except Exception:
+    boto3 = None
+import sys
+import platform
 from datetime import datetime
 from zoneinfo import ZoneInfo
+ 
 
 logger = logging.getLogger()
-
-# Lazy imports to work around broken PIL in Lambda layer
-_reportlab_canvas = None
-_pdfrw_modules = None
-
-
-def _get_reportlab_canvas():
-    """Lazy import of reportlab with PIL mock to work around broken Lambda layer"""
-    global _reportlab_canvas
-    if _reportlab_canvas is None:
-        # Mock PIL to prevent broken PIL from breaking reportlab
-        # The Lambda layer has PIL installed but it's missing C extensions (_imaging)
-        import sys
-        if 'PIL' not in sys.modules:
-            from types import ModuleType
-            pil_mock = ModuleType('PIL')
-            pil_mock.Image = ModuleType('PIL.Image')
-            sys.modules['PIL'] = pil_mock
-            sys.modules['PIL.Image'] = pil_mock.Image
-            logger.info("PIL mocked to work around broken Lambda layer (missing _imaging C extension)")
-
-        from reportlab.pdfgen import canvas
-        _reportlab_canvas = canvas
-    return _reportlab_canvas
-
-
-def _get_pdfrw_modules():
-    """Lazy import of pdfrw modules"""
-    global _pdfrw_modules
-    if _pdfrw_modules is None:
-        from pdfrw import PdfReader, PdfWriter, PageMerge
-        _pdfrw_modules = {'PdfReader': PdfReader, 'PdfWriter': PdfWriter, 'PageMerge': PageMerge}
-    return _pdfrw_modules
 
 
 def get_malaysia_time():
@@ -70,16 +43,96 @@ def format_field_value(key, value):
         return str(value)
 
 
-def create_overlay(application_data, placeholder_positions, signature_position=None, signature_size=None):
+def _decode_base64_image_data(signature_data):
+    if not signature_data:
+        return None
+
+    if isinstance(signature_data, (bytes, bytearray)):
+        return bytes(signature_data)
+
+    s = str(signature_data).strip()
+    if not s:
+        return None
+
+    if s.startswith('data:'):
+        parts = s.split(',', 1)
+        if len(parts) == 2:
+            s = parts[1]
+
+    s = re.sub(r'\s+', '', s)
+    if not s:
+        return None
+
+    missing_padding = (-len(s)) % 4
+    if missing_padding:
+        s += '=' * missing_padding
+
+    try:
+        return base64.b64decode(s, validate=True)
+    except Exception:
+        return base64.b64decode(s)
+
+
+def _build_signature_image_reader(signature_data):
+    from reportlab.lib.utils import ImageReader
+
+    image_data = _decode_base64_image_data(signature_data)
+    if not image_data:
+        return None
+
+    try:
+        from PIL import Image as PILImage
+    except Exception:
+        PILImage = None
+
+    if PILImage is not None:
+        try:
+            im = PILImage.open(io.BytesIO(image_data))
+            im.load()
+            if im.mode in ('RGBA', 'LA') or (im.mode == 'P' and 'transparency' in im.info):
+                if im.mode != 'RGBA':
+                    im = im.convert('RGBA')
+                background = PILImage.new('RGB', im.size, (255, 255, 255))
+                background.paste(im, mask=im.split()[-1])
+                im = background
+            elif im.mode != 'RGB':
+                im = im.convert('RGB')
+            return ImageReader(im)
+        except Exception:
+            pass
+
+    try:
+        return ImageReader(io.BytesIO(image_data))
+    except Exception:
+        return None
+
+
+def create_overlay(application_data, placeholder_positions, signature_position=None, signature_size=None, pagesize=None):
     """Create PDF overlay with text fields and signature image at specified positions"""
+    try:
+        from reportlab.pdfgen import canvas
+        from pdfrw import PdfReader
+    except Exception as e:
+        logger.error(
+            "PDF dependency import failed (reportlab/pdfrw). This is commonly caused by a broken/incompatible Pillow (PIL) in the Lambda layer.",
+            extra={
+                'error_type': type(e).__name__,
+                'error_message': str(e),
+                'python_version': sys.version,
+                'platform': platform.platform(),
+                'machine': platform.machine(),
+            },
+            exc_info=True
+        )
+        raise
+
     logger.info("Creating PDF overlay with application data")
 
-    # Lazy import
-    canvas = _get_reportlab_canvas()
-    pdfrw = _get_pdfrw_modules()
-
     packet = io.BytesIO()
-    can = canvas.Canvas(packet)
+    if pagesize:
+        can = canvas.Canvas(packet, pagesize=pagesize)
+    else:
+        can = canvas.Canvas(packet)
     can.setFont("Helvetica", 10)
 
     # Prepare data - combine first and last name if needed
@@ -159,19 +212,23 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
                 text_to_draw = formatted_value[:60]  # Limit to 60 characters
                 can.drawString(x, y, text_to_draw)
 
-    # Signature processing disabled due to broken PIL in Lambda layer
-    # The Lambda layer has PIL but missing C extensions (_imaging)
-    # Cannot use ImageReader which requires working PIL
     signature_data_url = data.get('signatureData') or data.get('signature_data')
     if signature_data_url and signature_position and signature_size:
-        logger.warning("⚠️ Signature data provided but cannot be processed")
-        logger.warning("⚠️ Lambda layer PIL is broken (missing _imaging C extension)")
-        logger.warning("⚠️ To enable signatures: Rebuild Lambda layer with proper Pillow for Amazon Linux")
-        logger.warning("⚠️ PDF will be generated WITHOUT signature")
+        try:
+            logger.info("Processing signature data")
+            img = _build_signature_image_reader(signature_data_url)
+            if not img:
+                raise ValueError("Signature data is empty or could not be decoded")
+            x, y = signature_position
+            width, height = signature_size
+            can.drawImage(img, x, y, width=width, height=height, mask='auto')
+            logger.info(f"Signature drawn at ({x}, {y}) size ({width}, {height})")
+        except Exception as e:
+            logger.error(f"Error processing signature: {str(e)}", exc_info=True)
 
     can.save()
     packet.seek(0)
-    overlay_pdf = pdfrw['PdfReader'](packet)
+    overlay_pdf = PdfReader(packet)
     logger.info(f"Overlay PDF pages count: {len(overlay_pdf.pages)}")
     return overlay_pdf
 
@@ -192,11 +249,21 @@ def generate_pdf(template_bytes, application_data, placeholder_positions, signat
         bytes: Generated PDF file content
     """
     try:
-        # Lazy import
-        pdfrw = _get_pdfrw_modules()
-        PdfReader = pdfrw['PdfReader']
-        PdfWriter = pdfrw['PdfWriter']
-        PageMerge = pdfrw['PageMerge']
+        try:
+            from pdfrw import PdfReader, PdfWriter, PageMerge
+        except Exception as e:
+            logger.error(
+                "PDF dependency import failed (pdfrw). If this error mentions PIL/_imaging, the Lambda layer Pillow binary is incompatible with the Lambda runtime/architecture.",
+                extra={
+                    'error_type': type(e).__name__,
+                    'error_message': str(e),
+                    'python_version': sys.version,
+                    'platform': platform.platform(),
+                    'machine': platform.machine(),
+                },
+                exc_info=True
+            )
+            raise
 
         logger.info("=" * 60)
         logger.info("Generating PDF from template")
@@ -223,7 +290,13 @@ def generate_pdf(template_bytes, application_data, placeholder_positions, signat
         logger.info(f"Using template MediaBox for overlay pagesize: ({overlay_width}, {overlay_height})")
 
         # Create overlay with application data and signature
-        overlay_pdf = create_overlay(application_data, placeholder_positions, signature_position, signature_size)
+        overlay_pdf = create_overlay(
+            application_data,
+            placeholder_positions,
+            signature_position,
+            signature_size,
+            pagesize=(overlay_width, overlay_height)
+        )
 
         # Set overlay page size to match template
         for overlay_page in overlay_pdf.pages:
@@ -267,6 +340,9 @@ def load_template_from_s3(bucket_name, template_key):
         bytes: PDF template file content
     """
     try:
+        if boto3 is None:
+            raise RuntimeError("boto3 is required to load templates from S3, but it is not installed")
+
         logger.info("=" * 60)
         logger.info("Loading PDF Template from S3")
         logger.info("=" * 60)
