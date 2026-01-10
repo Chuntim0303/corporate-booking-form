@@ -56,3 +56,7 @@ PLACEHOLDER_POSITIONS = {
 # Signature positioning for PDF (if signature field exists)
 SIGNATURE_POSITION = (40, 80)
 SIGNATURE_SIZE = (180, 90)
+
+# Field width limits for PDF text (in characters)
+# Adjust these to control how much text fits in each field
+ADDRESS_MAX_WIDTH = 80  # Maximum characters for address field before truncation

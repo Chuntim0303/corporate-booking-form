@@ -14,6 +14,12 @@ import sys
 import platform
 from datetime import datetime
 from zoneinfo import ZoneInfo
+
+# Import config for field width limits
+try:
+    from backend import config
+except ImportError:
+    import config
  
 
 logger = logging.getLogger()
@@ -188,8 +194,15 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
 
     # Combine all address parts into single line with comma separators
     if address_parts:
-        data['address'] = ', '.join(address_parts)
-        logger.info(f"Combined address field created: {data['address']}")
+        full_address = ', '.join(address_parts)
+        # Truncate to configured max width if needed
+        max_width = getattr(config, 'ADDRESS_MAX_WIDTH', 80)
+        if len(full_address) > max_width:
+            data['address'] = full_address[:max_width-3] + '...'
+            logger.info(f"Combined address field created (truncated): {data['address']}")
+        else:
+            data['address'] = full_address
+            logger.info(f"Combined address field created: {data['address']}")
 
     # Add submitted date (current Malaysia time)
     malaysia_now = get_malaysia_time()
@@ -212,7 +225,9 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
                         can.drawString(x, y - i * line_height, line[:80])
             else:
                 # Single line fields (including address)
-                text_to_draw = formatted_value[:100]  # Allow longer text for address
+                # Use configured max width for address, default 60 for other fields
+                max_chars = getattr(config, 'ADDRESS_MAX_WIDTH', 80) if key == 'address' else 60
+                text_to_draw = formatted_value[:max_chars]
                 can.drawString(x, y, text_to_draw)
 
     signature_data_url = data.get('signatureData') or data.get('signature_data')
