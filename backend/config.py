@@ -44,18 +44,18 @@ PLACEHOLDER_POSITIONS = {
     'full_name': (138, 562),
     'email_address': (416, 543.8),
     'phone_number': (280, 543.8),
-    'position': (446, 523.5),
+    'position': (416, 523.5),
     'company_name': (138, 523.5),
     'nric': (138, 543),
-    'address': (138, 503.5),
+    'address': (138, 513.5),
     'partnership_tier': (138, 400),
     'total_payable': (138, 410),
     'submitted_date': (124, 145),
 }
 
 # Signature positioning for PDF (if signature field exists)
-SIGNATURE_POSITION = (40, 80)
-SIGNATURE_SIZE = (180, 90)
+SIGNATURE_POSITION = (45, 210)
+SIGNATURE_SIZE = (120, 60)
 
 # Field width limits for PDF text (in characters)
 # Adjust these to control how much text fits in each field
@@ -63,4 +63,6 @@ ADDRESS_MAX_WIDTH = 80  # Maximum characters for address field per line
 
 # Second row position for long addresses (x, y coordinates)
 # If address exceeds ADDRESS_MAX_WIDTH, remainder continues on this position
-ADDRESS_ROW2_POSITION = (138, 491.5)  # 12 points below the first row (503.5 - 12)
+ADDRESS_ROW2_POSITION = (138, 490.5)  # 12 points below the first row (503.5 - 12)
+
+
