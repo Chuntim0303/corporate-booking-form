@@ -59,4 +59,8 @@ SIGNATURE_SIZE = (180, 90)
 
 # Field width limits for PDF text (in characters)
 # Adjust these to control how much text fits in each field
-ADDRESS_MAX_WIDTH = 80  # Maximum characters for address field before truncation
+ADDRESS_MAX_WIDTH = 80  # Maximum characters for address field per line
+
+# Second row position for long addresses (x, y coordinates)
+# If address exceeds ADDRESS_MAX_WIDTH, remainder continues on this position
+ADDRESS_ROW2_POSITION = (138, 491.5)  # 12 points below the first row (503.5 - 12)
