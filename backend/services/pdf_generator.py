@@ -145,6 +145,12 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
     data = application_data.copy()
     if 'firstName' in data and 'lastName' in data:
         data['full_name'] = f"{data.get('firstName', '')} {data.get('lastName', '')}".strip()
+        # Duplicate full_name for second position
+        data['full_name_2'] = data['full_name']
+
+    # Duplicate NRIC for second position if it exists
+    if 'nric' in data and data['nric']:
+        data['nric_2'] = data['nric']
 
     # Map frontend field names to backend field names for consistency
     field_mapping = {

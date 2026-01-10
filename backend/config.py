@@ -42,11 +42,13 @@ ALLOWED_FILE_TYPES = os.environ.get('ALLOWED_FILE_TYPES', 'image/jpeg,image/png,
 # Adjust these positions to match your PDF template layout
 PLACEHOLDER_POSITIONS = {
     'full_name': (138, 562),
+    'full_name_2': (138, 300),  # Second full_name position - adjust coordinates as needed
     'email_address': (416, 543.8),
     'phone_number': (280, 543.8),
     'position': (416, 523.5),
     'company_name': (138, 523.5),
     'nric': (138, 543),
+    'nric_2': (138, 280),  # Second NRIC position - adjust coordinates as needed
     'address': (138, 513.5),
     'partnership_tier': (138, 400),
     'total_payable': (138, 410),
