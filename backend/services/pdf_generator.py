@@ -20,23 +20,12 @@ _pdfrw_modules = None
 
 
 def _get_reportlab_canvas():
-    """Lazy import of reportlab.pdfgen.canvas with PIL workaround"""
+    """Lazy import of reportlab.pdfgen.canvas"""
     global _reportlab_canvas
     if _reportlab_canvas is None:
-        # Mock PIL before reportlab tries to import it
-        # This prevents the broken PIL in Lambda layer from breaking reportlab
-        import sys
-        if 'PIL' not in sys.modules:
-            # Create a minimal mock PIL module
-            from types import ModuleType
-            pil_mock = ModuleType('PIL')
-            pil_mock.Image = ModuleType('PIL.Image')
-            sys.modules['PIL'] = pil_mock
-            sys.modules['PIL.Image'] = pil_mock.Image
-            logger.info("PIL mocked to work around Lambda layer issues")
-
         from reportlab.pdfgen import canvas
         _reportlab_canvas = canvas
+        logger.info("Reportlab canvas loaded successfully")
     return _reportlab_canvas
 
 
@@ -165,28 +154,12 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
     # Handle signature image if provided
     signature_data = data.get('signatureData') or data.get('signature_data')
     if signature_data and signature_position and signature_size:
-        import sys
         import tempfile
         import os
 
-        # Save mock state and unmock PIL for signature processing
-        pil_was_mocked = False
-        saved_pil_modules = {}
-
+        temp_file_path = None
         try:
             logger.info(f"Processing signature image for PDF overlay - data length: {len(signature_data) if signature_data else 0}, position: {signature_position}, size: {signature_size}")
-
-            # Check if PIL is mocked (has no __file__ attribute)
-            if 'PIL' in sys.modules and not hasattr(sys.modules['PIL'], '__file__'):
-                pil_was_mocked = True
-                logger.info("Temporarily removing mocked PIL to allow real PIL for signature processing")
-                # Save mocked modules
-                if 'PIL' in sys.modules:
-                    saved_pil_modules['PIL'] = sys.modules['PIL']
-                    del sys.modules['PIL']
-                if 'PIL.Image' in sys.modules:
-                    saved_pil_modules['PIL.Image'] = sys.modules['PIL.Image']
-                    del sys.modules['PIL.Image']
 
             # Extract base64 data from data URL (format: data:image/png;base64,...)
             if signature_data.startswith('data:image'):
@@ -195,7 +168,7 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
             # Decode base64 image
             image_bytes = base64.b64decode(signature_data)
 
-            # Save to temporary file
+            # Save to temporary file - reportlab will use PIL to read it
             temp_fd, temp_file_path = tempfile.mkstemp(suffix='.png', dir='/tmp')
             try:
                 os.write(temp_fd, image_bytes)
@@ -204,28 +177,23 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
 
             logger.info(f"Signature saved to temp file: {temp_file_path}")
 
-            # Draw signature - reportlab will use real PIL now
+            # Draw signature - reportlab will use PIL internally to read the image
             x, y = signature_position
             width, height = signature_size
             can.drawImage(temp_file_path, x, y, width=width, height=height, preserveAspectRatio=True, mask='auto')
             logger.info(f"Signature image added to PDF at position ({x}, {y}) with size ({width}, {height})")
 
-            # Clean up temp file
-            try:
-                os.remove(temp_file_path)
-                logger.debug(f"Cleaned up temp signature file: {temp_file_path}")
-            except Exception as cleanup_error:
-                logger.warning(f"Failed to clean up temp file {temp_file_path}: {cleanup_error}")
-
         except Exception as e:
             logger.error(f"Error processing signature image: {str(e)}", exc_info=True)
             logger.warning("Continuing PDF generation without signature")
         finally:
-            # Restore mocked PIL if it was mocked
-            if pil_was_mocked:
-                logger.info("Restoring mocked PIL modules")
-                for module_name, module_obj in saved_pil_modules.items():
-                    sys.modules[module_name] = module_obj
+            # Clean up temp file
+            if temp_file_path:
+                try:
+                    os.remove(temp_file_path)
+                    logger.debug(f"Cleaned up temp signature file: {temp_file_path}")
+                except Exception as cleanup_error:
+                    logger.warning(f"Failed to clean up temp file {temp_file_path}: {cleanup_error}")
     else:
         if not signature_data:
             logger.info("No signature data provided in application data")
