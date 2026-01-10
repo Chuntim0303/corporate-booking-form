@@ -194,15 +194,8 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
 
     # Combine all address parts into single line with comma separators
     if address_parts:
-        full_address = ', '.join(address_parts)
-        # Truncate to configured max width if needed
-        max_width = getattr(config, 'ADDRESS_MAX_WIDTH', 80)
-        if len(full_address) > max_width:
-            data['address'] = full_address[:max_width-3] + '...'
-            logger.info(f"Combined address field created (truncated): {data['address']}")
-        else:
-            data['address'] = full_address
-            logger.info(f"Combined address field created: {data['address']}")
+        data['address'] = ', '.join(address_parts)
+        logger.info(f"Combined address field created: {data['address']}")
 
     # Add submitted date (current Malaysia time)
     malaysia_now = get_malaysia_time()
@@ -223,11 +216,29 @@ def create_overlay(application_data, placeholder_positions, signature_position=N
                 for i, line in enumerate(lines):
                     if i < 5:  # Limit to 5 lines
                         can.drawString(x, y - i * line_height, line[:80])
+            elif key == 'address':
+                # Special handling for address field - wrap to second row if too long
+                max_width = getattr(config, 'ADDRESS_MAX_WIDTH', 80)
+                address_text = str(formatted_value)
+
+                if len(address_text) > max_width:
+                    # Draw first line
+                    first_line = address_text[:max_width]
+                    can.drawString(x, y, first_line)
+
+                    # Draw second line at configured position
+                    second_line = address_text[max_width:]
+                    row2_position = getattr(config, 'ADDRESS_ROW2_POSITION', (x, y - 12))
+                    x2, y2 = row2_position
+                    # Truncate second line if it's also too long
+                    can.drawString(x2, y2, second_line[:max_width])
+                    logger.debug(f"Address wrapped to second row at ({x2}, {y2})")
+                else:
+                    # Single line address
+                    can.drawString(x, y, address_text)
             else:
-                # Single line fields (including address)
-                # Use configured max width for address, default 60 for other fields
-                max_chars = getattr(config, 'ADDRESS_MAX_WIDTH', 80) if key == 'address' else 60
-                text_to_draw = formatted_value[:max_chars]
+                # Single line fields (default 60 character limit)
+                text_to_draw = formatted_value[:60]
                 can.drawString(x, y, text_to_draw)
 
     signature_data_url = data.get('signatureData') or data.get('signature_data')
