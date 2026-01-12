@@ -482,42 +482,27 @@ def get_db_connection():
         raise
 
 
-def create_pxier_customer(contact_data: Dict[str, Any]) -> Dict[str, Any]:
+def build_pxier_payload(contact_data: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Create customer in Pxier API
+    Build Pxier API payload from contact data.
 
     Args:
-        contact_data: Contact data from database with keys:
+        contact_data: Contact data with keys:
             - first_name, last_name, email_address, phone_number
             - address_line_1, address_line_2, city, state, postcode
 
     Returns:
-        API response from Pxier with customerId and contactId
-
-    Raises:
-        Exception: If API call fails
+        Pxier API payload dict
     """
-    logger.info("Creating Pxier customer", extra={
-        'first_name': contact_data.get('first_name'),
-        'last_name': contact_data.get('last_name'),
-        'email': contact_data.get('email_address')
-    })
-
     # Validate Pxier configuration
     pxier_token = os.environ.get('PXIER_ACCESS_TOKEN')
-    pxier_username = os.environ.get('PXIER_USERNAME')
-    pxier_password = os.environ.get('PXIER_PASSWORD')
-    pxier_platform = os.environ.get('PXIER_PLATFORM_ADDRESS')
 
-    if not pxier_token or not pxier_username or not pxier_password or not pxier_platform:
-        logger.error("Pxier API credentials not configured")
-        raise Exception("Pxier API credentials not configured. Please set PXIER_ACCESS_TOKEN, PXIER_USERNAME, PXIER_PASSWORD, and PXIER_PLATFORM_ADDRESS environment variables.")
+    if not pxier_token:
+        logger.error("Pxier API access token not configured")
+        raise Exception("Pxier API credentials not configured. Please set PXIER_ACCESS_TOKEN environment variable.")
 
     # Build customer name
     customer_name = f"{contact_data.get('first_name', '')} {contact_data.get('last_name', '')}".strip()
-
-    # Build Pxier API URL
-    pxier_url = f"{pxier_platform}/events/updateCustomer"
 
     # Prepare phone number
     phone = contact_data.get('phone_number') or ''
@@ -544,6 +529,45 @@ def create_pxier_customer(contact_data: Dict[str, Any]) -> Dict[str, Any]:
             "mobile": phone
         }]
     }
+
+    return payload
+
+
+def create_pxier_customer(contact_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Create customer in Pxier API
+
+    Args:
+        contact_data: Contact data from database with keys:
+            - first_name, last_name, email_address, phone_number
+            - address_line_1, address_line_2, city, state, postcode
+
+    Returns:
+        API response from Pxier with customerId and contactId
+
+    Raises:
+        Exception: If API call fails
+    """
+    logger.info("Creating Pxier customer", extra={
+        'first_name': contact_data.get('first_name'),
+        'last_name': contact_data.get('last_name'),
+        'email': contact_data.get('email_address')
+    })
+
+    # Validate Pxier configuration
+    pxier_username = os.environ.get('PXIER_USERNAME')
+    pxier_password = os.environ.get('PXIER_PASSWORD')
+    pxier_platform = os.environ.get('PXIER_PLATFORM_ADDRESS')
+
+    if not pxier_username or not pxier_password or not pxier_platform:
+        logger.error("Pxier API credentials not configured")
+        raise Exception("Pxier API credentials not configured. Please set PXIER_USERNAME, PXIER_PASSWORD, and PXIER_PLATFORM_ADDRESS environment variables.")
+
+    # Build Pxier API URL
+    pxier_url = f"{pxier_platform}/events/updateCustomer"
+
+    # Build payload using helper function
+    payload = build_pxier_payload(contact_data)
 
     headers = {
         "Content-Type": "application/json"
@@ -659,14 +683,19 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
             )
             existing_contact = cursor.fetchone()
 
+            # Track whether this is a new or existing contact for audit purposes
+            is_new_contact = False
+
             if existing_contact and existing_contact.get('contact_id'):
                 contact_id = existing_contact['contact_id']
+                is_new_contact = False
                 logger.info("Reusing existing contact_id for email", extra={
                     'contact_id': contact_id,
                     'email': email,
                     'table': 'contacts'
                 })
             else:
+                is_new_contact = True
                 # Insert into contacts table FIRST
                 contact_insert_query = """
                 INSERT INTO contacts (
@@ -826,67 +855,155 @@ def insert_lead_and_partner_application(data: Dict[str, Any]) -> Dict[str, Any]:
                 'receipt_key': receipt_key
             })
 
-            # Create customer in Pxier after all database records are inserted
-            pxier_customer_id = None
-            pxier_contact_id = None
+            # Prepare contact data for Pxier payload (always build payload for audit)
+            pxier_contact_data = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'email_address': email,
+                'phone_number': contact_data.get('phone_number'),
+                'address_line_1': contact_data.get('address_line_1'),
+                'address_line_2': contact_data.get('address_line_2'),
+                'city': contact_data.get('city'),
+                'state': contact_data.get('state'),
+                'postcode': contact_data.get('postcode')
+            }
+
+            # Build Pxier payload for audit record
+            pxier_payload = None
             try:
-                # Prepare contact data for Pxier
-                pxier_contact_data = {
-                    'first_name': first_name,
-                    'last_name': last_name,
-                    'email_address': email,
-                    'phone_number': contact_data.get('phone_number'),
-                    'address_line_1': contact_data.get('address_line_1'),
-                    'address_line_2': contact_data.get('address_line_2'),
-                    'city': contact_data.get('city'),
-                    'state': contact_data.get('state'),
-                    'postcode': contact_data.get('postcode')
-                }
-
-                pxier_response = create_pxier_customer(pxier_contact_data)
-                pxier_customer_id = pxier_response.get('data', {}).get('customerId')
-                pxier_contact_id = pxier_response.get('data', {}).get('contactId')
-
-                logger.info("Pxier customer created successfully", extra={
-                    'pxier_customer_id': pxier_customer_id,
-                    'pxier_contact_id': pxier_contact_id,
-                    'contact_id': contact_id
-                })
-
-                # Update contacts table with Pxier IDs
-                cursor.execute("""
-                    UPDATE contacts
-                    SET pxier_customer_id = %s,
-                        pxier_contact_id = %s,
-                        became_customer_at = NOW(),
-                        updated_at = NOW()
-                    WHERE contact_id = %s
-                """, (pxier_customer_id, pxier_contact_id, contact_id))
-
-                # Update partner_applications with customer_id
-                cursor.execute("""
-                    UPDATE partner_applications
-                    SET customer_id = %s,
-                        converted_to_customer_at = NOW(),
-                        updated_at = NOW()
-                    WHERE id = %s
-                """, (pxier_customer_id, application_id))
-
-                logger.info("Updated contacts and partner_applications with Pxier customer IDs", extra={
-                    'contact_id': contact_id,
-                    'application_id': application_id,
-                    'pxier_customer_id': pxier_customer_id
-                })
-
+                pxier_payload = build_pxier_payload(pxier_contact_data)
             except Exception as e:
-                # Log error but don't fail the entire transaction
-                # The application is still submitted even if Pxier creation fails
-                logger.error("Failed to create Pxier customer (application still saved)", extra={
+                logger.error("Failed to build Pxier payload for audit", extra={
                     'error_type': type(e).__name__,
                     'error_message': str(e),
-                    'contact_id': contact_id,
-                    'application_id': application_id
+                    'contact_id': contact_id
                 }, exc_info=True)
+
+            # Create customer in Pxier ONLY for NEW contacts
+            pxier_customer_id = None
+            pxier_contact_id = None
+
+            if is_new_contact:
+                # NEW CONTACT: Send to Pxier and create audit with action='created'
+                try:
+                    logger.info("Creating Pxier customer for NEW contact", extra={
+                        'contact_id': contact_id,
+                        'email': email
+                    })
+
+                    pxier_response = create_pxier_customer(pxier_contact_data)
+                    pxier_customer_id = pxier_response.get('data', {}).get('customerId')
+                    pxier_contact_id = pxier_response.get('data', {}).get('contactId')
+
+                    logger.info("Pxier customer created successfully", extra={
+                        'pxier_customer_id': pxier_customer_id,
+                        'pxier_contact_id': pxier_contact_id,
+                        'contact_id': contact_id
+                    })
+
+                    # Update contacts table with Pxier IDs
+                    cursor.execute("""
+                        UPDATE contacts
+                        SET pxier_customer_id = %s,
+                            pxier_contact_id = %s,
+                            became_customer_at = NOW(),
+                            updated_at = NOW()
+                        WHERE contact_id = %s
+                    """, (pxier_customer_id, pxier_contact_id, contact_id))
+
+                    # Update partner_applications with customer_id
+                    cursor.execute("""
+                        UPDATE partner_applications
+                        SET customer_id = %s,
+                            converted_to_customer_at = NOW(),
+                            updated_at = NOW()
+                        WHERE id = %s
+                    """, (pxier_customer_id, application_id))
+
+                    logger.info("Updated contacts and partner_applications with Pxier customer IDs", extra={
+                        'contact_id': contact_id,
+                        'application_id': application_id,
+                        'pxier_customer_id': pxier_customer_id
+                    })
+
+                except Exception as e:
+                    # Log error but don't fail the entire transaction
+                    # The application is still submitted even if Pxier creation fails
+                    logger.error("Failed to create Pxier customer (application still saved)", extra={
+                        'error_type': type(e).__name__,
+                        'error_message': str(e),
+                        'contact_id': contact_id,
+                        'application_id': application_id
+                    }, exc_info=True)
+
+                # Create audit record for NEW contact
+                try:
+                    audit_insert_query = """
+                    INSERT INTO contact_audits (
+                        contact_id, email_address, phone_number, booking_id,
+                        action, source, payload, created_at
+                    ) VALUES (
+                        %s, %s, %s, %s, %s, %s, %s, NOW()
+                    )
+                    """
+                    cursor.execute(audit_insert_query, (
+                        contact_id,
+                        email,
+                        contact_data.get('phone_number'),
+                        application_id,
+                        'created',
+                        'corporate_form',
+                        json.dumps(pxier_payload) if pxier_payload else None
+                    ))
+                    logger.info("Created audit record for NEW contact", extra={
+                        'contact_id': contact_id,
+                        'application_id': application_id,
+                        'action': 'created'
+                    })
+                except Exception as e:
+                    logger.error("Failed to create audit record for new contact", extra={
+                        'error_type': type(e).__name__,
+                        'error_message': str(e),
+                        'contact_id': contact_id
+                    }, exc_info=True)
+
+            else:
+                # EXISTING CONTACT: Skip Pxier, create audit with action='proposed_update'
+                logger.info("Skipping Pxier update for EXISTING contact", extra={
+                    'contact_id': contact_id,
+                    'email': email
+                })
+
+                # Create audit record for EXISTING contact
+                try:
+                    audit_insert_query = """
+                    INSERT INTO contact_audits (
+                        contact_id, email_address, phone_number, booking_id,
+                        action, source, payload, created_at
+                    ) VALUES (
+                        %s, %s, %s, %s, %s, %s, %s, NOW()
+                    )
+                    """
+                    cursor.execute(audit_insert_query, (
+                        contact_id,
+                        email,
+                        contact_data.get('phone_number'),
+                        application_id,
+                        'proposed_update',
+                        'corporate_form',
+                        json.dumps(pxier_payload) if pxier_payload else None
+                    ))
+                    logger.info("Created audit record for EXISTING contact", extra={
+                        'contact_id': contact_id,
+                        'application_id': application_id,
+                        'action': 'proposed_update'
+                    })
+                except Exception as e:
+                    logger.error("Failed to create audit record for existing contact", extra={
+                        'error_type': type(e).__name__,
+                        'error_message': str(e),
+                        'contact_id': contact_id
+                    }, exc_info=True)
 
             # Commit all inserts and updates
             connection.commit()
