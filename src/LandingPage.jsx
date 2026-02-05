@@ -12,7 +12,7 @@ const LandingPage = ({ onJoinNetwork }) => {
       name: 'Silver',
       amount: 'RM 30,000',
       yearlyIncentive: '1,800',
-      fbPoints: '20,000',
+      fbPoints: '3,000',
       tenureYears: '2',
       popular: false
     },
